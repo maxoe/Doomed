@@ -63,7 +63,7 @@ int App::initializeGLFW()
     // for debugging adjust to your display resolution
     const auto width = 3840;
     const auto height = 1860;
-    window = glfwCreateWindow(width, height, "Fancy Renderstuff", glfwGetPrimaryMonitor(), nullptr);
+    window = glfwCreateWindow(width, height, "Earthbender", glfwGetPrimaryMonitor(), nullptr);
 
     if (window == nullptr)
     {
