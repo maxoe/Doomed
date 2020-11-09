@@ -11,7 +11,7 @@ Milestone 1: Basics for Flat World Rendering
 - basic materials lighting, implement phong model (B)
 (- continuous build setup)
 
-Milestone 2: A Working Flat World Game and Research for M3
+Milestone 2: A Working Flat World and Research for M3
 - simple camera movement using WASD and Mouse (B)
 - imgui menu (M)
 - multithreading (game loop, ...)
@@ -25,11 +25,10 @@ Milestone 3: Flat World --> Curved World
     - adapt tile mapping (B)
     - fix rendering distance (M)
 
-Milestone 4:
+Milestone 4: Scenes and a More Complex World
 - If truely non-euclidean rendering works
-    - Simple objects creation and loading.
-    - Standard object models will probably not work because we don't render in a vector space. (B)
-    - (Switch world curvature in menu)
+    - Simple objects creation and loading. Standard object models will probably not work because we don't render in a vector space. (B)
+    - Switch world curvature in menu, transformations between worlds (M)
 
 - If we used portal-style rendering
     - standard object loading and rendering (B)
