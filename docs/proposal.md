@@ -18,7 +18,7 @@ Milestone 4:
 - If truely non-euclidean rendering works
     - Simple objects creation and loading. Standard object models will probably not work because we don't render in a vector space.
 - If we used portal-style rendering
-    - tandard object loading and rendering 
+    - standard object loading and rendering 
     - create multiple scenes with different applications of portals
     - implement recursive rendering of portals which are visible within a portal
 
