@@ -1,4 +1,6 @@
-Project Earthbender: Team members Ehrlinspiel, Björn and Oesterle, Max. 3D-Maze Escape game using portals. Portals shall support light transport and shadows. We try to create a tense atmosphere of a maze with high walls using deferred shading/lighting with SSAO and relief mapping.
+Project Doomed: Team members Ehrlinspiel, Björn and Oesterle, Max
+Game Idea: 3D-Maze Escape game using portals. You spawn in a maze and have to find the exit (or a safe place) in a given time. From a safe place you can then continue your search for the exit. The maze's minimap is uncovered as you proceed to explorer more parts of the maze.
+Portals can lead you into different parts of the maze. They shall support light transport and shadows, they are supposed to look like normal windows into an "impossible room" (maybe with some effect on it). We try to create a tense, realistic atmosphere of a maze using raytracing, many lights and some kind of relief mapping.
 
 M = Max Oesterle
 B = Björn Ehrlinspiel
@@ -20,7 +22,7 @@ Milestone 2: World
 
 Milestone 3: Game
 - portals supporting light transport/shadows (M)
-- normal, relief mapping (steep parallax occlusion mapping?) (M)
+- normal, relief mapping (respectively steep parallax occlusion mapping?) (M)
 - game state (timer, visible map), entities (B)
 - game logic and story (B)
 
