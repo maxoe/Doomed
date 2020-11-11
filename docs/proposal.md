@@ -1,40 +1,33 @@
-Project Earthbender: Team members Ehrlinspiel, Björn and Oesterle, Max. Rendering using non-euclidean geometry. Truely hyperbolic or spheric geometry rendering is targeted with fallback to normal rendering using tricks like virtual cameras to give the illusion of non-euclidean spaces. Generation of worlds using tile mapping.
+Project Earthbender: Team members Ehrlinspiel, Björn and Oesterle, Max. Maze Escape game using portals. Portals shall support light transport and shadows. We try to create a tense atmosphere of a maze with high walls using deferred shading/lighting with SSAO and relief mapping.
 
 M = Max Oesterle
 B = Björn Ehrlinspiel
 
-Milestone 1: Basics for Flat World Rendering
-- open window (M)
-- render flat world, ray intersection with objects (M)
-- flat euclidean world generation (tile mapping) (B)
-- wireframe rendering
-- basic materials lighting, implement phong model (B)
-(- continuous build setup)
+Milestone 1: Basics
+- setup and open window (M)
+- load and render simple objects with texture, phong (M)
+- wireframe rendering (B)
+- imgui menu (B)
+- generate/create simple world (later a node in graph)
 
-Milestone 2: A Working Flat World and Research for M3
-- simple camera movement using WASD and Mouse (B)
-- imgui menu (M)
-- multithreading (game loop, ...)
-- understand the mathematics of gyrovectors and develop an idea for coordinates and transformations/projections (vectors don't work in non-euclidean spaces because there are two different points (1, 1) and six different points (1, 1, 1)) (M, B)
-- gyrovector math library
+Milestone 2: World
+- camera movement using WASD and Mouse (B)
+- generate/create simple graph based worlds, hierarchical data structures for nodes, e.g. BVH (B, M for designing boundaries between nodes which are similar to portals)
+- multithreading, game loop (M)
+- raytracing (M)
+- envmap (M)
 
-Milestone 3: Flat World --> Curved World
-- Try to implement the rendering of a non-euclidean flat world. If it turns out, that truely non-euclidean rendering is not feasible this project, implement portal style illusions of non-euclidean geometry, but avoid teleportations. Use virtual cameras instead.
 
-- If truely non-euclidean rendering works
-    - adapt tile mapping (B)
-    - fix rendering distance (M)
+Milestone 3: Game
+- portals supporting light transport/shadows (M)
+- normal, relief mapping (steep parallax occlusion mapping?) (M)
+- game state (timer, visible map), entities (B)
+- game logic and story (B)
 
-Milestone 4: Scenes and a More Complex World
-- If truely non-euclidean rendering works
-    - Simple objects creation and loading. Standard object models will probably not work because we don't render in a vector space. (B)
-    - Switch world curvature in menu, transformations between worlds (M)
-
-- If we used portal-style rendering
-    - standard object loading and rendering (B)
-    - create multiple scenes with different applications of portals (B)
-    - implement recursive rendering of portals which are visible within a portal (M)
-    - Shadows (e.g. Shadow Mapping) (M)
+Milestone 4: Fancyness
+- many lights, lighting grid hierarchy (M)
+- day/night cycle, lights in maze (B)
+- add game logic, story, objects, light sources, new scenes as time allows (B, M)
 
 
 Libraries / APIs:
@@ -42,15 +35,16 @@ Libraries / APIs:
 - OpenGL
 - glad
 - glm
+- Assimp
 
 
 Tutorials
 - https://www.glfw.org/docs/3.0/quick.html
 - http://www.opengl-tutorial.org/beginners-tutorials/tutorial-1-opening-a-window/ and following
+- https://learnopengl.com/
 
 Papers
-- Ungar: Hyperbolic Trigonometry and its Application in the Poincaré Ball Model of Hyperbolic Geometry. 2000.
-- Osudin, Child, Hui-He: Rendering Non-Euclidean Geometry in Real-Time Using Spherical and Hyperbolic Trigonometry. 2019.
+- http://www.cemyuksel.com/research/lgh/real-time_rendering_with_lgh_i3d2019.pdf
 
 Resources
 - if rendering pseudo-non-euclidean open source object models and textures
