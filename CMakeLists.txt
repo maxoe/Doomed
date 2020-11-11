@@ -26,7 +26,7 @@ if(DEFINED ENV{VCPKG_INSTALLATION_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
       CACHE STRING "")
 endif()
 
-project(Earthbender
+project(Doomed
   LANGUAGES CXX
 )
 

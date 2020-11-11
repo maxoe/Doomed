@@ -1,5 +1,5 @@
-# Earthbender
-A game about weird geometry and exotic physics.
+# Doomed
+A game about a maze that does not follow the rules of your mind.
 
 # How to Build
 
