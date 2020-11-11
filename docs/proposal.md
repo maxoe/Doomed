@@ -1,4 +1,4 @@
-Project Earthbender: Team members Ehrlinspiel, Björn and Oesterle, Max. Maze Escape game using portals. Portals shall support light transport and shadows. We try to create a tense atmosphere of a maze with high walls using deferred shading/lighting with SSAO and relief mapping.
+Project Earthbender: Team members Ehrlinspiel, Björn and Oesterle, Max. 3D-Maze Escape game using portals. Portals shall support light transport and shadows. We try to create a tense atmosphere of a maze with high walls using deferred shading/lighting with SSAO and relief mapping.
 
 M = Max Oesterle
 B = Björn Ehrlinspiel
