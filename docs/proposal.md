@@ -47,4 +47,4 @@ Papers
 - http://www.cemyuksel.com/research/lgh/real-time_rendering_with_lgh_i3d2019.pdf
 
 Resources
-- if rendering pseudo-non-euclidean open source object models and textures
+- open source object models and textures
