@@ -27,7 +27,7 @@ Milestone 3: Game
 Milestone 4: Fancyness
 - many lights, lighting grid hierarchy (M)
 - day/night cycle, lights in maze (B)
-- add game logic, story, objects, light sources, new scenes as time allows (B, M)
+- add game logic, story, objects, light sources, HDR and bloom, new scenes as time allows (B, M)
 
 
 Libraries / APIs:
