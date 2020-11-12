@@ -191,7 +191,7 @@ int App::mainLoop()
         program.setMat3f("normalMatrix", normalMatrix);
 
         program.setVec3f("kD", 1.0f, 0.5f, 0.31f);
-        program.setVec3f("kS", 10.0f, 10.0f, 10.0f);
+        program.setVec3f("kS", 1.0f, 0.5f, 0.31f);
         program.setFloat("n", 16.0f);
         program.setVec3f("lightWorldPos", lightPos);
         program.setVec3f("lightIntensity", lightColor);
