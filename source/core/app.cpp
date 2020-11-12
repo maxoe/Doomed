@@ -5,6 +5,12 @@
 #include <cassert>
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+
 App* App::instance = nullptr;
 
 App::App()
@@ -62,7 +68,7 @@ int App::initializeGLFW()
 
     // for debugging adjust to your display resolution
     const auto width = 3840;
-    const auto height = 1860;
+    const auto height = 2160;
     window = glfwCreateWindow(width, height, "Doomed", glfwGetPrimaryMonitor(), nullptr);
 
     if (window == nullptr)
@@ -84,33 +90,73 @@ int App::initializeGLFW()
 int App::mainLoop()
 {
     // SOME EXAMPLE GEOMETRY
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
 
-    static const GLfloat g_vertex_buffer_data[] = {
-        -1.0f,
-        -1.0f,
-        0.0f,
-        1.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-    };
+    GLuint vertexArrayID;
+    glGenVertexArrays(1, &vertexArrayID);
+    glBindVertexArray(vertexArrayID);
 
-    GLuint vertexbuffer;
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(
-        GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    // cube and normals
+    float vertices[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,
+        -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,
 
-    // FINISHED SETTING UP EXAMPLE GEOMETRY
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,
+        -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,
+
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+        0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,
+
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f};
+
+    GLuint vbo, vao;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //// normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    //// light cube
+    // GLuint lightVao;
+    // glGenVertexArrays(1, &lightVao);
+    // glBindVertexArray(lightVao);
+    //// vbo already bound
+    //// set the vertex attribute
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    // glEnableVertexAttribArray(0);
+
+    // FINISHED SETTING UP EXAMPLE GEOMETRY AND TRANSFORMATIONS
 
     AppShader program("simple");
+    // AppShader lightProgram("simple");
 
-    glUseProgram(program.getProgramId());
+    glEnable(GL_DEPTH_TEST);
+
+    glm::vec3 cameraPos(0.0f, 0.0f, -3.0);
+    glm::vec3 cameraDir(1.2f, 1.0f, 2.0f);
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+    glm::vec3 lightDir(-1.2f, -1.0f, -2.0f);
+    glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -119,23 +165,65 @@ int App::mainLoop()
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // DRAW EXAMPLE GEOMETRY
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        glVertexAttribPointer(
-            0,  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,  // size
-            GL_FLOAT,  // type
-            GL_FALSE,  // normalized?
-            0,         // stride
-            (void*)0   // array buffer offset
-        );
+        // draw cube
+        program.use();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(
+            model, glm::radians((float)glfwGetTime() * 30), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(
+            model, glm::radians((float)glfwGetTime() * 45), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        // Draw the triangle !
-        glDrawArrays(GL_TRIANGLES, 0, 3);  // 3 indices starting at 0 -> 1 triangle
-        glDisableVertexAttribArray(0);
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, cameraPos);
+
+        glm::mat4 projection =
+            glm::perspective(glm::radians(45.0f), 3840.0f / 2160.0f, 0.1f, 100.0f);
+
+        program.setMat4f("modelMatrix", model);
+        program.setMat4f("MVP", projection * view * model);
+
+        glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(model));
+        // std::cout << glm::to_string(normalMatrix) << std::endl;
+
+        program.setMat3f("normalMatrix", normalMatrix);
+
+        program.setVec3f("kD", 1.0f, 0.5f, 0.31f);
+        program.setVec3f("kS", 10.0f, 10.0f, 10.0f);
+        program.setFloat("n", 16.0f);
+        program.setVec3f("lightWorldPos", lightPos);
+        program.setVec3f("lightIntensity", lightColor);
+        program.setVec3f("camWorldPos", cameraPos);
+
+        // DRAW EXAMPLE GEOMETRY
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        //// draw light cube
+        // lightProgram.use();
+
+        // model = glm::mat4(1.0f);
+        // model = glm::translate(model, lightPos);
+        // model = glm::scale(model, glm::vec3(0.2f));
+        // normalMatrix = glm::inverse(glm::transpose(glm::mat3(model)));
+
+        // program.setMat4f("view", view);
+        // program.setMat4f("projection", projection);
+
+        // program.setVec3f("objectColor", lightColor);
+        // program.setVec3f("lightColor", lightColor);
+        // program.setVec3f("lightPos", lightPos);
+        // program.setMat4f("normalMatrix", normalMatrix);
+        // program.setVec3f("viewPos", cameraPos);
+
+        // std::cout << glm::to_string(lightPos) << std::endl;
+        // std::cout << glm::to_string(cameraPos) << std::endl;
+
+        // glBindVertexArray(lightVao);
+        // glDrawArrays(GL_TRIANGLES, 0, 108);
+        // glDisableVertexAttribArray(vao);
 
         // FINISHED DRAWING EXAMPLE GEOMTRY
         glfwSwapBuffers(window);

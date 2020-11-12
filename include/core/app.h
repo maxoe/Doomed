@@ -14,9 +14,7 @@ public:
 
 private:
     static App* instance;
-
     GLFWwindow* window;
 
     int initializeGLFW();
-    GLuint vertexbuffer;
 };

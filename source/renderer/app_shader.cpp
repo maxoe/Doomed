@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <glm/gtc/type_ptr.hpp>
+
 AppShader::AppShader(const char* name)
 {
     programId = glCreateProgram();
@@ -106,4 +108,54 @@ GLuint AppShader::compile(const std::filesystem::path& path, GLenum type)
 GLuint AppShader::getProgramId() const
 {
     return programId;
+}
+
+void AppShader::use() const
+{
+    glUseProgram(programId);
+}
+
+void AppShader::setBool(const std::string& name, bool value) const
+{
+    glUniform1i(glGetUniformLocation(programId, name.c_str()), (int)value);
+}
+void AppShader::setInt(const std::string& name, int value) const
+{
+    glUniform1i(glGetUniformLocation(programId, name.c_str()), value);
+}
+void AppShader::setFloat(const std::string& name, float value) const
+{
+    glUniform1f(glGetUniformLocation(programId, name.c_str()), value);
+}
+
+void AppShader::setVec3f(const std::string& name, float x, float y, float z) const
+{
+    glUniform3f(glGetUniformLocation(programId, name.c_str()), x, y, z);
+}
+
+void AppShader::setVec3f(const std::string& name, const glm::vec3& vec) const
+{
+    glUniform3fv(glGetUniformLocation(programId, name.c_str()), 1, glm::value_ptr(vec));
+}
+
+void AppShader::setVec4f(const std::string& name, float x, float y, float z, float w) const
+{
+    glUniform4f(glGetUniformLocation(programId, name.c_str()), x, y, z, w);
+}
+
+void AppShader::setVec4f(const std::string& name, const glm::vec4& vec) const
+{
+    glUniform4fv(glGetUniformLocation(programId, name.c_str()), 1, glm::value_ptr(vec));
+}
+
+void AppShader::setMat3f(const std::string& name, const glm::mat3& mat) const
+{
+    glUniformMatrix3fv(
+        glGetUniformLocation(programId, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+void AppShader::setMat4f(const std::string& name, const glm::mat4& mat) const
+{
+    glUniformMatrix4fv(
+        glGetUniformLocation(programId, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
