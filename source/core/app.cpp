@@ -2,6 +2,9 @@
 
 #include "renderer/app_shader.h"
 
+#include "vendor/imgui_impl_glfw.h"
+#include "vendor/imgui_impl_opengl3.h"
+
 #include <cassert>
 #include <iostream>
 
@@ -20,6 +23,7 @@ App::App()
     {
         App::instance = this;
     }
+    this->gui = new Gui();
 }
 
 int App::initialize()
@@ -30,7 +34,7 @@ int App::initialize()
     });
 
     const auto glfwError = initializeGLFW();
-    if (glfwError != 0)
+    if (glfwError == 0)
     {
         return glfwError;
     }
@@ -43,6 +47,8 @@ int App::initialize()
         return 1;
     }
 
+    gui->initialize(NULL, window);
+
     return 0;
 }
 
@@ -50,7 +56,7 @@ int App::initializeGLFW()
 {
     if (glfwInit() == GLFW_FALSE)
     {
-        return 1;
+        return 0;
     }
 
 #if __APPLE__
@@ -74,7 +80,7 @@ int App::initializeGLFW()
     if (window == nullptr)
     {
         glfwTerminate();
-        return 1;
+        return 0;
     }
 
     glfwMakeContextCurrent(window);
@@ -84,13 +90,11 @@ int App::initializeGLFW()
 
     // TODO: Register event callback
 
-    return 0;
+    return 1;
 }
 
 int App::mainLoop()
 {
-    // SOME EXAMPLE GEOMETRY
-
     GLuint vertexArrayID;
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
@@ -160,13 +164,7 @@ int App::mainLoop()
 
     while (!glfwWindowShouldClose(window))
     {
-        auto width = 0;
-        auto height = 0;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glfwPollEvents();
 
         // draw cube
         program.use();
@@ -197,10 +195,6 @@ int App::mainLoop()
         program.setVec3f("lightIntensity", lightColor);
         program.setVec3f("camWorldPos", cameraPos);
 
-        // DRAW EXAMPLE GEOMETRY
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
         //// draw light cube
         // lightProgram.use();
 
@@ -226,9 +220,32 @@ int App::mainLoop()
         // glDisableVertexAttribArray(vao);
 
         // FINISHED DRAWING EXAMPLE GEOMTRY
+
+        // feed inputs to dear imgui, start new frame
+        gui->prepare();
+
+
+        // render your GUI
+        gui->defineWindow();
+
+        //Rendering
+        auto width = 0;
+        auto height = 0;
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // DRAW EXAMPLE GEOMETRY
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        gui->render();
+
         glfwSwapBuffers(window);
-        glfwPollEvents();
     }
+
+    gui->shutdown();
 
     glfwDestroyWindow(window);
     glfwTerminate();
