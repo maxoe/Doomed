@@ -3,8 +3,8 @@ A game about a maze that does not follow the rules of your mind.
 
 # How to Build
 
-1. install `vcpkg`
-2. install with `vcpkg install @vcpkg_reponse_file.txt`
+1. Install [vcpkg](https://github.com/microsoft/vcpkg) using `git clone https://github.com/microsoft/vcpkg` and `.\vcpkg\bootstrap-vcpkg.bat` or `./vcpkg/bootstrap-vcpkg.sh`
+2. Install packages with `vcpkg install @vcpkg_reponse_file.txt`
 3. Use `vcpkg integrate install` to setup vcpkg for use in e.g. Visual Studio
 4. `cmake -Bbuild`
 
