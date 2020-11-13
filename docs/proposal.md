@@ -33,12 +33,12 @@ Milestone 4: Fancyness
 - Add multiple stages until exit is reached to game logic
 
 Optional:
-    - many lights (M)
-    - day/night cycle (B)
-    - Additional game logic, story (M, B)
-    - Addiitonal objects to interact with (M, B)
-    - HDR, Bloom (M)
-    - New puzzle-like scenes (B)
+- many lights (M)
+- day/night cycle (B)
+- Additional game logic, story (M, B)
+- Addiitonal objects to interact with (M, B)
+- HDR, Bloom (M)
+- New puzzle-like scenes (B)
 
 
 Libraries / APIs:
