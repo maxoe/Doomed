@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include "gui/gui.h"
 
 class App
 {
@@ -15,6 +17,8 @@ public:
 private:
     static App* instance;
     GLFWwindow* window;
+    Gui* gui;
 
     int initializeGLFW();
+    int initializeImgui();
 };
