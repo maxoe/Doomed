@@ -156,11 +156,10 @@ int App::mainLoop()
 
     glEnable(GL_DEPTH_TEST);
 
-    glm::vec3 cameraPos(0.0f, 0.0f, -3.0);
+    glm::vec3 camWorldPos(0.0f, 0.0f, 3.0);
     glm::vec3 cameraDir(1.2f, 1.0f, 2.0f);
-    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    glm::vec3 lightDir(-1.2f, -1.0f, -2.0f);
-    glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+    glm::vec3 lightWorldPos(1.2f, 1.0f, 2.0f);
+    glm::vec3 lightIntensity(1.0f, 1.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -168,14 +167,17 @@ int App::mainLoop()
 
         // draw cube
         program.use();
+
+        // model viel be in scene model, view-projection in camera
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::rotate(
             model, glm::radians((float)glfwGetTime() * 30), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(
             model, glm::radians((float)glfwGetTime() * 45), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, cameraPos);
+        // breaks lightning for some reason it's very dark
+        glm::mat4 view =
+            glm::lookAt(camWorldPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         glm::mat4 projection =
             glm::perspective(glm::radians(45.0f), 3840.0f / 2160.0f, 0.1f, 100.0f);
@@ -184,36 +186,35 @@ int App::mainLoop()
         program.setMat4f("MVP", projection * view * model);
 
         glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(model));
-        // std::cout << glm::to_string(normalMatrix) << std::endl;
 
         program.setMat3f("normalMatrix", normalMatrix);
 
-        program.setVec3f("kD", 1.0f, 0.5f, 0.31f);
-        program.setVec3f("kS", 1.0f, 0.5f, 0.31f);
+        program.setVec3f("kD", 1.0f, 1.0f, 5.0f);
+        program.setVec3f("kS", 0.0f, 0.0f, 3.0f);
         program.setFloat("n", 16.0f);
-        program.setVec3f("lightWorldPos", lightPos);
-        program.setVec3f("lightIntensity", lightColor);
-        program.setVec3f("camWorldPos", cameraPos);
+        program.setVec3f("lightWorldPos", lightWorldPos);
+        program.setVec3f("lightIntensity", lightIntensity);
+        program.setVec3f("camWorldPos", camWorldPos);
 
         //// draw light cube
         // lightProgram.use();
 
         // model = glm::mat4(1.0f);
-        // model = glm::translate(model, lightPos);
+        // model = glm::translate(model, lightWorldPos);
         // model = glm::scale(model, glm::vec3(0.2f));
         // normalMatrix = glm::inverse(glm::transpose(glm::mat3(model)));
 
         // program.setMat4f("view", view);
         // program.setMat4f("projection", projection);
 
-        // program.setVec3f("objectColor", lightColor);
-        // program.setVec3f("lightColor", lightColor);
-        // program.setVec3f("lightPos", lightPos);
+        // program.setVec3f("objectColor", lightIntensity);
+        // program.setVec3f("lightIntensity", lightIntensity);
+        // program.setVec3f("lightWorldPos", lightWorldPos);
         // program.setMat4f("normalMatrix", normalMatrix);
-        // program.setVec3f("viewPos", cameraPos);
+        // program.setVec3f("viewPos", camWorldPos);
 
-        // std::cout << glm::to_string(lightPos) << std::endl;
-        // std::cout << glm::to_string(cameraPos) << std::endl;
+        // std::cout << glm::to_string(lightWorldPos) << std::endl;
+        // std::cout << glm::to_string(camWorldPos) << std::endl;
 
         // glBindVertexArray(lightVao);
         // glDrawArrays(GL_TRIANGLES, 0, 108);
