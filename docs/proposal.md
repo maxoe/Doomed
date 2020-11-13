@@ -7,7 +7,8 @@ B = Björn Ehrlinspiel
 
 Milestone 1: Basics
 - setup and open window (M)
-- load and render simple objects with texture, phong (M)
+- phong shading (M)
+- load objects and textures (M)
 - wireframe rendering (B)
 - imgui menu (B)
 - generate/create simple world (later a node in graph)
