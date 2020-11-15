@@ -57,6 +57,8 @@ target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm)
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE imgui::imgui)
 
+find_package(Assimp CONFIG REQUIRED)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE assimp::assimp)
 
 # Symlink resources
 if ( UNIX )
