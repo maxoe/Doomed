@@ -20,7 +20,7 @@ public:
 
     Mesh() = delete;
     Mesh(Mesh const&) = delete;
-    Mesh(std::vector<VertexData> const&& vertices, std::vector<GLuint> const&& indices);
+    Mesh(std::vector<VertexData>&& vertices, std::vector<GLuint>&& indices);
     ~Mesh()
     {
         glBindVertexArray(vao);

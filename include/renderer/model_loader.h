@@ -10,8 +10,17 @@ class ModelLoader
 {
 public:
     ModelLoader() = delete;
-    static Mesh* load(std::string const& path);
+    static Mesh* load(std::string const& relPath);
 
 private:
-    static Mesh* processMeshGeometry(aiMesh* mesh);
+    static Mesh* processNodeGeometry(const aiNode* node, const aiScene* scene);
+    static void processNodeGeometryRecursively(
+        const aiNode* node,
+        const aiScene* scene,
+        std::vector<VertexData>& vertices,
+        std::vector<GLuint>& indices);
+    static void processMeshGeometry(
+        const aiMesh* mesh,
+        std::vector<VertexData>& vertices,
+        std::vector<GLuint>& indices);
 };

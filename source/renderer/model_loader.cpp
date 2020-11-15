@@ -29,31 +29,66 @@ Mesh* ModelLoader::load(std::string const& relPath)
         return nullptr;
     }
 
-    return processMeshGeometry(scene->mMeshes[0]);
+    return processNodeGeometry(scene->mRootNode, scene);
 }
 
-Mesh* ModelLoader::processMeshGeometry(aiMesh* mesh)
+/* NO SUPPORT FOR TRANSFORMATIONS BETWEEN NODES YET */
+Mesh* ModelLoader::processNodeGeometry(const aiNode* node, const aiScene* scene)
 {
     std::vector<VertexData> vertices;
-
-    for (std::size_t i = 0; i < mesh->mNumVertices; ++i)
-    {
-        VertexData v = {
-            {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z},
-            {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z}};
-        vertices.emplace_back(v);
-    }
-
     std::vector<GLuint> indices;
 
-    for (GLuint i = 0; i < mesh->mNumFaces; i++)
+    for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
-        aiFace face = mesh->mFaces[i];
-        for (GLuint j = 0; j < face.mNumIndices; j++)
-        {
-            indices.emplace_back(face.mIndices[j]);
-        }
+        const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        processMeshGeometry(mesh, vertices, indices);
+    }
+
+    for (GLuint i = 0; i < node->mNumChildren; ++i)
+    {
+        processNodeGeometryRecursively(node->mChildren[i], scene, vertices, indices);
     }
 
     return new Mesh(std::move(vertices), std::move(indices));
+}
+
+void ModelLoader::processNodeGeometryRecursively(
+    const aiNode* node,
+    const aiScene* scene,
+    std::vector<VertexData>& vertices,
+    std::vector<GLuint>& indices)
+{
+    for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+    {
+        const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        processMeshGeometry(mesh, vertices, indices);
+    }
+}
+
+void ModelLoader::processMeshGeometry(
+    const aiMesh* mesh,
+    std::vector<VertexData>& vertices,
+    std::vector<GLuint>& indices)
+{
+    vertices.reserve(mesh->mNumVertices);
+
+    for (std::size_t j = 0; j < mesh->mNumVertices; ++j)
+    {
+        VertexData v = {
+            {mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z},
+            {mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z}};
+
+        vertices.emplace_back(v);
+    }
+
+    indices.reserve(mesh->mNumFaces);
+    for (GLuint j = 0; j < mesh->mNumFaces; j++)
+    {
+        const aiFace& face = mesh->mFaces[j];
+
+        for (GLuint k = 0; k < face.mNumIndices; k++)
+        {
+            indices.emplace_back(face.mIndices[k]);
+        }
+    }
 }

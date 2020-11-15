@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-Mesh::Mesh(std::vector<VertexData> const&& vertices, std::vector<GLuint> const&& indices)
+Mesh::Mesh(std::vector<VertexData>&& vertices, std::vector<GLuint>&& indices)
     : numIndices(indices.size())
 {
     glGenBuffers(1, &vbo);
