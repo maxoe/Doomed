@@ -1,8 +1,7 @@
 #include "core/app.h"
 
 #include "renderer/app_shader.h"
-#include "renderer/model_loader.h"
-#include "renderer/mesh.h"
+#include "world/maze_node.h"
 
 #include "vendor/imgui_impl_glfw.h"
 #include "vendor/imgui_impl_opengl3.h"
@@ -79,7 +78,8 @@ int App::initializeGLFW()
     // for debugging adjust to your display resolution
     const auto width = 3840;
     const auto height = 2160;
-    window = glfwCreateWindow(width, height, "Doomed", glfwGetPrimaryMonitor(), nullptr);
+    window =
+        glfwCreateWindow(width, height, "Doomed", nullptr /*glfwGetPrimaryMonitor()*/, nullptr);
 
     if (window == nullptr)
     {
@@ -106,7 +106,8 @@ int App::mainLoop()
     glm::vec3 lightWorldPos(5.0f, 5.0f, 2.0f);
     glm::vec3 lightIntensity(50.0f, 40.0f, 40.0f);
 
-    Mesh* debug = ModelLoader::load("debug/house.obj");
+    MazeNode firstNode;
+    firstNode.addObject("debug/house.obj");
 
     // TODO MOVE TO BE CONTROLLED BY IMGUI
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -143,11 +144,9 @@ int App::mainLoop()
         program.setVec3f("camWorldPos", camWorldPos);
 
         gui->prepare();
-
-        // render your GUI
         gui->defineWindow();
 
-        // Rendering
+        // render
         auto width = 0;
         auto height = 0;
         glfwGetFramebufferSize(window, &width, &height);
@@ -155,7 +154,7 @@ int App::mainLoop()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        debug->draw(program);
+        firstNode.draw(program);
 
         gui->render();
 

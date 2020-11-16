@@ -10,6 +10,7 @@ Mesh::Mesh(
     std::vector<GLuint>&& triangleIndices,
     std::vector<TextureData>&& textureData)
     : numIndices(triangleIndices.size())
+    , textures(textureData)
 {
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -47,9 +48,6 @@ Mesh::Mesh(
         GL_STATIC_DRAW);
 
     glBindVertexArray(0);
-
-    // TODO: PUT THIS IN WOLRD CLASS OR SO
-    TextureLoader::load(textureData);
 }
 
 void Mesh::draw(AppShader& shader)
@@ -60,6 +58,12 @@ void Mesh::draw(AppShader& shader)
     // ONLY ONE DIFFUSE AND ONE SPECULAR TEXTURE CURRENTLY
     for (unsigned int i = 0; i < textures.size(); i++)
     {
+        if (!textures[i].isValid)
+        {
+            std::cerr << "Skipping texture " << textures[i].path << ", not loaded yet" << std::endl;
+            continue;
+        }
+
         glActiveTexture(GL_TEXTURE0 + i);  // activate proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
         std::string number;
@@ -72,6 +76,7 @@ void Mesh::draw(AppShader& shader)
         shader.setInt(("material." + name + number).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
+
     // draw mesh
     glUseProgram(shader.getProgramId());
     glBindVertexArray(vao);
@@ -80,4 +85,9 @@ void Mesh::draw(AppShader& shader)
 
     // reset
     glActiveTexture(GL_TEXTURE0);
+}
+
+std::vector<TextureData>& Mesh::getTextureData()
+{
+    return textures;
 }

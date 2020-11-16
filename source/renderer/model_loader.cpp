@@ -94,8 +94,8 @@ void ModelLoader::processMeshGeometry(
 
     for (std::size_t i = 0; i < mesh->mNumVertices; ++i)
     {
-        aiVector3D positionTransformed = *transform * mesh->mVertices[i];
-        aiVector3D normalTransformed = rotation.Rotate(mesh->mNormals[i]);
+        const aiVector3D positionTransformed = *transform * mesh->mVertices[i];
+        const aiVector3D normalTransformed = rotation.Rotate(mesh->mNormals[i]);
 
         VertexData v = {
             {positionTransformed.x, positionTransformed.y, positionTransformed.z},
