@@ -60,6 +60,9 @@ target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE imgui::imgui)
 find_package(Assimp CONFIG REQUIRED)
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE assimp::assimp)
 
+find_path(STB_INCLUDE_DIRS "stb.h")
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE ${STB_INCLUDE_DIRS})
+
 # Symlink resources
 if ( UNIX )
     add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/resources/ ${CMAKE_BINARY_DIR}/resources)

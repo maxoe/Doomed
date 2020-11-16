@@ -13,15 +13,17 @@
 #include "renderer/mesh.h"
 #include "global/config.h"
 
-Mesh* ModelLoader::load(std::string const& relPath)
+Mesh* ModelLoader::load(std::string const& relModelPath)
 {
     std::filesystem::path modelPath(APP_MODEL_DIR);
-    modelPath = modelPath / relPath;
+    modelPath = modelPath / relModelPath;
 
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(
-        modelPath.string(),
-        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+
+    const aiScene* scene;
+    unsigned pFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices |
+                      aiProcess_PreTransformVertices;
+    scene = importer.ReadFile(modelPath.string(), pFlags);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -29,66 +31,130 @@ Mesh* ModelLoader::load(std::string const& relPath)
         return nullptr;
     }
 
-    return processNodeGeometry(scene->mRootNode, scene);
+    return processNode(scene->mRootNode, scene);
 }
 
-/* NO SUPPORT FOR TRANSFORMATIONS BETWEEN NODES YET */
-Mesh* ModelLoader::processNodeGeometry(const aiNode* node, const aiScene* scene)
+Mesh* ModelLoader::processNode(const aiNode* node, const aiScene* scene)
 {
     std::vector<VertexData> vertices;
     std::vector<GLuint> indices;
+    std::vector<TextureData> textures;
+    aiMatrix4x4 accTransform = aiMatrix4x4();
 
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
         const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        processMeshGeometry(mesh, vertices, indices);
+        processMeshGeometry(mesh, &accTransform, vertices, indices, textures);
     }
 
     for (GLuint i = 0; i < node->mNumChildren; ++i)
     {
-        processNodeGeometryRecursively(node->mChildren[i], scene, vertices, indices);
+        processNodeGeometryRecursively(
+            node->mChildren[i], scene, &accTransform, vertices, indices, textures);
     }
 
-    return new Mesh(std::move(vertices), std::move(indices));
+    processSceneMaterials(scene, textures);
+
+    return new Mesh(std::move(vertices), std::move(indices), std::move((textures)));
 }
 
 void ModelLoader::processNodeGeometryRecursively(
     const aiNode* node,
     const aiScene* scene,
+    aiMatrix4x4* const accTransform,
     std::vector<VertexData>& vertices,
-    std::vector<GLuint>& indices)
+    std::vector<GLuint>& indices,
+    std::vector<TextureData>& textures)
 {
-    for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+    for (GLuint i = 0; i < node->mNumMeshes; ++i)
     {
         const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        processMeshGeometry(mesh, vertices, indices);
+        processMeshGeometry(mesh, accTransform, vertices, indices, textures);
+    }
+
+    for (GLuint i = 0; i < node->mNumChildren; ++i)
+    {
+        processNodeGeometryRecursively(
+            node->mChildren[i], scene, accTransform, vertices, indices, textures);
     }
 }
 
 void ModelLoader::processMeshGeometry(
     const aiMesh* mesh,
+    const aiMatrix4x4* transform,
     std::vector<VertexData>& vertices,
-    std::vector<GLuint>& indices)
+    std::vector<GLuint>& indices,
+    std::vector<TextureData>& textures)
 {
+    // vertices
     vertices.reserve(mesh->mNumVertices);
+    aiQuaternion rotation;
+    aiVector3D trash;
+    transform->Decompose(trash, rotation, trash);
 
-    for (std::size_t j = 0; j < mesh->mNumVertices; ++j)
+    for (std::size_t i = 0; i < mesh->mNumVertices; ++i)
     {
+        aiVector3D positionTransformed = *transform * mesh->mVertices[i];
+        aiVector3D normalTransformed = rotation.Rotate(mesh->mNormals[i]);
+
         VertexData v = {
-            {mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z},
-            {mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z}};
+            {positionTransformed.x, positionTransformed.y, positionTransformed.z},
+            {normalTransformed.x, normalTransformed.y, normalTransformed.z}};
+
+        // check first if mesh contains textures
+        if (mesh->mTextureCoords[0])
+        {
+            glm::vec2 vec;
+            vec.x = mesh->mTextureCoords[0][i].x;
+            vec.y = mesh->mTextureCoords[0][i].y;
+            v.texCoords = vec;
+        }
+        else
+        {
+            v.texCoords = glm::vec2(0.0f, 0.0f);
+        }
 
         vertices.emplace_back(v);
     }
 
+    // triangle indices
     indices.reserve(mesh->mNumFaces);
-    for (GLuint j = 0; j < mesh->mNumFaces; j++)
+    for (GLuint i = 0; i < mesh->mNumFaces; i++)
     {
-        const aiFace& face = mesh->mFaces[j];
+        const aiFace& face = mesh->mFaces[i];
 
-        for (GLuint k = 0; k < face.mNumIndices; k++)
+        for (GLuint j = 0; j < face.mNumIndices; j++)
         {
-            indices.emplace_back(face.mIndices[k]);
+            indices.emplace_back(face.mIndices[j]);
         }
+    }
+}
+
+void ModelLoader::processSceneMaterials(const aiScene* scene, std::vector<TextureData>& textures)
+{
+    if (scene->HasMaterials())
+    {
+        for (GLuint i = 0; i < scene->mNumMaterials; i++)
+        {
+            const aiMaterial* material = scene->mMaterials[i];
+
+            addTextureByType(material, aiTextureType_DIFFUSE, "texture_diffuse", textures);
+            addTextureByType(material, aiTextureType_SPECULAR, "texture_specular", textures);
+        }
+    }
+}
+
+void ModelLoader::addTextureByType(
+    const aiMaterial* material,
+    const aiTextureType type,
+    const char* typeName,
+    std::vector<TextureData>& textures)
+{
+    for (GLuint i = 0; i < material->GetTextureCount(type); ++i)
+    {
+        aiString str;
+        material->GetTexture(type, i, &str);
+        TextureData texture{0, typeName, str.C_Str(), false};
+        textures.emplace_back(texture);
     }
 }

@@ -101,12 +101,12 @@ int App::mainLoop()
 {
     AppShader program("simple");
 
-    glm::vec3 camWorldPos(0.0f, 0.0f, 3.0);
+    glm::vec3 camWorldPos(0.0f, 0.8f, 3.0);
     glm::vec3 cameraDir(1.2f, 1.0f, 2.0f);
-    glm::vec3 lightWorldPos(1.2f, 1.0f, 2.0f);
-    glm::vec3 lightIntensity(1.0f, 1.0f, 1.0f);
+    glm::vec3 lightWorldPos(5.0f, 5.0f, 2.0f);
+    glm::vec3 lightIntensity(50.0f, 40.0f, 40.0f);
 
-    Mesh* suzanna = ModelLoader::load("debug/suzanne.obj");
+    Mesh* debug = ModelLoader::load("debug/house.obj");
 
     // TODO MOVE TO BE CONTROLLED BY IMGUI
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -116,14 +116,14 @@ int App::mainLoop()
         glfwPollEvents();
 
         // setup program and transformations will be moved to world class
-        program.use();
-
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
         model = glm::rotate(
             model, glm::radians((float)glfwGetTime() * 30), glm::vec3(0.0f, 1.0f, 0.0f));
 
         glm::mat4 view =
             glm::lookAt(camWorldPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        view = glm::translate(view, glm::vec3(0.0f, -7.0f, -25.0f));
 
         glm::mat4 projection =
             glm::perspective(glm::radians(45.0f), 3840.0f / 2160.0f, 0.1f, 100.0f);
@@ -135,8 +135,8 @@ int App::mainLoop()
 
         program.setMat3f("normalMatrix", normalMatrix);
 
-        program.setVec3f("kD", 1.0f, 1.0f, 5.0f);
-        program.setVec3f("kS", 0.0f, 0.0f, 3.0f);
+        program.setVec3f("kD", 1.0f, 1.0f, 1.0f);
+        program.setVec3f("kS", 0.0f, 0.0f, 0.0f);
         program.setFloat("n", 16.0f);
         program.setVec3f("lightWorldPos", lightWorldPos);
         program.setVec3f("lightIntensity", lightIntensity);
@@ -155,7 +155,7 @@ int App::mainLoop()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        suzanna->draw(program);
+        debug->draw(program);
 
         gui->render();
 

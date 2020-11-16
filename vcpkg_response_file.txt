@@ -3,3 +3,4 @@ glfw3
 glm
 imgui
 assimp
+stb

@@ -10,17 +10,26 @@ struct VertexData
 {
     glm::vec3 position;
     glm::vec3 normal;
+    glm::vec2 texCoords;
+};
+
+struct TextureData
+{
+    GLuint id;
+    std::string type;
+    std::string path;
+    bool isValid;
 };
 
 class Mesh
 {
 public:
-    std::vector<VertexData> vertices;
-    std::vector<unsigned int> indices;
-
     Mesh() = delete;
     Mesh(Mesh const&) = delete;
-    Mesh(std::vector<VertexData>&& vertices, std::vector<GLuint>&& indices);
+    Mesh(
+        std::vector<VertexData>&& vertices,
+        std::vector<GLuint>&& indices,
+        std::vector<TextureData>&& textureData);
     ~Mesh()
     {
         glBindVertexArray(vao);
@@ -36,4 +45,8 @@ private:
     GLuint vbo = 0;
     GLuint ebo = 0;
     GLsizei numIndices = 0;
+
+    std::vector<VertexData> vertices;
+    std::vector<GLuint> indices;
+    std::vector<TextureData> textures;
 };
