@@ -40,6 +40,8 @@ public:
 
     void draw(AppShader& shader);
     std::vector<TextureData>& getTextureData();
+    void setModelMatrix(glm::mat4& modelMatrix);
+    const glm::mat4& getModelMatrix() const;
 
 private:
     GLuint vao = 0;
@@ -47,7 +49,9 @@ private:
     GLuint ebo = 0;
     GLsizei numIndices = 0;
 
-    //std::vector<VertexData> vertices;
-    //std::vector<GLuint> indices;
+    // std::vector<VertexData> vertices;
+    // std::vector<GLuint> indices;
     std::vector<TextureData> textures;
+    glm::mat4 modelMatrix;
+    glm::mat4 normalMatrix;
 };

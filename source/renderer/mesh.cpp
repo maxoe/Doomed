@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <glm/gtc/matrix_inverse.hpp>
 
 Mesh::Mesh(
     std::vector<VertexData>&& vertexWithData,
@@ -11,6 +12,8 @@ Mesh::Mesh(
     std::vector<TextureData>&& textureData)
     : numIndices(triangleIndices.size())
     , textures(textureData)
+    , modelMatrix(glm::mat4(1.0f))
+    , normalMatrix(glm::mat3(1.0f))
 {
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -52,6 +55,9 @@ Mesh::Mesh(
 
 void Mesh::draw(AppShader& shader)
 {
+    shader.setMat4f("modelMatrix", modelMatrix);
+    shader.setMat3f("normalMatrix", normalMatrix);
+
     unsigned int diffuseNr = 0;
     unsigned int specularNr = 0;
 
@@ -90,4 +96,15 @@ void Mesh::draw(AppShader& shader)
 std::vector<TextureData>& Mesh::getTextureData()
 {
     return textures;
+}
+
+void Mesh::setModelMatrix(glm::mat4& model)
+{
+    modelMatrix = model;
+    normalMatrix = glm::inverseTranspose(glm::mat3(modelMatrix));
+}
+
+const glm::mat4& Mesh::getModelMatrix() const
+{
+    return modelMatrix;
 }

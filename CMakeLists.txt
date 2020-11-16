@@ -69,7 +69,7 @@ if ( UNIX )
 endif()
 # hack because symlinks on windows suck
 if ( MSVC )
-	if (NOT EXISTS ${CMAKE_BINARY_DIR}/resources)
+        if (NOT EXISTS ${CMAKE_BINARY_DIR}/resources)
 		add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND mklink /J "\"${CMAKE_BINARY_DIR}/resources\"" "\"${CMAKE_SOURCE_DIR}/resources/\"")
 	endif()
 	if (NOT EXISTS ${CMAKE_BINARY_DIR}/include)

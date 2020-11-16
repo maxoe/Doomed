@@ -3,9 +3,16 @@
 uniform vec3 lightWorldPos;
 uniform vec3 lightIntensity;
 
-uniform vec3 kS; // specular material parameter
-uniform vec3 kD; // diffuse material parameter
-uniform float n;  // phong exponent of the material
+/* NOT AVAILABLE ANYMORE AS CONSTANTS --> READ FROM TEXTURE OR WAIT UNTIL MATERIAL IS READ  */
+//uniform vec3 kS; // specular material parameter  NOT AVAILABLE ANYMORE
+//uniform vec3 kD; // diffuse material parameter   NOT AVAILABLE ANYMORE
+//uniform float n;  // phong exponent of the material  NOT AVAILABLE ANYMORE
+float n = 10;
+vec3 kS = vec3(1.0f, 1.0f, 1.0f);
+
+
+
+
 
 uniform vec3 camWorldPos; // the camera position in world space
 
