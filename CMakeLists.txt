@@ -70,10 +70,12 @@ endif()
 # hack because symlinks on windows suck
 if ( MSVC )
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/resources)
+                add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND rmdir -Force "\"${CMAKE_BINARY_DIR}/resources\"")
 		add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND mklink /J "\"${CMAKE_BINARY_DIR}/resources\"" "\"${CMAKE_SOURCE_DIR}/resources/\"")
 	endif()
 	if (NOT EXISTS ${CMAKE_BINARY_DIR}/include)
 		# necessary so that visual studio displays the header files in the explorer
+                add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND rmdir -Force "\"${CMAKE_BINARY_DIR}/include\"")
 		add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND mklink /J "\"${CMAKE_BINARY_DIR}/include\"" "\"${CMAKE_SOURCE_DIR}/include/\"")
 	endif()
 endif()
