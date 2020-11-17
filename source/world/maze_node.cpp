@@ -1,5 +1,6 @@
 #include "world/maze_node.h"
 
+#include <iostream>
 #include <glm/ext/matrix_transform.hpp>
 
 #include "renderer/model_loader.h"
@@ -35,6 +36,8 @@ void MazeNode::addObject(std::string const& relModelPath, glm::mat4& modelMatrix
     // load textures of mesh only if not  already loaded in maze node
     for (auto& texture : meshes.back()->getTextureData())
     {
+        texture.path = std::filesystem::path(relModelPath).replace_filename(texture.path).string();
+
         auto tex = loadedTextures.find(texture.path);
 
         if (tex == loadedTextures.end())

@@ -1,6 +1,6 @@
 #include "renderer/texture_loader.h"
-
 #include "renderer/mesh.h"
+#include "global/config.h"
 
 #include <string>
 #include <filesystem>

@@ -22,7 +22,8 @@ Mesh* ModelLoader::load(std::string const& relModelPath)
 
     const aiScene* scene;
     unsigned pFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices |
-                      aiProcess_PreTransformVertices;
+                      aiProcess_PreTransformVertices | aiProcess_GenNormals;
+
     scene = importer.ReadFile(modelPath.string(), pFlags);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -104,9 +105,7 @@ void ModelLoader::processMeshGeometry(
         // check first if mesh contains textures
         if (mesh->mTextureCoords[0])
         {
-            glm::vec2 vec;
-            vec.x = mesh->mTextureCoords[0][i].x;
-            vec.y = mesh->mTextureCoords[0][i].y;
+            glm::vec2 vec = {mesh->mTextureCoords[0][i].x, vec.y = mesh->mTextureCoords[0][i].y};
             v.texCoords = vec;
         }
         else
