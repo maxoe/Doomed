@@ -1,37 +1,33 @@
 #pragma once
 
-#include "global/config.h"
 #include "renderer/mesh.h"
 
-#include <glm/glm.hpp>
 #include <string>
 #include <assimp/scene.h>
+
+#include "model.h"
 
 class ModelLoader
 {
 public:
     ModelLoader() = delete;
-    static Mesh* ModelLoader::load(std::string const& relModelPath);
+    static Model* load(std::string const& relModelPath);
 
 private:
-    static Mesh* processNode(const aiNode* node, const aiScene* scene);
+    static const std::string& getModelPath(const std::string& path);
+    static const std::string& getTextureDir(const std::string& path);
+    static std::vector<Mesh*> processScene(const aiNode* node, const aiScene* scene);
 
     static void processNodeGeometryRecursively(
         const aiNode* node,
         const aiScene* scene,
         aiMatrix4x4* const accTransform,
-        std::vector<VertexData>& vertices,
-        std::vector<GLuint>& indices,
-        std::vector<TextureData>& textures);
+        std::vector<Mesh*>& meshes);
 
-    static void processMeshGeometry(
-        const aiMesh* mesh,
-        const aiMatrix4x4* accTransform,
-        std::vector<VertexData>& vertices,
-        std::vector<GLuint>& indices,
-        std::vector<TextureData>& textures);
+    static Mesh*
+    processMesh(const aiMesh* mesh, const aiMatrix4x4* accTransform, const aiScene* scene);
 
-    static void processSceneMaterials(const aiScene* scene, std::vector<TextureData>& textures);
+    static std::vector<TextureData> processMeshMaterials(const aiMesh* mesh, const aiScene* scene);
 
     static void addTextureByType(
         const aiMaterial* material,

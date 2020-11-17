@@ -8,6 +8,12 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+AppShader::AppShader()
+    : AppShader("default")
+{
+    std::cout << "Falling back to default shader" << std::endl;
+}
+
 AppShader::AppShader(const char* name)
 {
     programId = glCreateProgram();

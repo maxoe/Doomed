@@ -10,7 +10,7 @@
 class AppShader
 {
 public:
-    AppShader() = delete;
+    AppShader();
     AppShader(const AppShader&) = delete;
     AppShader(const char* name);
     GLuint compile(const std::filesystem::path& shaderPath, GLenum shaderType);

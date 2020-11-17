@@ -16,8 +16,8 @@ struct VertexData
 struct TextureData
 {
     GLuint id;
-    std::string type;
     std::string path;
+    std::string type;
     bool isValid;
 };
 
@@ -25,11 +25,10 @@ class Mesh
 {
 public:
     Mesh() = delete;
-    Mesh(Mesh const&) = delete;
     Mesh(
-        std::vector<VertexData>&& vertices,
-        std::vector<GLuint>&& indices,
-        std::vector<TextureData>&& textureData);
+        const std::vector<VertexData>& vertices,
+        const std::vector<GLuint>& indices,
+        const std::vector<TextureData>& textures);
     ~Mesh()
     {
         glBindVertexArray(vao);
@@ -38,10 +37,9 @@ public:
         glDeleteVertexArrays(1, &vao);
     };
 
-    void draw(AppShader& shader);
+    void draw(AppShader& shader) const;
+
     std::vector<TextureData>& getTextureData();
-    void setModelMatrix(glm::mat4& modelMatrix);
-    const glm::mat4& getModelMatrix() const;
 
 private:
     GLuint vao = 0;
@@ -49,9 +47,5 @@ private:
     GLuint ebo = 0;
     GLsizei numIndices = 0;
 
-    // std::vector<VertexData> vertices;
-    // std::vector<GLuint> indices;
     std::vector<TextureData> textures;
-    glm::mat4 modelMatrix;
-    glm::mat4 normalMatrix;
 };

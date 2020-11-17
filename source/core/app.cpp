@@ -21,6 +21,7 @@ App::App()
     {
         App::instance = this;
     }
+
     this->gui = new Gui();
 }
 
@@ -45,7 +46,7 @@ int App::initialize()
         return 1;
     }
 
-    gui->initialize(NULL, window);
+    gui->initialize(nullptr, window);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -103,7 +104,7 @@ int App::mainLoop()
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
     modelMatrix = glm::rotate(modelMatrix, glm::radians((float)140), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    maze.addNode()->addObject("debug/house.obj", modelMatrix);
+    maze.addNode()->addModel("debug/house.obj", modelMatrix);
 
     while (!glfwWindowShouldClose(window))
     {

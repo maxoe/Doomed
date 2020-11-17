@@ -1,24 +1,18 @@
 #include "renderer/texture_loader.h"
 #include "renderer/mesh.h"
-#include "global/config.h"
 
 #include <string>
-#include <filesystem>
 #include <iostream>
 
 #include <stb_image.h>
 
 GLuint TextureLoader::load(const TextureData& td)
 {
-    std::filesystem::path texturePath(APP_TEXTURE_DIR);
-    texturePath = texturePath / td.path;
-
     GLuint textureId;
     glGenTextures(1, &textureId);
 
     int width, height, nrComponents;
-    unsigned char* data =
-        stbi_load(texturePath.string().c_str(), &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(td.path.c_str(), &width, &height, &nrComponents, 0);
 
     if (data)
     {
@@ -51,7 +45,7 @@ GLuint TextureLoader::load(const TextureData& td)
     }
     else
     {
-        std::cout << "Texture failed to load at path: " << texturePath << std::endl;
+        std::cout << "Texture failed to load at path: " << td.path << std::endl;
         stbi_image_free(data);
 
         return GL_FALSE;

@@ -4,16 +4,13 @@
 
 #include <iostream>
 #include <string>
-#include <glm/gtc/matrix_inverse.hpp>
 
 Mesh::Mesh(
-    std::vector<VertexData>&& vertexWithData,
-    std::vector<GLuint>&& triangleIndices,
-    std::vector<TextureData>&& textureData)
+    const std::vector<VertexData>& vertexWithData,
+    const std::vector<GLuint>& triangleIndices,
+    const std::vector<TextureData>& textureData)
     : numIndices(triangleIndices.size())
     , textures(textureData)
-    , modelMatrix(glm::mat4(1.0f))
-    , normalMatrix(glm::mat3(1.0f))
 {
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -53,16 +50,13 @@ Mesh::Mesh(
     glBindVertexArray(0);
 }
 
-void Mesh::draw(AppShader& shader)
+void Mesh::draw(AppShader& shader) const
 {
-    shader.setMat4f("modelMatrix", modelMatrix);
-    shader.setMat3f("normalMatrix", normalMatrix);
-
-    unsigned int diffuseNr = 0;
-    unsigned int specularNr = 0;
+    GLuint diffuseNr = 0;
+    GLuint specularNr = 0;
 
     // ONLY ONE DIFFUSE AND ONE SPECULAR TEXTURE CURRENTLY
-    for (unsigned int i = 0; i < textures.size(); i++)
+    for (GLuint i = 0; i < textures.size(); i++)
     {
         if (!textures[i].isValid)
         {
@@ -73,18 +67,22 @@ void Mesh::draw(AppShader& shader)
         glActiveTexture(GL_TEXTURE0 + i);  // activate proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
         std::string number;
-        std::string name = textures[i].type;
-        if (name == "textureDiffuse")
+        std::string type = textures[i].type;
+        if (type == "textureDiffuse")
             number = std::to_string(diffuseNr++);
-        else if (name == "textureSpecular")
+        else if (type == "textureSpecular")
             number = std::to_string(specularNr++);
+        else
+        {
+            std::cout << "Type " << type << " of texture " << textures[i].path << " was not found"
+                      << std::endl;
+        }
 
-        shader.setInt(("material." + name + number).c_str(), i);
+        shader.setInt("material." + type.append(number), i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
 
     // draw mesh
-    glUseProgram(shader.getProgramId());
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -96,15 +94,4 @@ void Mesh::draw(AppShader& shader)
 std::vector<TextureData>& Mesh::getTextureData()
 {
     return textures;
-}
-
-void Mesh::setModelMatrix(glm::mat4& model)
-{
-    modelMatrix = model;
-    normalMatrix = glm::inverseTranspose(glm::mat3(modelMatrix));
-}
-
-const glm::mat4& Mesh::getModelMatrix() const
-{
-    return modelMatrix;
 }

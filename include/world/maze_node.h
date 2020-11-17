@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renderer/mesh.h"
+#include "renderer/model.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -18,22 +18,23 @@ public:
 
     ~MazeNode()
     {
-        for (auto mesh : meshes)
+        for (auto* model : models)
         {
-            delete mesh;
+            delete model;
         }
-    };
+    }
 
     void draw();
-    void addObject(std::string const& relModelPath, glm::mat4& modelMatrix = glm::mat4(1.0f));
+    void addModel(std::string const& relModelPath);
+    void addModel(std::string const& relModelPath, glm::mat4& modelMatrix);
 
     Camera& getCamera();
 
 private:
+    std::vector<Model*> models;
     Camera camera;
-    std::vector<Mesh*> meshes;
     std::unordered_map<std::string, GLuint> loadedTextures;
-    AppShader shader;
     glm::vec3 lightWorldPos;
     glm::vec3 lightIntensity;
+    AppShader shader;
 };
