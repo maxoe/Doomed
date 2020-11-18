@@ -4,8 +4,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
-#include <renderer/mesh.h>
 
+#include <renderer/mesh.h>
 #include "renderer/app_shader.h"
 
 class Model

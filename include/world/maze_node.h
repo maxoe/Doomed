@@ -1,14 +1,13 @@
 #pragma once
 
-#include "renderer/model.h"
-
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
 #include <unordered_map>
 
 #include "renderer/app_shader.h"
-#include <core/camera.h>
+#include "core/camera.h"
+#include "renderer/model.h"
 
 class MazeNode
 {

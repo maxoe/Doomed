@@ -1,6 +1,5 @@
 #include "renderer/mesh.h"
 #include "renderer/app_shader.h"
-#include "renderer/texture_loader.h"
 
 #include <iostream>
 #include <string>
@@ -27,17 +26,32 @@ Mesh::Mesh(
     // vertex positions
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
-        0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, position));
+        0,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(VertexData),
+        reinterpret_cast<void*>(offsetof(VertexData, position)));
 
     // vertex normals
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, normal));
+        1,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(VertexData),
+        reinterpret_cast<void*>(offsetof(VertexData, normal)));
 
     // vertex texture coords
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, texCoords));
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(VertexData),
+        reinterpret_cast<void*>(offsetof(VertexData, texCoords)));
 
     // indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -84,7 +98,7 @@ void Mesh::draw(AppShader& shader) const
 
     // draw mesh
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     // reset

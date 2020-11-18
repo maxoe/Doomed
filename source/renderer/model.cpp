@@ -1,7 +1,5 @@
 #include "renderer/model.h"
 
-#include <iostream>
-
 #include "renderer/app_shader.h"
 #include "renderer/texture_loader.h"
 #include "renderer/mesh.h"

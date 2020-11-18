@@ -1,25 +1,21 @@
 #include "core/app.h"
 
-#include "renderer/app_shader.h"
-
-#include "vendor/imgui_impl_glfw.h"
-#include "vendor/imgui_impl_opengl3.h"
-
 #include <cassert>
 #include <iostream>
 
 #include <glm/gtx/string_cast.hpp>
 
 #include "world/maze.h"
+#include "renderer/app_shader.h"
 
 App* App::instance = nullptr;
 
 App::App()
 {
-    assert(!App::instance);
-    if (App::instance == nullptr)
+    assert(!instance);
+    if (instance == nullptr)
     {
-        App::instance = this;
+        instance = this;
     }
 
     this->gui = new Gui();
