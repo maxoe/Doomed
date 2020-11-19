@@ -94,9 +94,6 @@ int App::initializeGLFW()
 
 int App::mainLoop()
 {
-    // TODO TO BE CONTROLLED BY IMGUI
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     Maze maze;
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
     modelMatrix = glm::rotate(
