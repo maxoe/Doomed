@@ -5,7 +5,6 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "world/maze.h"
-#include "renderer/app_shader.h"
 #include "core/logger.h"
 
 App* App::instance = nullptr;
@@ -127,9 +126,15 @@ int App::mainLoop()
         glfwSwapBuffers(window);
     }
 
-    gui->shutdown();
+    shutdown();
 
+    return 0;
+}
+
+void App::shutdown()
+{
+    gui->shutdown();
+    LOG_CLEANUP();
     glfwDestroyWindow(window);
     glfwTerminate();
-    return 0;
 }

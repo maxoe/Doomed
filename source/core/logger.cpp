@@ -3,12 +3,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
-#include <iostream>
-
-Logger* Logger::coreLogger = 0;
-Logger* Logger::gameLogger = 0;
-Logger* Logger::rendererLogger = 0;
-
 Logger* Logger::getCoreLogger()
 {
     if (!coreLogger)
@@ -77,4 +71,12 @@ void Logger::logInfo(const std::string& msg) const
 void Logger::logWarning(const std::string& msg) const
 {
     logger->warn(std::string("[WARNING] ") + msg);
+}
+
+void Logger::cleanUp()
+{
+    delete coreLogger;
+    delete gameLogger;
+    delete rendererLogger;
+    delete loaderLogger;
 }

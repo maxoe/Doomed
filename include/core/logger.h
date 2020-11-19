@@ -18,16 +18,17 @@ public:
     void logInfo(const std::string& msg) const;
     void logWarning(const std::string& msg) const;
 
+    static void cleanUp();
+
 private:
-    static Logger* coreLogger;
-    static Logger* gameLogger;
-    static Logger* rendererLogger;
-    static Logger* loaderLogger;
+    inline static Logger* coreLogger = nullptr;
+    inline static Logger* gameLogger = nullptr;
+    inline static Logger* rendererLogger = nullptr;
+    inline static Logger* loaderLogger = nullptr;
 
     std::unique_ptr<spdlog::logger> logger = nullptr;
 
     Logger(const char* name);
-    ~Logger();
 
     void initLogger(const char* name);
 };
@@ -51,3 +52,5 @@ private:
 #define LOG_LOADER_INFO(...) ::Logger::getLoaderLogger()->logInfo(__VA_ARGS__)
 #define LOG_LOADER_WARN(...) ::Logger::getLoaderLogger()->logWarning(__VA_ARGS__)
 #define LOG_LOADER_ERROR(...) ::Logger::getLoaderLogger()->logError(__VA_ARGS__)
+
+#define LOG_CLEANUP Logger::cleanUp
