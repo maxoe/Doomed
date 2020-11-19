@@ -17,16 +17,21 @@ public:
     void logInfo(std::string msg);
     void logWarning(std::string msg);
 
+    static std::ostringstream* getUiLogStream();
+
 private:
     static Logger* coreLogger;
     static Logger* gameLogger;
     static Logger* shaderLogger;
+    static std::ostringstream* uiLogStream;
+    static std::vector<spdlog::sink_ptr>* logSinks;
 
     std::unique_ptr<spdlog::logger> logger = nullptr;
 
     Logger(const char* name);
-    ~Logger();
 
+    static std::vector<spdlog::sink_ptr>* getLogSinks();
+    
     void initLogger(const char* name);
 };
 

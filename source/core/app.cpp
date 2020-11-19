@@ -113,6 +113,15 @@ int App::mainLoop()
         gui->prepare();
         gui->defineWindow();
 
+        // TODO one ui for game one for rendering debug
+        if (gui->isWireframeModeEnabled)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
         // render
         auto width = 0;
         auto height = 0;
