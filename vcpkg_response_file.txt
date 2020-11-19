@@ -4,3 +4,4 @@ glm
 imgui
 assimp
 stb
+spdlog

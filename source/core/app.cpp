@@ -7,6 +7,7 @@
 
 #include "world/maze.h"
 #include "renderer/app_shader.h"
+#include "logging/logger.h"
 
 App* App::instance = nullptr;
 
@@ -19,12 +20,15 @@ App::App()
     }
 
     this->gui = new Gui();
+
+    LOG_CORE_INFO("GUI has been successfully initialized");
 }
 
 int App::initialize()
 {
     // set before init to get init errors
     glfwSetErrorCallback([](int error, const char* description) {
+        LOG_CORE_ERROR("GLFW Error: " + std::string(description));
         std::cerr << "GLFW Error" << error << ": " << description << std::endl;
     });
 
