@@ -18,19 +18,24 @@ public:
     void logInfo(const std::string& msg) const;
     void logWarning(const std::string& msg) const;
 
+    static std::ostringstream* getUiLogStream();
+
     static void cleanUp();
 
 private:
+    Logger(const char* name);
+
+    void initLogger(const char* name);
+    static std::vector<spdlog::sink_ptr>* getLogSinks();
+
     inline static Logger* coreLogger = nullptr;
     inline static Logger* gameLogger = nullptr;
     inline static Logger* rendererLogger = nullptr;
     inline static Logger* loaderLogger = nullptr;
 
+    inline static std::ostringstream* uiLogStream = nullptr;
+    inline static std::vector<spdlog::sink_ptr>* logSinks = nullptr;
     std::unique_ptr<spdlog::logger> logger = nullptr;
-
-    Logger(const char* name);
-
-    void initLogger(const char* name);
 };
 
 // Core log macros
