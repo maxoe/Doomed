@@ -1,13 +1,12 @@
 #include "core/app.h"
 
 #include <cassert>
-#include <iostream>
 
 #include <glm/gtx/string_cast.hpp>
 
 #include "world/maze.h"
 #include "renderer/app_shader.h"
-#include "logging/logger.h"
+#include "core/logger.h"
 
 App* App::instance = nullptr;
 
@@ -29,7 +28,6 @@ int App::initialize()
     // set before init to get init errors
     glfwSetErrorCallback([](int error, const char* description) {
         LOG_CORE_ERROR("GLFW Error: " + std::string(description));
-        std::cerr << "GLFW Error" << error << ": " << description << std::endl;
     });
 
     const auto glfwError = initializeGLFW();
@@ -42,7 +40,7 @@ int App::initialize()
     if (gladError == 0)
     {
         glfwTerminate();
-        std::cerr << "Error while loading Open GL" << std::endl;
+        LOG_CORE_ERROR("Error while loading Open GL");
         return 1;
     }
 
@@ -102,7 +100,8 @@ int App::mainLoop()
 
     Maze maze;
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
-    modelMatrix = glm::rotate(modelMatrix, glm::radians((float)140), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelMatrix = glm::rotate(
+        modelMatrix, glm::radians(static_cast<float>(140)), glm::vec3(0.0f, 1.0f, 0.0f));
 
     maze.addNode()->addModel("debug/house.obj", modelMatrix);
 

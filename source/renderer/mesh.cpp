@@ -1,7 +1,7 @@
 #include "renderer/mesh.h"
 #include "renderer/app_shader.h"
+#include "core/logger.h"
 
-#include <iostream>
 #include <string>
 
 Mesh::Mesh(
@@ -74,7 +74,7 @@ void Mesh::draw(AppShader& shader) const
     {
         if (!textures[i].isValid)
         {
-            std::cerr << "Skipping texture " << textures[i].path << ", not loaded yet" << std::endl;
+            LOG_RENDERER_ERROR("Skipping texture " + textures[i].path + ", not loaded yet");
             continue;
         }
 
@@ -88,8 +88,8 @@ void Mesh::draw(AppShader& shader) const
             number = std::to_string(specularNr++);
         else
         {
-            std::cout << "Type " << type << " of texture " << textures[i].path << " was not found"
-                      << std::endl;
+            LOG_RENDERER_ERROR(
+                "Type " + type + " of texture " + textures[i].path + " was not found");
         }
 
         shader.setInt("material." + type.append(number), i);

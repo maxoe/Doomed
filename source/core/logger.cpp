@@ -1,4 +1,4 @@
-#include "logging/logger.h"
+#include "core/logger.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -7,7 +7,7 @@
 
 Logger* Logger::coreLogger = 0;
 Logger* Logger::gameLogger = 0;
-Logger* Logger::shaderLogger = 0;
+Logger* Logger::rendererLogger = 0;
 
 Logger* Logger::getCoreLogger()
 {
@@ -27,13 +27,22 @@ Logger* Logger::getGameLogger()
     return gameLogger;
 };
 
-Logger* Logger::getShaderLogger()
+Logger* Logger::getRendererLogger()
 {
-    if (!shaderLogger)
+    if (!rendererLogger)
     {
-        shaderLogger = new Logger("SHADER");
+        rendererLogger = new Logger("SHADER");
     }
-    return shaderLogger;
+    return rendererLogger;
+};
+
+Logger* Logger::getLoaderLogger()
+{
+    if (!rendererLogger)
+    {
+        rendererLogger = new Logger("LOADER");
+    }
+    return rendererLogger;
 };
 
 Logger::Logger(const char* name)
@@ -55,17 +64,17 @@ void Logger::initLogger(const char* name)
     logger->flush_on(spdlog::level::trace);
 }
 
-void Logger::logError(std::string msg)
+void Logger::logError(const std::string& msg) const
 {
     logger->error(std::string("[ERROR] ") + msg);
 }
 
-void Logger::logInfo(std::string msg)
+void Logger::logInfo(const std::string& msg) const
 {
     logger->info(std::string("[INFO] ") + msg);
 }
 
-void Logger::logWarning(std::string msg)
+void Logger::logWarning(const std::string& msg) const
 {
     logger->warn(std::string("[WARNING] ") + msg);
 }

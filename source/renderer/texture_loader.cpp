@@ -1,8 +1,8 @@
 #include "renderer/texture_loader.h"
 #include "renderer/mesh.h"
+#include "core/logger.h"
 
 #include <string>
-#include <iostream>
 
 #include <stb_image.h>
 
@@ -45,9 +45,8 @@ GLuint TextureLoader::load(const TextureData& td)
     }
     else
     {
-        std::cout << "Texture failed to load at path: " << td.path << std::endl;
+        LOG_LOADER_ERROR("Texture failed to load at path: " + td.path);
         stbi_image_free(data);
-
         return GL_FALSE;
     }
 }

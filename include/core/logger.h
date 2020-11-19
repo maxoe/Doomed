@@ -11,16 +11,18 @@ class Logger
 public:
     static Logger* getCoreLogger();
     static Logger* getGameLogger();
-    static Logger* getShaderLogger();
+    static Logger* getRendererLogger();
+    static Logger* getLoaderLogger();
 
-    void logError(std::string msg);
-    void logInfo(std::string msg);
-    void logWarning(std::string msg);
+    void logError(const std::string& msg) const;
+    void logInfo(const std::string& msg) const;
+    void logWarning(const std::string& msg) const;
 
 private:
     static Logger* coreLogger;
     static Logger* gameLogger;
-    static Logger* shaderLogger;
+    static Logger* rendererLogger;
+    static Logger* loaderLogger;
 
     std::unique_ptr<spdlog::logger> logger = nullptr;
 
@@ -40,8 +42,12 @@ private:
 #define LOG_GAME_WARN(...) ::Logger::getGameLogger()->logWarning(__VA_ARGS__)
 #define LOG_GAME_ERROR(...) ::Logger::getGameLogger()->logError(__VA_ARGS__)
 
-// Shader log macros
-#define LOG_SHADER_INFO(...) ::Logger::getShaderLogger()->logInfo(__VA_ARGS__)
-#define LOG_SHADER_WARN(...) ::Logger::getShaderLogger()->logWarning(__VA_ARGS__)
-#define LOG_SHADER_ERROR(...) ::Logger::getShaderLogger()->logError(__VA_ARGS__)
+// Renderer log macros
+#define LOG_RENDERER_INFO(...) ::Logger::getRendererLogger()->logInfo(__VA_ARGS__)
+#define LOG_RENDERER_WARN(...) ::Logger::getRendererLogger()->logWarning(__VA_ARGS__)
+#define LOG_RENDERER_ERROR(...) ::Logger::getRendererLogger()->logError(__VA_ARGS__)
 
+// Loader log macros
+#define LOG_LOADER_INFO(...) ::Logger::getLoaderLogger()->logInfo(__VA_ARGS__)
+#define LOG_LOADER_WARN(...) ::Logger::getLoaderLogger()->logWarning(__VA_ARGS__)
+#define LOG_LOADER_ERROR(...) ::Logger::getLoaderLogger()->logError(__VA_ARGS__)
