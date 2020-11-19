@@ -57,6 +57,11 @@ target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm)
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE imgui::imgui)
 
+find_package(Assimp CONFIG REQUIRED)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE assimp::assimp)
+
+find_path(STB_INCLUDE_DIRS "stb.h")
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE ${STB_INCLUDE_DIRS})
 
 # Symlink resources
 if ( UNIX )
@@ -64,11 +69,13 @@ if ( UNIX )
 endif()
 # hack because symlinks on windows suck
 if ( MSVC )
-	if (NOT EXISTS ${CMAKE_BINARY_DIR}/resources)
+        if (NOT EXISTS ${CMAKE_BINARY_DIR}/resources)
+                add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND rmdir -Force "\"${CMAKE_BINARY_DIR}/resources\"")
 		add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND mklink /J "\"${CMAKE_BINARY_DIR}/resources\"" "\"${CMAKE_SOURCE_DIR}/resources/\"")
 	endif()
 	if (NOT EXISTS ${CMAKE_BINARY_DIR}/include)
 		# necessary so that visual studio displays the header files in the explorer
+                add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND rmdir -Force "\"${CMAKE_BINARY_DIR}/include\"")
 		add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" PRE_BUILD COMMAND mklink /J "\"${CMAKE_BINARY_DIR}/include\"" "\"${CMAKE_SOURCE_DIR}/include/\"")
 	endif()
 endif()
