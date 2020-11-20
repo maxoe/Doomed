@@ -97,9 +97,9 @@ int App::mainLoop()
     Maze maze;
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
     modelMatrix = glm::rotate(
-        modelMatrix, glm::radians(static_cast<float>(140)), glm::vec3(0.0f, 1.0f, 0.0f));
+        modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    maze.addNode()->addModel("debug/house.obj", modelMatrix);
+    maze.addNode()->addModel("node1/Sci Fi Corridor.obj", modelMatrix);
 
     while (!glfwWindowShouldClose(window))
     {

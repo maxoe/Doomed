@@ -35,5 +35,6 @@ private:
     std::unordered_map<std::string, GLuint> loadedTextures;
     glm::vec3 lightWorldPos;
     glm::vec3 lightIntensity;
+    glm::vec3 ambient;
     AppShader shader;
 };
