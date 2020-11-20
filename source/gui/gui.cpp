@@ -1,4 +1,5 @@
 #include "gui/gui.h"
+#include "core/logger.h"
 
 Gui::Gui()
 {
@@ -14,6 +15,20 @@ void Gui::initialize(const char* glslVersion, GLFWwindow* window)
     ImGui_ImplOpenGL3_Init(glslVersion);
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+    // Adapt style
+    ImGuiStyle* style = &ImGui::GetStyle();
+    style->WindowPadding = ImVec2(15, 15);
+    style->WindowRounding = 5.0f;
+    style->FramePadding = ImVec2(5, 5);
+    style->FrameRounding = 4.0f;
+    style->ItemSpacing = ImVec2(12, 8);
+    style->ItemInnerSpacing = ImVec2(8, 6);
+    style->IndentSpacing = 25.0f;
+    style->ScrollbarSize = 15.0f;
+    style->ScrollbarRounding = 9.0f;
+    style->GrabMinSize = 5.0f;
+    style->GrabRounding = 3.0f;
+    style->WindowTitleAlign = ImVec2(0.5F, 0.5F);
 }
 
 void Gui::prepare()
@@ -25,8 +40,13 @@ void Gui::prepare()
 
 void Gui::defineWindow()
 {
-    ImGui::Begin("Demo window");
-    ImGui::Button("Hello!");
+    ImGui::Begin("Doomed ImGui");
+    ImGui::Checkbox("wireframe", &(Gui::isWireframeModeEnabled));
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
+    ImGui::BeginChild("Scrolling");
+    ImGui::TextUnformatted(Logger::getUiLogStream()->str().c_str());
+    ImGui::EndChild();
     ImGui::End();
 }
 

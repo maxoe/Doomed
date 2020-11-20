@@ -53,6 +53,7 @@ Tutorials
 - https://www.glfw.org/docs/3.0/quick.html
 - http://www.opengl-tutorial.org/beginners-tutorials/tutorial-1-opening-a-window/ and following
 - https://learnopengl.com/
+-https://developer-blog.net/professionelles-loggen-unter-c/
 
 Papers
 - http://www.cemyuksel.com/research/lgh/real-time_rendering_with_lgh_i3d2019.pdf

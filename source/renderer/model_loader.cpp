@@ -1,6 +1,5 @@
 #include "renderer/model_loader.h"
 
-#include <iostream>
 #include <vector>
 #include <filesystem>
 
@@ -12,6 +11,7 @@
 #include "renderer/mesh.h"
 #include "global/config.h"
 #include "renderer/model.h"
+#include "core/logger.h"
 
 Model* ModelLoader::load(std::string const& relModelPath)
 {
@@ -34,7 +34,7 @@ Model* ModelLoader::load(std::string const& relModelPath)
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::cout << std::string("ERROR::ASSIMP:: ") + importer.GetErrorString() << std::endl;
+        LOG_LOADER_ERROR(std::string("ERROR::ASSIMP:: ") + importer.GetErrorString());
         return new Model();
     }
 

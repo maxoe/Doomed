@@ -1,12 +1,11 @@
 #include "core/app.h"
 
 #include <cassert>
-#include <iostream>
 
 #include <glm/gtx/string_cast.hpp>
 
 #include "world/maze.h"
-#include "renderer/app_shader.h"
+#include "core/logger.h"
 
 App* App::instance = nullptr;
 
@@ -19,13 +18,15 @@ App::App()
     }
 
     this->gui = new Gui();
+
+    LOG_CORE_INFO("GUI has been successfully initialized");
 }
 
 int App::initialize()
 {
     // set before init to get init errors
     glfwSetErrorCallback([](int error, const char* description) {
-        std::cerr << "GLFW Error" << error << ": " << description << std::endl;
+        LOG_CORE_ERROR("GLFW Error: " + std::string(description));
     });
 
     const auto glfwError = initializeGLFW();
@@ -38,7 +39,7 @@ int App::initialize()
     if (gladError == 0)
     {
         glfwTerminate();
-        std::cerr << "Error while loading Open GL" << std::endl;
+        LOG_CORE_ERROR("Error while loading Open GL");
         return 1;
     }
 
@@ -93,12 +94,10 @@ int App::initializeGLFW()
 
 int App::mainLoop()
 {
-    // TODO TO BE CONTROLLED BY IMGUI
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     Maze maze;
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
-    modelMatrix = glm::rotate(modelMatrix, glm::radians((float)140), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelMatrix = glm::rotate(
+        modelMatrix, glm::radians(static_cast<float>(140)), glm::vec3(0.0f, 1.0f, 0.0f));
 
     maze.addNode()->addModel("debug/house.obj", modelMatrix);
 
@@ -109,6 +108,15 @@ int App::mainLoop()
         gui->prepare();
         gui->defineWindow();
 
+        // TODO one ui for game one for rendering debug
+        if (gui->isWireframeModeEnabled)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
         // render
         auto width = 0;
         auto height = 0;
@@ -124,9 +132,15 @@ int App::mainLoop()
         glfwSwapBuffers(window);
     }
 
-    gui->shutdown();
+    shutdown();
 
+    return 0;
+}
+
+void App::shutdown()
+{
+    gui->shutdown();
+    LOG_CLEANUP();
     glfwDestroyWindow(window);
     glfwTerminate();
-    return 0;
 }

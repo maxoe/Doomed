@@ -1,7 +1,7 @@
 #include "renderer/app_shader.h"
 #include "global/config.h"
+#include "core/logger.h"
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -11,7 +11,7 @@
 AppShader::AppShader()
     : AppShader("default")
 {
-    std::cout << "Falling back to default shader" << std::endl;
+    LOG_RENDERER_WARN("Falling back to default shader");
 }
 
 AppShader::AppShader(const char* name)
@@ -32,8 +32,8 @@ AppShader::AppShader(const char* name)
         fragmentShaderPath += APP_FRAMENT_SHADER_EXTENSION;
         if (!std::filesystem::exists(fragmentShaderPath))
         {
-            std::cerr << "Error: No fragment shader found for shader " << fragmentShaderPath
-                      << std::endl;
+            LOG_RENDERER_ERROR(
+                "Error: No fragment shader found for shader " + fragmentShaderPath.string());
         }
         else
         {
@@ -51,8 +51,8 @@ AppShader::AppShader(const char* name)
         if (infoLogLength > 0)
         {
             std::vector<char> programErrorMessage(infoLogLength + 1);
-            glGetProgramInfoLog(programId, infoLogLength, NULL, &programErrorMessage[0]);
-            std::cerr << "Error linking program: " << &programErrorMessage[0] << std::endl;
+            glGetProgramInfoLog(programId, infoLogLength, nullptr, &programErrorMessage[0]);
+            LOG_RENDERER_ERROR("Error linking program: " + std::string(&programErrorMessage[0]));
         }
 
         glDetachShader(programId, vertexShaderId);
@@ -63,8 +63,8 @@ AppShader::AppShader(const char* name)
     }
     else
     {
-        std::cerr << "Error creating shader " << name << ". Vertex shader file not found"
-                  << std::endl;
+        LOG_RENDERER_ERROR(
+            "Error creating shader " + std::string(name) + ". Vertex shader file not found");
     }
 }
 
@@ -85,13 +85,13 @@ GLuint AppShader::compile(const std::filesystem::path& path, GLenum type)
     }
     else
     {
-        std::cerr << "Error compiling shader: Cannot open shader file " << path << std::endl;
+        LOG_RENDERER_ERROR("Error compiling shader: Cannot open shader file " + path.string());
         return GL_FALSE;
     }
 
     // compile
     char const* vertexSourcePointer = shaderCode.c_str();
-    glShaderSource(id, 1, &vertexSourcePointer, NULL);
+    glShaderSource(id, 1, &vertexSourcePointer, nullptr);
     glCompileShader(id);
 
     // check for errors
@@ -103,12 +103,12 @@ GLuint AppShader::compile(const std::filesystem::path& path, GLenum type)
     if (infoLogLength > 0)
     {
         std::vector<char> vertexShaderErrorMessage(infoLogLength + 1);
-        glGetShaderInfoLog(id, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
-        std::cerr << "Error compiling shader " << path << ": " << &vertexShaderErrorMessage[0]
-                  << std::endl;
+        glGetShaderInfoLog(id, infoLogLength, nullptr, &vertexShaderErrorMessage[0]);
+        LOG_RENDERER_ERROR(
+            "Error compiling shader " + path.string() + ": " + &vertexShaderErrorMessage[0]);
     }
 
-    std::cout << "Compiled shader " << path << std::endl;
+    LOG_RENDERER_INFO("Compiled shader " + path.string());
     return id;
 }
 
@@ -124,7 +124,7 @@ void AppShader::use() const
 
 void AppShader::setBool(const std::string& name, bool value) const
 {
-    glUniform1i(glGetUniformLocation(programId, name.c_str()), (int)value);
+    glUniform1i(glGetUniformLocation(programId, name.c_str()), static_cast<int>(value));
 }
 void AppShader::setInt(const std::string& name, int value) const
 {
