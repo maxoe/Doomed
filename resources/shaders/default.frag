@@ -2,6 +2,7 @@
 
 uniform vec3 lightWorldPos;
 uniform vec3 lightIntensity;
+uniform vec3 ambient;
 
 /* NOT AVAILABLE ANYMORE AS CONSTANTS --> READ FROM TEXTURE OR WAIT UNTIL MATERIAL IS READ  */
 //uniform vec3 kS; // specular material parameter  NOT AVAILABLE ANYMORE
@@ -38,5 +39,5 @@ main()
 	vec3 specular = kS * pow(max(0, dot(reflectedDir, lightDir)), n);
 	vec3 intensity = lightIntensity / pow(length(worldPosition - lightWorldPos), 2);
 	
-	fragColor = vec4((kDTex + specular) * intensity, 1.0);
+	fragColor = vec4((kDTex + specular + ambient) * intensity, 1.0);
 }

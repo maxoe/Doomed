@@ -23,7 +23,7 @@ public:
         }
     }
 
-    void draw();
+    void draw(glm::vec3 ambient);
     void addModel(std::string const& relModelPath);
     void addModel(std::string const& relModelPath, glm::mat4& modelMatrix);
 
@@ -35,5 +35,6 @@ private:
     std::unordered_map<std::string, GLuint> loadedTextures;
     glm::vec3 lightWorldPos;
     glm::vec3 lightIntensity;
+    glm::vec3 ambient;
     AppShader shader;
 };

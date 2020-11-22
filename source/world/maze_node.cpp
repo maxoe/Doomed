@@ -1,25 +1,28 @@
 #include "world/maze_node.h"
 
 #include <glm/ext/matrix_transform.hpp>
+#include "glm/gtx/string_cast.hpp"
 
 #include "renderer/model_loader.h"
 #include "core/camera.h"
+#include "core/logger.h"
 
 MazeNode::MazeNode()
-    : lightWorldPos(glm::vec3(3.0f, 7.0f, 3.0))
+    : lightWorldPos(glm::vec3(0.0f, 0.0f, 0.0))
     , lightIntensity(glm::vec3(15.0f, 14.0f, 14.0f))
 {
 }
 
-void MazeNode::draw()
+void MazeNode::draw(glm::vec3 ambient)
 {
     shader.use();
 
     shader.setMat4f("VP", camera.getVP());
     shader.setVec3f("camWorldPos", camera.getCamWorldPos());
 
-    shader.setVec3f("lightWorldPos", lightWorldPos);
+    shader.setVec3f("lightWorldPos", camera.getCamWorldPos());
     shader.setVec3f("lightIntensity", lightIntensity);
+    shader.setVec3f("ambient", ambient);
 
     for (auto* model : models)
     {

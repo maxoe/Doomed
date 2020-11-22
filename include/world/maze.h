@@ -17,7 +17,7 @@ public:
         }
     }
 
-    void draw();
+    void draw(glm::vec3 ambient);
     MazeNode* addNode();
 
 private:

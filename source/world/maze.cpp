@@ -1,10 +1,10 @@
 #include "world/maze.h"
 
-void Maze::draw()
+void Maze::draw(glm::vec3 ambient)
 {
     for (auto* node : nodes)
     {
-        node->draw();
+        node->draw(ambient);
     }
 }
 
