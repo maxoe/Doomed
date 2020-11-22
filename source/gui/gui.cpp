@@ -43,6 +43,12 @@ void Gui::defineWindow()
     ImGui::Begin("Doomed ImGui");
     ImGui::Checkbox("wireframe", &(Gui::isWireframeModeEnabled));
 
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Ambient");
+    ImGui::InputFloat("Red", &ambient[0], 0);
+    ImGui::InputFloat("Green", &ambient[1], 0);
+    ImGui::InputFloat("Blue", &ambient[2], 0);
+
+
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
     ImGui::BeginChild("Scrolling");
     ImGui::TextUnformatted(Logger::getUiLogStream()->str().c_str());

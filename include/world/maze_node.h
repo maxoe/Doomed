@@ -23,7 +23,7 @@ public:
         }
     }
 
-    void draw();
+    void draw(glm::vec3 ambient);
     void addModel(std::string const& relModelPath);
     void addModel(std::string const& relModelPath, glm::mat4& modelMatrix);
 

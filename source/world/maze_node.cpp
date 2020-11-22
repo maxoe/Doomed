@@ -10,11 +10,10 @@
 MazeNode::MazeNode()
     : lightWorldPos(glm::vec3(0.0f, 0.0f, 0.0))
     , lightIntensity(glm::vec3(15.0f, 14.0f, 14.0f))
-    , ambient(glm::vec3(1.0f, 1.0f, 1.0f))
 {
 }
 
-void MazeNode::draw()
+void MazeNode::draw(glm::vec3 ambient)
 {
     shader.use();
 
