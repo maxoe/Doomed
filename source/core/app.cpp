@@ -125,7 +125,7 @@ int App::mainLoop()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        maze.draw(gui->ambient);
+        maze.draw(gui->ambient, gui->lightWorldPos, gui->lightIntensity);
 
         gui->render();
 

@@ -48,6 +48,15 @@ void Gui::defineWindow()
     ImGui::InputFloat("Green", &ambient[1], 0);
     ImGui::InputFloat("Blue", &ambient[2], 0);
 
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "lightWorldPos");
+    ImGui::InputFloat("X", &lightWorldPos[0], 0);
+    ImGui::InputFloat("Y", &lightWorldPos[1], 0);
+    ImGui::InputFloat("Z", &lightWorldPos[2], 0);
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "lightIntensity");
+    ImGui::InputFloat("R", &lightIntensity[0], 0);
+    ImGui::InputFloat("G", &lightIntensity[1], 0);
+    ImGui::InputFloat("B", &lightIntensity[2], 0);
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
     ImGui::BeginChild("Scrolling");

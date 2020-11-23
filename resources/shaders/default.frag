@@ -39,5 +39,5 @@ main()
 	vec3 specular = kS * pow(max(0, dot(reflectedDir, lightDir)), n);
 	vec3 intensity = lightIntensity / pow(length(worldPosition - lightWorldPos), 2);
 	
-	fragColor = vec4((kDTex + specular + ambient) * intensity, 1.0);
+	fragColor = vec4((diffuse + specular ) * intensity + ambient, 1.0);
 }

@@ -23,7 +23,7 @@ public:
         }
     }
 
-    void draw(glm::vec3 ambient);
+    void draw(glm::vec3 ambient, glm::vec3 lightWorldPos, glm::vec3 lightIntensity);
     void addModel(std::string const& relModelPath);
     void addModel(std::string const& relModelPath, glm::mat4& modelMatrix);
 
