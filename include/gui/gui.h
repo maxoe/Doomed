@@ -17,8 +17,8 @@ public:
 
     bool isWireframeModeEnabled = false;
     glm::vec3 ambient = glm::vec3(0.f, 0.f, 0.f);
-    glm::vec3 lightWorldPos = glm::vec3(0.0f, 3.0f, 5.0f);
-    glm::vec3 lightIntensity = glm::vec3(0.0f, 1100.0f, 900.0f);
+    glm::vec3 lightWorldPos = glm::vec3(0.0f, 3.0f, 10.0f);
+    glm::vec3 lightIntensity = glm::vec3(0.0f, 940.0f, 620.0f);
 
 private:
 };
