@@ -44,19 +44,18 @@ void Gui::defineWindow()
     ImGui::Checkbox("wireframe", &(Gui::isWireframeModeEnabled));
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Ambient");
-    ImGui::InputFloat("Red", &ambient[0], 0);
-    ImGui::InputFloat("Green", &ambient[1], 0);
-    ImGui::InputFloat("Blue", &ambient[2], 0);
+    ImGui::DragFloat("Red", &ambient[0], 0.1f);
+    ImGui::DragFloat("Green", &ambient[1], 0.1f);
+    ImGui::DragFloat("Blue", &ambient[2], 0.1f);
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "lightWorldPos");
-    ImGui::InputFloat("X", &lightWorldPos[0], 0);
-    ImGui::InputFloat("Y", &lightWorldPos[1], 0);
-    ImGui::InputFloat("Z", &lightWorldPos[2], 0);
-
+    ImGui::DragFloat("X", &lightWorldPos[0], 1.0f);
+    ImGui::DragFloat("Y", &lightWorldPos[1], 1.0f);
+    ImGui::DragFloat("Z", &lightWorldPos[2], 1.0f);
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "lightIntensity");
-    ImGui::InputFloat("R", &lightIntensity[0], 0);
-    ImGui::InputFloat("G", &lightIntensity[1], 0);
-    ImGui::InputFloat("B", &lightIntensity[2], 0);
+    ImGui::DragFloat("R", &lightIntensity[0], 10.0f);
+    ImGui::DragFloat("G", &lightIntensity[1], 10.0f);
+    ImGui::DragFloat("B", &lightIntensity[2], 10.0f);
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
     ImGui::BeginChild("Scrolling");
