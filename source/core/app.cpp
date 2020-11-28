@@ -99,7 +99,9 @@ int App::mainLoop()
     modelMatrix = glm::rotate(
         modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    maze.addNode()->addModel("node1/blender.obj", modelMatrix);
+    maze.addNode()
+        ->addModel("node1/blender.obj", modelMatrix)
+        ->addPointLight(PointLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 940.0f, 620.0f)));
 
     while (!glfwWindowShouldClose(window))
     {
@@ -125,7 +127,7 @@ int App::mainLoop()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        maze.draw(gui->ambient, gui->lightWorldPos, gui->lightIntensity);
+        maze.draw(/*gui->ambient*/);
 
         gui->render();
 

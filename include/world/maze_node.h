@@ -13,7 +13,7 @@ class MazeNode
 {
 public:
     MazeNode();
-    MazeNode(MazeNode const&) = delete;
+    MazeNode(const MazeNode&) = delete;
 
     ~MazeNode()
     {
@@ -23,9 +23,14 @@ public:
         }
     }
 
-    void draw(glm::vec3 ambient, glm::vec3 lightWorldPos, glm::vec3 lightIntensity);
-    void addModel(std::string const& relModelPath);
-    void addModel(std::string const& relModelPath, glm::mat4& modelMatrix);
+    void draw();
+    MazeNode* addModel(const std::string& relModelPath);
+    MazeNode* addModel(const std::string& relModelPath, glm::mat4& modelMatrix);
+    MazeNode* addPointLight(const PointLight& relModelPath);
+    MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);
+
+    [[nodiscard]] glm::vec3 MazeNode::getDirectionalLightDirection() const;
+    [[nodiscard]] glm::vec3 getDirectionalLightIntensity() const;
 
     Camera& getCamera();
 
@@ -33,8 +38,12 @@ private:
     std::vector<Model*> models;
     Camera camera;
     std::unordered_map<std::string, GLuint> loadedTextures;
-    glm::vec3 lightWorldPos;
-    glm::vec3 lightIntensity;
-    glm::vec3 ambient;
     AppShader shader;
+
+    glm::vec3 ambient;
+    glm::vec3 directionalLightDir;
+    glm::vec3 directionalLightIntensity;
+    bool hasDirectionalLight = false;
+
+    std::vector<PointLight> pointLights;
 };

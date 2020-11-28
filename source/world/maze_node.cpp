@@ -4,23 +4,37 @@
 #include "glm/gtx/string_cast.hpp"
 
 #include "renderer/model_loader.h"
+#include "renderer/point_light.h"
 #include "core/camera.h"
 #include "core/logger.h"
 
 MazeNode::MazeNode()
+    : ambient(glm::vec3(0.f))
+    , directionalLightDir(0.f)
+    , directionalLightIntensity(glm::vec3(0.f))
 {
 }
 
-void MazeNode::draw(glm::vec3 ambient, glm::vec3 lightWorldPos, glm::vec3 lightIntensity)
+void MazeNode::draw()
 {
     shader.use();
 
     shader.setMat4f("VP", camera.getVP());
     shader.setVec3f("camWorldPos", camera.getCamWorldPos());
 
-    shader.setVec3f("lightWorldPos", lightWorldPos);
-    shader.setVec3f("lightIntensity", lightIntensity);
     shader.setVec3f("ambient", ambient);
+
+    if (hasDirectionalLight)
+    {
+        shader.setDirectionalLight(directionalLightDir, directionalLightIntensity);
+    }
+
+    for (std::size_t i = 0; i < pointLights.size(); ++i)
+    {
+        shader.setPointLight(pointLights[i], i);
+    }
+
+    shader.setInt(std::string("pointLightCount"), pointLights.size());
 
     for (auto* model : models)
     {
@@ -28,19 +42,58 @@ void MazeNode::draw(glm::vec3 ambient, glm::vec3 lightWorldPos, glm::vec3 lightI
     }
 }
 
-void MazeNode::addModel(std::string const& relModelPath, glm::mat4& modelMatrix)
+MazeNode* MazeNode::addModel(const std::string& relModelPath, glm::mat4& modelMatrix)
 {
     models.emplace_back(ModelLoader::load(relModelPath));
     models.back()->setModelMatrix(modelMatrix);
+
+    return this;
 }
 
-void MazeNode::addModel(std::string const& relModelPath)
+MazeNode* MazeNode::addModel(const std::string& relModelPath)
 {
     glm::mat4 modelMatrix(1.0f);
     addModel(relModelPath, modelMatrix);
+
+    return this;
+}
+
+MazeNode* MazeNode::addPointLight(const PointLight& pointLight)
+{
+    if (pointLights.size() == shader.getMaxPointLights())
+    {
+        LOG_RENDERER_ERROR(
+            "Error setting point light in maze node: Max point lights " +
+            std::to_string(shader.getMaxPointLights()) + " exceeded.");
+    }
+    else
+    {
+        pointLights.emplace_back(pointLight);
+    }
+
+    return this;
 }
 
 Camera& MazeNode::getCamera()
 {
     return camera;
+}
+
+glm::vec3 MazeNode::getDirectionalLightDirection() const
+{
+    return directionalLightDir;
+}
+
+[[nodiscard]] glm::vec3 MazeNode::getDirectionalLightIntensity() const
+{
+    return directionalLightIntensity;
+}
+
+MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity)
+{
+    directionalLightDir = dir;
+    directionalLightIntensity = intensity;
+    hasDirectionalLight = true;
+
+    return this;
 }

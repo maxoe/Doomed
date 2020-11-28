@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global/config.h"
+#include "renderer/point_light.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -27,7 +28,14 @@ public:
     void setMat3f(const std::string& name, const glm::mat3& mat) const;
     void setMat4f(const std::string& name, const glm::mat4& mat) const;
 
+    void setPointLight(const PointLight& pointLight, GLuint index) const;
+    void setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const;
+
+    [[nodiscard]] GLuint getMaxPointLights() const;
+
 private:
     inline static const auto shaderDir = std::filesystem::path(APP_SHADER_DIR);
     GLuint programId;
+    // CHANGE IN FRAGMENT SHADER TOO OR LEAVE IT
+    const GLuint maxPointLights = 10;
 };

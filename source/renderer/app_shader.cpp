@@ -166,3 +166,42 @@ void AppShader::setMat4f(const std::string& name, const glm::mat4& mat) const
     glUniformMatrix4fv(
         glGetUniformLocation(programId, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
+
+void AppShader::setPointLight(const PointLight& pointLight, GLuint index) const
+{
+    if (index >= maxPointLights)
+    {
+        LOG_RENDERER_ERROR(
+            "Error setting point light with index " + std::to_string(index) +
+            " in shader: Index is larger than max point lights " + std::to_string(maxPointLights));
+        return;
+    }
+
+    setVec3f(
+        std::string("pointLights[") + std::to_string(index) + std::string("].pos"),
+        pointLight.getPos());
+    setVec3f(
+        std::string("pointLights[") + std::to_string(index) + std::string("].intensity"),
+        pointLight.getIntensity());
+    setFloat(
+        std::string("pointLights[") + std::to_string(index) + std::string("].constAtt"),
+        pointLight.getConstAttenuation());
+    setFloat(
+        std::string("pointLights[") + std::to_string(index) + std::string("].linAtt"),
+        pointLight.getLinAttenuation());
+    setFloat(
+        std::string("pointLights[") + std::to_string(index) + std::string("].quadAtt"),
+        pointLight.getQuadAttenuation());
+}
+
+void AppShader::setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const
+{
+    setVec3f(std::string("directionalLightDir"), dir);
+    setVec3f(std::string("directionalLightIntensity"), intensity);
+    setBool(std::string("hasDirectionalLight"), true);
+}
+
+GLuint AppShader::getMaxPointLights() const
+{
+    return maxPointLights;
+}

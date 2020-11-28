@@ -1,9 +1,5 @@
 #version 330 core
 
-uniform vec3 lightWorldPos;
-uniform vec3 lightIntensity;
-uniform vec3 ambient;
-
 /* NOT AVAILABLE ANYMORE AS CONSTANTS --> READ FROM TEXTURE OR WAIT UNTIL MATERIAL IS READ  */
 //uniform vec3 kS; // specular material parameter  NOT AVAILABLE ANYMORE
 //uniform vec3 kD; // diffuse material parameter   NOT AVAILABLE ANYMORE
@@ -11,8 +7,25 @@ uniform vec3 ambient;
 float n = 10;
 vec3 kS = vec3(1.0f, 1.0f, 1.0f);
 
+struct Light
+{
+  vec3 pos;
+  vec3 intensity;
+  float constAtt;
+  float linAtt;
+  float quadAtt;
+};
 
+#define MAX_POINT_LIGHTS 10
+uniform Light pointLights[MAX_POINT_LIGHTS];
+uniform int pointLightCount;
 
+uniform vec3 directionalLightDir;
+uniform vec3 directionalLightIntensity;
+// set to true when directional light is set the first time
+uniform bool hasDirectionalLight = false;
+
+uniform vec3 ambient;
 
 
 uniform vec3 camWorldPos; // the camera position in world space
@@ -26,18 +39,32 @@ in vec2 texCoord;
 
 out vec4 fragColor; // the resulting color value (will be written into the framebuffer)
 
-void
-main()
+// lightDir must be not normalized
+vec3 getLightContribution(vec3 lightDir, vec3 lightIntensity)
 {
+	vec3 normalizedLightDir = normalize(lightDir);
 	vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
-
-	vec3 lightDir = normalize(lightWorldPos - worldPosition);
 	vec3 N = normalize(worldNormalInterpolated);
 	vec3 camDir = camWorldPos - worldPosition;
 	vec3 reflectedDir = normalize(reflect(camDir, N));
-	vec3 diffuse = kDTex * max(0, dot(lightDir, N));
-	vec3 specular = kS * pow(max(0, dot(reflectedDir, lightDir)), n);
-	vec3 intensity = lightIntensity / pow(length(worldPosition - lightWorldPos), 2);
+	vec3 diffuse = kDTex * max(0, dot(normalizedLightDir, N));
+	vec3 specular = kS * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
+	vec3 intensity = lightIntensity / pow(length(lightDir), 2);
+
+	return vec3((diffuse + specular ) * intensity);
+}
+
+void main()
+{
+	vec3 color = vec3(0.0f);
 	
-	fragColor = vec4((diffuse + specular ) * intensity + ambient, 1.0);
+	if (hasDirectionalLight) {
+		color = getLightContribution(directionalLightDir, directionalLightIntensity);
+	}
+
+	for (int i = 0; i < pointLightCount; ++i) {
+		color += getLightContribution(pointLights[i].pos - worldPosition, pointLights[i].intensity);
+	}
+
+	fragColor = vec4(color + ambient, 1.0);
 }
