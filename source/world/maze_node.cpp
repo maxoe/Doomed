@@ -78,24 +78,21 @@ MazeNode* MazeNode::attachModelToLast(
     }
     else
     {
-        const auto& translation = models.back()->getTranslation();
+        const auto& translation = lastModel->getTranslation();
         addModel(relModelPath, glm::translate(glm::identity<glm::mat4>(), translation));
     }
 
     auto* newModel = models.back();
 
-    // preserve scaling
-    newModel->setModelMatrix(glm::scale(
-        newModel->getModelMatrix(), lastModel->getWorldSize() / newModel->getWorldSize()));
-
     // model is now positioned on top of the previously added model
     // translate according to the attachment point
-    newModel->setModelMatrix(
-        glm::translate(newModel->getModelMatrix(), calcAttachmentOffset(lastModel, newModel, ap)));
-    std::cout << lastModel->getWorldSize().x << " " << lastModel->getWorldSize().y << " "
-              << lastModel->getWorldSize().z << std::endl;
-    std::cout << newModel->getWorldSize().x << " " << newModel->getWorldSize().y << " "
-              << newModel->getWorldSize().z << std::endl;
+    newModel->addModelTransformation(
+        glm::translate(glm::identity<glm::mat4>(), calcAttachmentOffset(lastModel, newModel, ap)));
+
+    // preserve scaling
+    newModel->addModelTransformation(glm::scale(
+        glm::identity<glm::mat4>(), lastModel->getWorldSize() / lastModel->getObjectSize()));
+
     return this;
 }
 
@@ -158,7 +155,7 @@ MazeNode* MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensi
 {
     if (pointLights.size() == shader.getMaxPointLights())
     {
-        LOG_RENDERER_ERROR(
+        LOG_WORLD_ERROR(
             "Error setting point light in maze node: Max point lights " +
             std::to_string(shader.getMaxPointLights()) + " exceeded.");
     }

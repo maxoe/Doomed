@@ -25,6 +25,7 @@ public:
     void draw(AppShader& shader) const;
 
     void setModelMatrix(const glm::mat4& matrix);
+    void addModelTransformation(const glm::mat4& matrix);
 
     [[nodiscard]] const std::unordered_map<std::string, GLuint>& getTextureRegistry() const;
     [[nodiscard]] const glm::mat4& getModelMatrix() const;

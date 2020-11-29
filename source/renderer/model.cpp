@@ -72,6 +72,12 @@ void Model::setModelMatrix(const glm::mat4& matrix)
     normalMatrix = glm::inverseTranspose(glm::mat3(modelMatrix));
 }
 
+void Model::addModelTransformation(const glm::mat4& matrix)
+{
+    modelMatrix = matrix * modelMatrix;
+    normalMatrix = glm::inverseTranspose(glm::mat3(modelMatrix));
+}
+
 const glm::mat4& Model::getModelMatrix() const
 {
     return modelMatrix;
