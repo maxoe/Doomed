@@ -26,7 +26,7 @@ public:
     void draw();
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, glm::mat4& modelMatrix);
-    MazeNode* addPointLight(const PointLight& relModelPath);
+    MazeNode* addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist);
     MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);
 
     [[nodiscard]] glm::vec3 MazeNode::getDirectionalLightDirection() const;

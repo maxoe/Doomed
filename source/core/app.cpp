@@ -101,7 +101,7 @@ int App::mainLoop()
 
     maze.addNode()
         ->addModel("node1/blender.obj", modelMatrix)
-        ->addPointLight(PointLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 940.0f, 620.0f)));
+        ->addPointLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 940.0f, 620.0f), 7);
 
     while (!glfwWindowShouldClose(window))
     {

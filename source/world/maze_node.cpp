@@ -58,7 +58,7 @@ MazeNode* MazeNode::addModel(const std::string& relModelPath)
     return this;
 }
 
-MazeNode* MazeNode::addPointLight(const PointLight& pointLight)
+MazeNode* MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist)
 {
     if (pointLights.size() == shader.getMaxPointLights())
     {
@@ -68,7 +68,7 @@ MazeNode* MazeNode::addPointLight(const PointLight& pointLight)
     }
     else
     {
-        pointLights.emplace_back(pointLight);
+        pointLights.emplace_back(PointLight(pos, intensity, dist));
     }
 
     return this;

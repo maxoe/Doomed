@@ -1,4 +1,4 @@
-#version 330 core
+#version 330 core	
 
 /* NOT AVAILABLE ANYMORE AS CONSTANTS --> READ FROM TEXTURE OR WAIT UNTIL MATERIAL IS READ  */
 //uniform vec3 kS; // specular material parameter  NOT AVAILABLE ANYMORE
@@ -40,18 +40,42 @@ in vec2 texCoord;
 out vec4 fragColor; // the resulting color value (will be written into the framebuffer)
 
 // lightDir must be not normalized
-vec3 getLightContribution(vec3 lightDir, vec3 lightIntensity)
+vec3 getPointLightContribution(int index)
 {
+	vec3 lightIntensity = pointLights[index].intensity;
+	vec3 lightDir = pointLights[index].pos - worldPosition;
 	vec3 normalizedLightDir = normalize(lightDir);
 	vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
 	vec3 N = normalize(worldNormalInterpolated);
 	vec3 camDir = camWorldPos - worldPosition;
 	vec3 reflectedDir = normalize(reflect(camDir, N));
+	
 	vec3 diffuse = kDTex * max(0, dot(normalizedLightDir, N));
 	vec3 specular = kS * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
-	vec3 intensity = lightIntensity / pow(length(lightDir), 2);
+	
+	float dist = length(lightDir);
+	vec3 intensity = lightIntensity / (pointLights[index].constAtt + pointLights[index].linAtt * dist + 
+    		    pointLights[index].quadAtt * (dist * dist));    
 
 	return vec3((diffuse + specular ) * intensity);
+}
+
+vec3 getDirectionalLightContribution()
+{
+	vec3 lightDir = -directionalLightDir;
+	vec3 normalizedLightDir = normalize(lightDir);
+	vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
+	vec3 N = normalize(worldNormalInterpolated);
+	vec3 camDir = camWorldPos - worldPosition;
+	vec3 reflectedDir = normalize(reflect(camDir, N));
+	
+	vec3 diffuse = kDTex * max(0, dot(normalizedLightDir, N));
+	vec3 specular = kS * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
+	
+//  no attenuation
+//	vec3 intensity = directionalLightIntensity / pow(length(lightDir), 2);
+
+	return vec3((diffuse + specular ) * directionalLightIntensity);
 }
 
 void main()
@@ -59,11 +83,11 @@ void main()
 	vec3 color = vec3(0.0f);
 	
 	if (hasDirectionalLight) {
-		color = getLightContribution(directionalLightDir, directionalLightIntensity);
+		color = getDirectionalLightContribution();
 	}
 
 	for (int i = 0; i < pointLightCount; ++i) {
-		color += getLightContribution(pointLights[i].pos - worldPosition, pointLights[i].intensity);
+		color += getPointLightContribution(i);
 	}
 
 	fragColor = vec4(color + ambient, 1.0);
