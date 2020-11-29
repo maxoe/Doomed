@@ -12,7 +12,7 @@ Logger* Logger::getCoreLogger()
         coreLogger = new Logger("CORE");
     }
     return coreLogger;
-};
+}
 
 Logger* Logger::getGameLogger()
 {
@@ -21,7 +21,7 @@ Logger* Logger::getGameLogger()
         gameLogger = new Logger("GAME");
     }
     return gameLogger;
-};
+}
 
 Logger* Logger::getRendererLogger()
 {
@@ -30,7 +30,7 @@ Logger* Logger::getRendererLogger()
         rendererLogger = new Logger("RENDERER");
     }
     return rendererLogger;
-};
+}
 
 Logger* Logger::getLoaderLogger()
 {
@@ -39,7 +39,16 @@ Logger* Logger::getLoaderLogger()
         rendererLogger = new Logger("LOADER");
     }
     return rendererLogger;
-};
+}
+
+Logger* Logger::getWorldLogger()
+{
+    if (!worldLogger)
+    {
+        worldLogger = new Logger("WORLD");
+    }
+    return worldLogger;
+}
 
 Logger::Logger(const char* name)
 {
@@ -102,6 +111,7 @@ void Logger::cleanUp()
     delete gameLogger;
     delete rendererLogger;
     delete loaderLogger;
+    delete worldLogger;
 
     delete uiLogStream;
     delete logSinks;

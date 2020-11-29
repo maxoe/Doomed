@@ -1,5 +1,6 @@
 #include "world/maze_node.h"
 
+#include <iostream>
 #include <glm/ext/matrix_transform.hpp>
 #include "glm/gtx/string_cast.hpp"
 
@@ -42,7 +43,7 @@ void MazeNode::draw()
     }
 }
 
-MazeNode* MazeNode::addModel(const std::string& relModelPath, glm::mat4& modelMatrix)
+MazeNode* MazeNode::addModel(const std::string& relModelPath, const glm::mat4& modelMatrix)
 {
     models.emplace_back(ModelLoader::load(relModelPath));
     models.back()->setModelMatrix(modelMatrix);
@@ -52,10 +53,105 @@ MazeNode* MazeNode::addModel(const std::string& relModelPath, glm::mat4& modelMa
 
 MazeNode* MazeNode::addModel(const std::string& relModelPath)
 {
-    glm::mat4 modelMatrix(1.0f);
+    glm::mat4 modelMatrix = glm::identity<glm::mat4>();
     addModel(relModelPath, modelMatrix);
 
     return this;
+}
+
+/*
+ * Adds a new model to the node relative to the last model in the models member according to the
+ * attachment point. If preserveRoation is true, then the new model will have the same rotation as
+ * the previous model.
+ *
+ */
+MazeNode* MazeNode::attachModelToLast(
+    const std::string& relModelPath,
+    AttachmentPoint ap,
+    bool preserveRotation)
+{
+    const auto* lastModel = models.back();
+
+    if (preserveRotation)
+    {
+        addModel(relModelPath, lastModel->getModelMatrix());
+    }
+    else
+    {
+        const auto& translation = models.back()->getTranslation();
+        addModel(relModelPath, glm::translate(glm::identity<glm::mat4>(), translation));
+    }
+
+    auto* newModel = models.back();
+
+    // preserve scaling
+    newModel->setModelMatrix(glm::scale(
+        newModel->getModelMatrix(), lastModel->getWorldSize() / newModel->getWorldSize()));
+
+    // model is now positioned on top of the previously added model
+    // translate according to the attachment point
+    newModel->setModelMatrix(
+        glm::translate(newModel->getModelMatrix(), calcAttachmentOffset(lastModel, newModel, ap)));
+    std::cout << lastModel->getWorldSize().x << " " << lastModel->getWorldSize().y << " "
+              << lastModel->getWorldSize().z << std::endl;
+    std::cout << newModel->getWorldSize().x << " " << newModel->getWorldSize().y << " "
+              << newModel->getWorldSize().z << std::endl;
+    return this;
+}
+
+/*
+ * Calculate offset to translate the model newModel from a perfectly overlapping position to a
+ * position where it connects to oldModel as specified by the attachment point.
+ * Example: PosX will translate newModel in a way that newModel will follow oldModel in positive x
+ * direction.
+ */
+glm::vec3 MazeNode::calcAttachmentOffset(
+    const Model* oldModel,
+    const Model* newModel,
+    AttachmentPoint ap) const
+{
+    switch (ap)
+    {
+        case AttachmentPoint::PosX:
+            return glm::vec3(
+                glm::abs(oldModel->getObjectMaxValues().x) +
+                    glm::abs(newModel->getObjectMinValues().x),
+                0.0f,
+                0.0f);
+        case AttachmentPoint::NegX:
+            return glm::vec3(
+                -(glm::abs(newModel->getObjectMaxValues().x) +
+                  glm::abs(oldModel->getObjectMinValues().x)),
+                0.0f,
+                0.0f);
+        case AttachmentPoint::PosY:
+            return glm::vec3(
+                0.0f,
+                glm::abs(oldModel->getObjectMaxValues().y) +
+                    glm::abs(newModel->getObjectMinValues().y),
+                0.0f);
+        case AttachmentPoint::NegY:
+            return glm::vec3(
+                0.0f,
+                -(glm::abs(newModel->getObjectMaxValues().y) +
+                  glm::abs(oldModel->getObjectMinValues().y)),
+                0.0f);
+        case AttachmentPoint::PosZ:
+            return glm::vec3(
+                0.0f,
+                0.0f,
+                glm::abs(oldModel->getObjectMaxValues().z) +
+                    glm::abs(newModel->getObjectMinValues().z));
+        case AttachmentPoint::NegZ:
+            return glm::vec3(
+                0.0f,
+                0.0f,
+                -(glm::abs(newModel->getObjectMaxValues().z) +
+                  glm::abs(oldModel->getObjectMinValues().z)));
+    }
+
+    LOG_WORLD_ERROR("Invalid attachment point");
+    return glm::vec3();
 }
 
 MazeNode* MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist)

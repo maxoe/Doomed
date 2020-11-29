@@ -41,6 +41,9 @@ public:
 
     std::vector<TextureData>& getTextureData();
 
+    [[nodiscard]] const glm::vec3& getMaxValues() const;
+    [[nodiscard]] const glm::vec3& getMinValues() const;
+
 private:
     GLuint vao = 0;
     GLuint vbo = 0;
@@ -48,4 +51,7 @@ private:
     GLsizei numIndices = 0;
 
     std::vector<TextureData> textures;
+
+    glm::vec3 maxValues;
+    glm::vec3 minValues;
 };

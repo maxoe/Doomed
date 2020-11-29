@@ -11,7 +11,8 @@ Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const s
     : modelPath(mPath)
     , textureDir(tDir)
     , meshes(loadedMeshes)
-
+    , maxValues(-std::numeric_limits<float>::infinity())
+    , minValues(std::numeric_limits<float>::infinity())
 {
     // load textures of meshes only if not already loaded
     for (auto* mesh : meshes)
@@ -33,7 +34,20 @@ Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const s
 
             texture.isValid = true;
         }
+
+        for (const auto* m : loadedMeshes)
+        {
+            minValues.x = minValues.x > m->getMinValues().x ? m->getMinValues().x : minValues.x;
+            minValues.y = minValues.y > m->getMinValues().y ? m->getMinValues().y : minValues.y;
+            minValues.z = minValues.z > m->getMinValues().z ? m->getMinValues().z : minValues.z;
+
+            maxValues.x = maxValues.x < m->getMaxValues().x ? m->getMaxValues().x : maxValues.x;
+            maxValues.y = maxValues.y < m->getMaxValues().y ? m->getMaxValues().y : maxValues.y;
+            maxValues.z = maxValues.z < m->getMaxValues().z ? m->getMaxValues().z : maxValues.z;
+        }
     }
+
+    ownSize = glm::abs(maxValues - minValues);
 }
 
 void Model::draw(AppShader& shader) const
@@ -52,7 +66,7 @@ const std::unordered_map<std::string, GLuint>& Model::getTextureRegistry() const
     return textureRegistry;
 }
 
-void Model::setModelMatrix(glm::mat4& matrix)
+void Model::setModelMatrix(const glm::mat4& matrix)
 {
     modelMatrix = matrix;
     normalMatrix = glm::inverseTranspose(glm::mat3(modelMatrix));
@@ -61,4 +75,30 @@ void Model::setModelMatrix(glm::mat4& matrix)
 const glm::mat4& Model::getModelMatrix() const
 {
     return modelMatrix;
+}
+
+const glm::vec3& Model::getObjectSize() const
+{
+    return ownSize;
+}
+
+glm::vec3 Model::getWorldSize() const
+{
+    // mirroring in model matrix may cause negative values
+    return glm::abs(glm::mat3(modelMatrix) * ownSize);
+}
+
+const glm::vec3& Model::getObjectMinValues() const
+{
+    return minValues;
+}
+
+const glm::vec3& Model::getObjectMaxValues() const
+{
+    return maxValues;
+}
+
+glm::vec3 Model::getTranslation() const
+{
+    return glm::vec3(modelMatrix[3]);
 }

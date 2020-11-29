@@ -13,6 +13,7 @@ public:
     static Logger* getGameLogger();
     static Logger* getRendererLogger();
     static Logger* getLoaderLogger();
+    static Logger* getWorldLogger();
 
     void logError(const std::string& msg) const;
     void logInfo(const std::string& msg) const;
@@ -32,6 +33,7 @@ private:
     inline static Logger* gameLogger = nullptr;
     inline static Logger* rendererLogger = nullptr;
     inline static Logger* loaderLogger = nullptr;
+    inline static Logger* worldLogger = nullptr;
 
     inline static std::ostringstream* uiLogStream = nullptr;
     inline static std::vector<spdlog::sink_ptr>* logSinks = nullptr;
@@ -57,5 +59,10 @@ private:
 #define LOG_LOADER_INFO(...) ::Logger::getLoaderLogger()->logInfo(__VA_ARGS__)
 #define LOG_LOADER_WARN(...) ::Logger::getLoaderLogger()->logWarning(__VA_ARGS__)
 #define LOG_LOADER_ERROR(...) ::Logger::getLoaderLogger()->logError(__VA_ARGS__)
+
+// World log macros
+#define LOG_WORLD_INFO(...) ::Logger::getWorldLogger()->logInfo(__VA_ARGS__)
+#define LOG_WORLD_WARN(...) ::Logger::getWorldLogger()->logWarning(__VA_ARGS__)
+#define LOG_WORLD_ERROR(...) ::Logger::getWorldLogger()->logError(__VA_ARGS__)
 
 #define LOG_CLEANUP Logger::cleanUp

@@ -24,10 +24,15 @@ public:
 
     void draw(AppShader& shader) const;
 
-    void setModelMatrix(glm::mat4& matrix);
+    void setModelMatrix(const glm::mat4& matrix);
 
     [[nodiscard]] const std::unordered_map<std::string, GLuint>& getTextureRegistry() const;
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
+    [[nodiscard]] const glm::vec3& getObjectSize() const;
+    [[nodiscard]] glm::vec3 getWorldSize() const;
+    [[nodiscard]] const glm::vec3& getObjectMinValues() const;
+    [[nodiscard]] const glm::vec3& getObjectMaxValues() const;
+    [[nodiscard]] glm::vec3 Model::getTranslation() const;
 
 private:
     const std::string modelPath;
@@ -36,4 +41,7 @@ private:
     std::unordered_map<std::string, GLuint> textureRegistry;
     glm::mat4 modelMatrix = glm::mat4(1.0f);
     glm::mat3 normalMatrix = glm::mat3(1.0f);
+    glm::vec3 maxValues;
+    glm::vec3 minValues;
+    glm::vec3 ownSize;
 };

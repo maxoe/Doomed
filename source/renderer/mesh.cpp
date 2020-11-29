@@ -10,6 +10,8 @@ Mesh::Mesh(
     const std::vector<TextureData>& textureData)
     : numIndices(triangleIndices.size())
     , textures(textureData)
+    , maxValues(-std::numeric_limits<float>::infinity())
+    , minValues(std::numeric_limits<float>::infinity())
 {
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -62,6 +64,17 @@ Mesh::Mesh(
         GL_STATIC_DRAW);
 
     glBindVertexArray(0);
+
+    for (const auto& v : vertexWithData)
+    {
+        minValues.x = minValues.x > v.position.x ? v.position.x : minValues.x;
+        minValues.y = minValues.y > v.position.y ? v.position.y : minValues.y;
+        minValues.z = minValues.z > v.position.z ? v.position.z : minValues.z;
+
+        maxValues.x = maxValues.x < v.position.x ? v.position.x : maxValues.x;
+        maxValues.y = maxValues.y < v.position.y ? v.position.y : maxValues.y;
+        maxValues.z = maxValues.z < v.position.z ? v.position.z : maxValues.z;
+    }
 }
 
 void Mesh::draw(AppShader& shader) const
@@ -108,4 +121,14 @@ void Mesh::draw(AppShader& shader) const
 std::vector<TextureData>& Mesh::getTextureData()
 {
     return textures;
+}
+
+const glm::vec3& Mesh::getMaxValues() const
+{
+    return maxValues;
+}
+
+const glm::vec3& Mesh::getMinValues() const
+{
+    return minValues;
 }

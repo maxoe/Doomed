@@ -5,6 +5,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "world/maze.h"
+#include "world/maze_node.h"
 #include "core/logger.h"
 
 App* App::instance = nullptr;
@@ -95,13 +96,15 @@ int App::initializeGLFW()
 int App::mainLoop()
 {
     Maze maze;
-    glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f));
+    glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 0.05f, 0.05f));
     modelMatrix = glm::rotate(
         modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
     maze.addNode()
-        ->addModel("node1/blender.obj", modelMatrix)
-        ->addPointLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 940.0f, 620.0f), 7);
+        ->addModel("sci-fi/hallway.obj", modelMatrix)
+        ->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
+        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(9.0f, 7.0f, 3.0f), 7)
+        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(3.0f, 9.0f, 7.0f), 7);
 
     while (!glfwWindowShouldClose(window))
     {
