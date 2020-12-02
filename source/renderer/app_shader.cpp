@@ -15,6 +15,7 @@ AppShader::AppShader()
 }
 
 AppShader::AppShader(const char* name)
+    : type(name)
 {
     programId = glCreateProgram();
 
@@ -204,4 +205,9 @@ void AppShader::setDirectionalLight(const glm::vec3& dir, const glm::vec3& inten
 GLuint AppShader::getMaxPointLights() const
 {
     return maxPointLights;
+}
+
+const std::string& AppShader::getType() const
+{
+    return type;
 }

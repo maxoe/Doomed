@@ -50,10 +50,10 @@ Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const s
     ownSize = glm::abs(maxValues - minValues);
 }
 
-void Model::draw(AppShader& shader) const
+void Model::draw(const AppShader* shader) const
 {
-    shader.setMat4f("modelMatrix", modelMatrix);
-    shader.setMat3f("normalMatrix", normalMatrix);
+    shader->setMat4f("modelMatrix", modelMatrix);
+    shader->setMat3f("normalMatrix", normalMatrix);
 
     for (auto* mesh : meshes)
     {

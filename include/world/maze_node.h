@@ -22,7 +22,8 @@ enum class AttachmentPoint
 class MazeNode
 {
 public:
-    MazeNode();
+    MazeNode() = delete;
+    MazeNode(const AppShader* shader);
     MazeNode(const MazeNode&) = delete;
 
     ~MazeNode()
@@ -59,7 +60,7 @@ private:
     std::vector<Model*> models;
     Camera camera;
     std::unordered_map<std::string, GLuint> loadedTextures;
-    AppShader shader;
+    const AppShader* shader;
 
     glm::vec3 ambient;
     glm::vec3 directionalLightDir;

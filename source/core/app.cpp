@@ -95,7 +95,8 @@ int App::initializeGLFW()
 
 int App::mainLoop()
 {
-    Maze maze;
+    Maze maze("deferred_geometry");
+
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 0.05f, 0.05f));
     modelMatrix = glm::rotate(
         modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -127,8 +128,6 @@ int App::mainLoop()
         auto height = 0;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         maze.draw(/*gui->ambient*/);
 
@@ -148,4 +147,19 @@ void App::shutdown()
     LOG_CLEANUP();
     glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+GLFWwindow* App::getWindow()
+{
+    return window;
+}
+
+Gui* App::getGui()
+{
+    return gui;
+}
+
+App* App::getInstance()
+{
+    return instance;
 }
