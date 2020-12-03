@@ -94,7 +94,7 @@ int App::initializeGLFW()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);  // macOS
 
-    glfwWindowHint(GLFW_SAMPLES, 8);  // 8x antialiasing
+    glfwWindowHint(GLFW_SAMPLES, 0);  // 8x antialiasing
 
     // for debugging adjust to your display resolution
     const auto width = 3840;
