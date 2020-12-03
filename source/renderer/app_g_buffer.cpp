@@ -32,7 +32,7 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRbo);
 
     // enable drawing to all textures
-    GLuint drawBuffers[] = {
+    GLenum drawBuffers[] = {
         GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
     glDrawBuffers(sizeof(drawBuffers) / sizeof(GLenum), drawBuffers);
 

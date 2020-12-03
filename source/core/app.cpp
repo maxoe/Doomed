@@ -8,6 +8,8 @@
 #include "world/maze_node.h"
 #include "core/logger.h"
 
+#define PRINT_GL_CALLBACKS 0
+
 App* App::instance = nullptr;
 
 App::App()
@@ -46,6 +48,27 @@ int App::initialize()
 
     gui->initialize(nullptr, window);
 
+#if PRINT_GL_CALLBACKS
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(
+        [](GLenum source,
+           GLenum type,
+           GLuint id,
+           GLenum severity,
+           GLsizei length,
+           const GLchar* message,
+           const void* userParam) {
+            fprintf(
+                stderr,
+                "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+                (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+                type,
+                severity,
+                message);
+        },
+        nullptr);
+#endif
+
     glEnable(GL_DEPTH_TEST);
 
     return 0;
@@ -59,12 +82,14 @@ int App::initializeGLFW()
     }
 
 #if __APPLE__
-    glslVersion = "#version 150";                   // does not match gl version below 3.3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // 3.2 because
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);  // mac
+    glslVersion = "#version 150";  // does not match gl version below 3.3
+    glfwWindowHint(
+        GLFW_CONTEXT_VERSION_MAJOR,
+        3);  // 3.2 because 4.3 only for debugging and don't know if works well on osx
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);  // and mac does not like 3.3
 #else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // 3.3 because
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // not everyone can do 4.x
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // need 4.3 because error callbacks
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 #endif
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);  // macOS
@@ -128,6 +153,8 @@ int App::mainLoop()
         auto height = 0;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         maze.draw(/*gui->ambient*/);
 

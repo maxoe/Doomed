@@ -1,5 +1,7 @@
 #include "renderer/app_renderer.h"
 
+#include <iostream>
+
 #include "core/app.h"
 #include "core/logger.h"
 #include "world/maze.h"
@@ -8,8 +10,7 @@
 
 // shader will be default initialized and fall back to "default"
 AppRenderer::AppRenderer()
-    : type("default")
-    , gBuffer()
+    : AppRenderer("default")
 {
     LOG_RENDERER_WARN("Falling back to default renderer");
 }
@@ -17,6 +18,7 @@ AppRenderer::AppRenderer()
 AppRenderer::AppRenderer(const std::string& renderType)
     : type(renderType)
     , shader(type.c_str())
+    , gBuffer(nullptr)
 {
     if (type == "deferred_geometry")
     {
@@ -24,11 +26,8 @@ AppRenderer::AppRenderer(const std::string& renderType)
         auto height = 0;
 
         glfwGetFramebufferSize(App::getInstance()->getWindow(), &width, &height);
-        gBuffer = AppGBuffer(width, height);
-    }
-    else
-    {
-        gBuffer = AppGBuffer();
+
+        gBuffer = new AppGBuffer(width, height);
     }
 }
 
@@ -64,9 +63,11 @@ void AppRenderer::renderDefault(Maze* maze)
 void AppRenderer::renderDeferred(Maze* maze)
 {
     shader.use();
-
+    auto width = 0;
+    auto height = 0;
+    glfwGetFramebufferSize(App::getInstance()->getWindow(), &width, &height);
     // geometry pass
-    gBuffer.bindForWriting();
+    gBuffer->bindForWriting();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto* node : maze->getNodes())
@@ -79,28 +80,24 @@ void AppRenderer::renderDeferred(Maze* maze)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    gBuffer.bindForReading();
-
-    auto width = 0;
-    auto height = 0;
-    glfwGetFramebufferSize(App::getInstance()->getWindow(), &width, &height);
+    gBuffer->bindForReading();
 
     GLuint halfWidth = width / 2.0f;
     GLuint halfHeight = height / 2.0f;
 
-    gBuffer.setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_POSITION);
+    gBuffer->setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_POSITION);
     glBlitFramebuffer(
         0, 0, width, height, 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-    gBuffer.setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_DIFFUSE);
+    gBuffer->setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_DIFFUSE);
     glBlitFramebuffer(
         0, 0, width, height, 0, halfHeight, halfWidth, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-    gBuffer.setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
+    gBuffer->setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
     glBlitFramebuffer(
         0, 0, width, height, halfWidth, halfHeight, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-    gBuffer.setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_TEXCOORD);
+    gBuffer->setReadBuffer(AppGBuffer::GBUFFER_TEXTURE_TYPE_TEXCOORD);
     glBlitFramebuffer(
         0, 0, width, height, halfWidth, 0, width, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 

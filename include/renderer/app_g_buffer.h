@@ -13,7 +13,7 @@ public:
         GBUFFER_NUM_TEXTURES
     };
 
-    AppGBuffer() = default;
+    AppGBuffer() = delete;
     AppGBuffer(const AppGBuffer& appGBuffer) = delete;
     AppGBuffer(GLuint windowWidth, GLuint windowHeight);
     ~AppGBuffer()

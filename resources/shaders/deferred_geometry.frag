@@ -17,5 +17,5 @@ void main()
 	worldPosOut = vec4(worldPosition, 1.0);
 	diffuseOut = vec4(texture(textureDiffuse0, texCoord).rgb, 1.0);
 	normalOut = vec4(normalize(worldNormalInterpolated), 1.0);
-	texCoordOut = vec4(1.0);
+	texCoordOut = vec4(texCoord, 1.0, 1.0);
 }

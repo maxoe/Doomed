@@ -9,6 +9,10 @@ class AppRenderer
 public:
     AppRenderer();
     AppRenderer(const std::string& type);
+    ~AppRenderer()
+    {
+        delete gBuffer;
+    }
 
     void render(Maze* maze);
     void renderDefault(Maze* maze);
@@ -21,5 +25,5 @@ public:
 private:
     std::string type;
     AppShader shader;
-    AppGBuffer gBuffer;
+    AppGBuffer* gBuffer;
 };
