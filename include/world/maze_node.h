@@ -22,8 +22,7 @@ enum class AttachmentPoint
 class MazeNode
 {
 public:
-    MazeNode() = delete;
-    MazeNode(const AppShader* shader);
+    MazeNode();
     MazeNode(const MazeNode&) = delete;
 
     ~MazeNode()
@@ -34,7 +33,8 @@ public:
         }
     }
 
-    void draw();
+    void setLightUniforms(AppShader& shader);
+    void draw(const AppShader& shader);
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);
@@ -44,23 +44,18 @@ public:
         bool preserveRotation = false);
 
     MazeNode* addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist);
+    const std::vector<PointLight>& getPointLights() const;
 
     MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);
     [[nodiscard]] glm::vec3 MazeNode::getDirectionalLightDirection() const;
     [[nodiscard]] glm::vec3 getDirectionalLightIntensity() const;
 
-    Camera& getCamera();
-
 private:
-    glm::vec3 MazeNode::calcAttachmentOffset(
-        const Model* oldModel,
-        const Model* newModel,
-        AttachmentPoint ap) const;
+    glm::vec3
+    calcAttachmentOffset(const Model* oldModel, const Model* newModel, AttachmentPoint ap) const;
 
     std::vector<Model*> models;
-    Camera camera;
     std::unordered_map<std::string, GLuint> loadedTextures;
-    const AppShader* shader;
 
     glm::vec3 ambient;
     glm::vec3 directionalLightDir;

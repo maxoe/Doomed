@@ -31,6 +31,7 @@ public:
     void setPointLight(const PointLight& pointLight, GLuint index) const;
     void setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const;
 
+    void setMaxPointLights(GLuint num);
     [[nodiscard]] GLuint getMaxPointLights() const;
     [[nodiscard]] const std::string& getType() const;
 
@@ -38,6 +39,6 @@ private:
     inline static const auto shaderDir = std::filesystem::path(APP_SHADER_DIR);
     const std::string type;
     GLuint programId;
-    // CHANGE IN FRAGMENT SHADER TOO OR LEAVE IT
-    const GLuint maxPointLights = 10;
+    // MUST FIT VALUE IN FRAGMENT SHADER
+    GLuint maxPointLights = 10;
 };

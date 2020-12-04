@@ -21,9 +21,12 @@ public:
 
     void draw();
     MazeNode* addNode();
-    const std::vector<MazeNode*>& getNodes();
+    [[nodiscard]] const std::vector<MazeNode*>& getNodes();
+    [[nodiscard]] MazeNode* getActiveNode();
+    [[nodiscard]] const Camera& getCamera() const;
 
 private:
+    Camera camera;
     std::vector<MazeNode*> nodes;
-    AppRenderer renderer;
+    std::shared_ptr<AppRenderer> renderer;
 };

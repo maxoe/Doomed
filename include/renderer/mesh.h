@@ -37,7 +37,7 @@ public:
         glDeleteVertexArrays(1, &vao);
     };
 
-    void draw(const AppShader* shader) const;
+    void draw(const AppShader& shader) const;
 
     std::vector<TextureData>& getTextureData();
 

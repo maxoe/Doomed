@@ -14,9 +14,9 @@ Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const s
     , maxValues(-std::numeric_limits<float>::infinity())
     , minValues(std::numeric_limits<float>::infinity())
 {
-    // load textures of meshes only if not already loaded
     for (auto* mesh : meshes)
     {
+        // load textures of meshes only if not already loaded
         for (auto& texture : mesh->getTextureData())
         {
             texture.path = (std::filesystem::path(textureDir) / texture.path).string();
@@ -50,10 +50,10 @@ Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const s
     ownSize = glm::abs(maxValues - minValues);
 }
 
-void Model::draw(const AppShader* shader) const
+void Model::draw(const AppShader& shader) const
 {
-    shader->setMat4f("modelMatrix", modelMatrix);
-    shader->setMat3f("normalMatrix", normalMatrix);
+    shader.setMat4f("modelMatrix", modelMatrix);
+    shader.setMat3f("normalMatrix", normalMatrix);
 
     for (auto* mesh : meshes)
     {

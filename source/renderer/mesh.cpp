@@ -77,7 +77,7 @@ Mesh::Mesh(
     }
 }
 
-void Mesh::draw(const AppShader* shader) const
+void Mesh::draw(const AppShader& shader) const
 {
     GLuint diffuseNr = 0;
     GLuint specularNr = 0;
@@ -105,7 +105,7 @@ void Mesh::draw(const AppShader* shader) const
                 "Type " + type + " of texture " + textures[i].path + " was not found");
         }
 
-        shader->setInt("material." + type.append(number), i);
+        shader.setInt("material." + type.append(number), i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
 

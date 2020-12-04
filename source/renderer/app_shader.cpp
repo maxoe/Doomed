@@ -211,3 +211,8 @@ const std::string& AppShader::getType() const
 {
     return type;
 }
+
+void AppShader::setMaxPointLights(GLuint num)
+{
+    maxPointLights = num;
+}
