@@ -6,14 +6,14 @@ class PointLight
 {
 public:
     PointLight();
-    PointLight(
-        const glm::vec3& pos,
-        const glm::vec3& intensity,
-        float constAtt,
-        float linAtt,
-        float quadAtt);
+    // PointLight(
+    // const glm::vec3& pos,
+    // const glm::vec3& intensity,
+    // float constAtt,
+    // float linAtt,
+    // float quadAtt);
 
-    PointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist = 20.0f /*arbitrary*/);
+    PointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist = 7.0f /*arbitrary*/);
 
     [[nodiscard]] glm::vec3 getPos() const;
     [[nodiscard]] glm::vec3 getIntensity() const;
@@ -25,6 +25,7 @@ public:
 private:
     glm::vec3 pos;
     glm::vec3 intensity;
+    float dist;
     float constAttenuation;
     float linAttenuation;
     float quadAttenuation;

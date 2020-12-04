@@ -20,7 +20,9 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
         // create storage and attach texture as target
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+            GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textures[i], 0);
     }
@@ -32,8 +34,7 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRbo);
 
     // enable drawing to all textures
-    GLenum drawBuffers[] = {
-        GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
     glDrawBuffers(sizeof(drawBuffers) / sizeof(GLenum), drawBuffers);
 
     const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -46,6 +47,12 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     // restore default fbo
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
+void AppGBuffer::setUniforms(const AppShader& shader) const
+{
+    shader.setInt("positionMap", GBUFFER_TEXTURE_TYPE_POSITION);
+    shader.setInt("diffuseMap", GBUFFER_TEXTURE_TYPE_DIFFUSE);
+    shader.setInt("normalMap", GBUFFER_TEXTURE_TYPE_NORMAL);
+}
 
 void AppGBuffer::bindForWriting() const
 {
@@ -54,10 +61,9 @@ void AppGBuffer::bindForWriting() const
 
 void AppGBuffer::bindForReading() const
 {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-}
-
-void AppGBuffer::setReadBuffer(GBUFFER_TEXTURE_TYPE textureType) const
-{
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + textureType);
+    for (GLuint i = 0; i < sizeof(textures) / sizeof(GBUFFER_TEXTURE_TYPE); ++i)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, textures[GBUFFER_TEXTURE_TYPE_POSITION + i]);
+    }
 }

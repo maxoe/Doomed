@@ -16,7 +16,7 @@ MazeNode::MazeNode()
 {
 }
 
-void MazeNode::setLightUniforms(AppShader& shader)
+void MazeNode::setLightUniforms(const AppShader& shader) const
 {
     shader.setVec3f("ambient", ambient);
 
@@ -178,4 +178,9 @@ MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& i
 const std::vector<PointLight>& MazeNode::getPointLights() const
 {
     return pointLights;
+}
+
+bool MazeNode::getHasDirectionalLight() const
+{
+    return hasDirectionalLight;
 }

@@ -136,6 +136,16 @@ void AppShader::setFloat(const std::string& name, float value) const
     glUniform1f(glGetUniformLocation(programId, name.c_str()), value);
 }
 
+void AppShader::setVec2f(const std::string& name, float x, float y) const
+{
+    glUniform2f(glGetUniformLocation(programId, name.c_str()), x, y);
+}
+
+void AppShader::setVec2f(const std::string& name, const glm::vec2& vec) const
+{
+    glUniform2fv(glGetUniformLocation(programId, name.c_str()), 1, glm::value_ptr(vec));
+}
+
 void AppShader::setVec3f(const std::string& name, float x, float y, float z) const
 {
     glUniform3f(glGetUniformLocation(programId, name.c_str()), x, y, z);

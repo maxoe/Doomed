@@ -33,7 +33,7 @@ public:
         }
     }
 
-    void setLightUniforms(AppShader& shader);
+    void setLightUniforms(const AppShader& shader) const;
     void draw(const AppShader& shader);
 
     MazeNode* addModel(const std::string& relModelPath);
@@ -49,6 +49,7 @@ public:
     MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);
     [[nodiscard]] glm::vec3 MazeNode::getDirectionalLightDirection() const;
     [[nodiscard]] glm::vec3 getDirectionalLightIntensity() const;
+    [[nodiscard]] bool getHasDirectionalLight() const;
 
 private:
     glm::vec3

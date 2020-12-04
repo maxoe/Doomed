@@ -1,5 +1,6 @@
 #pragma once
 #include <glad/glad.h>
+#include <renderer/app_shader.h>
 
 class AppGBuffer
 {
@@ -9,7 +10,6 @@ public:
         GBUFFER_TEXTURE_TYPE_POSITION,
         GBUFFER_TEXTURE_TYPE_DIFFUSE,
         GBUFFER_TEXTURE_TYPE_NORMAL,
-        GBUFFER_TEXTURE_TYPE_TEXCOORD,
         GBUFFER_NUM_TEXTURES
     };
 
@@ -34,9 +34,9 @@ public:
         }
     };
 
+    void setUniforms(const AppShader& shader) const;
     void bindForWriting() const;
     void bindForReading() const;
-    void setReadBuffer(GBUFFER_TEXTURE_TYPE textureType) const;
 
 private:
     GLuint fbo;

@@ -129,8 +129,9 @@ int App::mainLoop()
     maze.addNode()
         ->addModel("sci-fi/hallway.obj", modelMatrix)
         ->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(1.0f, 0.8f, 0.3f), 7)
-        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(0.3f, 1.0f, 0.8f), 7);
+        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(1.0f, 0.8f, 0.3f), 20)
+        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(0.3f, 1.0f, 0.8f), 20)
+        /*->setDirectionalLight(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.05f))*/;
 
     while (!glfwWindowShouldClose(window))
     {

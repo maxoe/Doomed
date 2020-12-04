@@ -5,24 +5,25 @@ PointLight::PointLight()
 {
 }
 
-PointLight::PointLight(
-    const glm::vec3& pos,
-    const glm::vec3& intensity,
-    float constAtt,
-    float linAtt,
-    float quadAtt)
-    : pos(pos)
-    , intensity(intensity)
-    , constAttenuation(constAtt)
-    , linAttenuation(linAtt)
-    , quadAttenuation(quadAtt)
-{
-}
+// PointLight::PointLight(
+//    const glm::vec3& pos,
+//    const glm::vec3& intensity,
+//    float constAtt,
+//    float linAtt,
+//    float quadAtt)
+//    : pos(pos)
+//    , intensity(intensity)
+//    , constAttenuation(constAtt)
+//    , linAttenuation(linAtt)
+//    , quadAttenuation(quadAtt)
+//{
+//}
 
 /* See http://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation */
 PointLight::PointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist)
     : pos(pos)
     , intensity(intensity)
+    , dist(dist)
 {
     const auto& att = attenuationFromDist(dist);
     constAttenuation = att[0];
@@ -131,13 +132,13 @@ float PointLight::getQuadAttenuation() const
  */
 float PointLight::getDist() const
 {
-    float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
+    /*float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
 
     float dist =
         (-linAttenuation + sqrtf(
                                linAttenuation * linAttenuation -
                                4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
-        (2 * quadAttenuation);
+        (2 * quadAttenuation);*/
 
     return dist;
 }
