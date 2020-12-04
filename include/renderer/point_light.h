@@ -20,6 +20,7 @@ public:
     [[nodiscard]] float getConstAttenuation() const;
     [[nodiscard]] float getLinAttenuation() const;
     [[nodiscard]] float getQuadAttenuation() const;
+    [[nodiscard]] float getDist() const;
 
 private:
     glm::vec3 pos;

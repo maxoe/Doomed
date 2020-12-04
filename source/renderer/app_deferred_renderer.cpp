@@ -1,5 +1,4 @@
 #include "renderer/app_deferred_renderer.h"
-#include "renderer/app_renderer.h"
 
 #include <iostream>
 
@@ -9,6 +8,9 @@
 #include <renderer/model_loader.h>
 
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_inverse.inl>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // shader will be default initialized and fall back to "default"
 
@@ -62,6 +64,7 @@ void AppDeferredRenderer::render(Maze* maze)
     glBlendFunc(GL_ONE, GL_ONE);
 
     gBuffer->bindForReading();
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // point light pass
@@ -77,9 +80,14 @@ void AppDeferredRenderer::render(Maze* maze)
     {
         // only one light per draw call so index is 0
         pointLightShader.setPointLight(l, 0);
+        float lightDist = l.getDist();
+        // std::cout << lightDist << std::endl;
+        glm::mat4 modelMatrix = glm::scale(glm::vec3(lightDist));
+        boundingSphere->setModelMatrix(modelMatrix);
+        boundingSphere->draw(pointLightShader);
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 std::string AppDeferredRenderer::getTypeName() const

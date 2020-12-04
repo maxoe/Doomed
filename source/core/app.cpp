@@ -120,7 +120,7 @@ int App::initializeGLFW()
 
 int App::mainLoop()
 {
-    Maze maze("default");
+    Maze maze("deferred");
 
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 0.05f, 0.05f));
     modelMatrix = glm::rotate(
@@ -129,8 +129,8 @@ int App::mainLoop()
     maze.addNode()
         ->addModel("sci-fi/hallway.obj", modelMatrix)
         ->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(9.0f, 7.0f, 3.0f), 7)
-        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(3.0f, 9.0f, 7.0f), 7);
+        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(1.0f, 0.8f, 0.3f), 7)
+        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(0.3f, 1.0f, 0.8f), 7);
 
     while (!glfwWindowShouldClose(window))
     {
