@@ -28,10 +28,11 @@ public:
     }
 
 private:
-    std::array<AppShader, 3> shader{
+    std::array<AppShader, 4> shader{
         "deferred_geometry",
         "deferred_point_light",
-        "deferred_dir_light"};
+        "deferred_dir_light",
+        "null_pass"};
     std::shared_ptr<AppGBuffer> gBuffer;
     Model* boundingSphere;
     Model* quad;

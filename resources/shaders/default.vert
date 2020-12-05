@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 layout(location = 0) in vec3 POSITION; // position of the vertex in object space
 layout(location = 1) in vec3 NORMAL;   // normal of the vertex in object space

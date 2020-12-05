@@ -28,18 +28,28 @@ public:
             glDeleteTextures(sizeof(textures) / sizeof(GBUFFER_TEXTURE_TYPE), textures);
         }
 
-        if (depthRbo != 0)
+        if (depthTexture != 0)
         {
-            glDeleteTextures(1, &depthRbo);
+            glDeleteTextures(1, &depthTexture);
+        }
+
+        if (finalTexture != 0)
+        {
+            glDeleteTextures(1, &finalTexture);
         }
     };
 
+    void startFrame() const;
+    void bindForGeometryPass() const;
+    void bindForStencilPass() const;
+    void bindForLightPass() const;
+    void bindForFinalPass() const;
+
     void setUniforms(const AppShader& shader) const;
-    void bindForWriting() const;
-    void bindForReading() const;
 
 private:
     GLuint fbo;
     GLuint textures[GBUFFER_NUM_TEXTURES];
-    GLuint depthRbo;
+    GLuint depthTexture;
+    GLuint finalTexture;
 };

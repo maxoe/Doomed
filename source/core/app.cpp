@@ -69,8 +69,6 @@ int App::initialize()
         nullptr);
 #endif
 
-    glEnable(GL_DEPTH_TEST);
-
     return 0;
 }
 
@@ -149,13 +147,16 @@ int App::mainLoop()
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
+
         // render
         auto width = 0;
         auto height = 0;
         glfwGetFramebufferSize(window, &width, &height);
+
         glViewport(0, 0, width, height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_TEST);
 
         maze.draw(/*gui->ambient*/);
 

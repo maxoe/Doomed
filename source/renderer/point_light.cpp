@@ -132,13 +132,11 @@ float PointLight::getQuadAttenuation() const
  */
 float PointLight::getDist() const
 {
-    /*float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
+    float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
 
-    float dist =
-        (-linAttenuation + sqrtf(
-                               linAttenuation * linAttenuation -
-                               4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
-        (2 * quadAttenuation);*/
-
+    // return (-linAttenuation + sqrtf(
+    //                            linAttenuation * linAttenuation -
+    //                          4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
+    // (2 * quadAttenuation);
     return dist;
 }

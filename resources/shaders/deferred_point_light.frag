@@ -1,4 +1,5 @@
-#version 330 core	
+#version 400 core
+
 
 float n = 10;
 vec3 kS = vec3(1.0f, 1.0f, 1.0f);
