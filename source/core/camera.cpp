@@ -6,10 +6,15 @@
 
 Camera::Camera()
     : camWorldPos(0.0f, 0.0f, -5.0f)
-    , cameraWorldDir(0.0f, 0.0f, 1.0f)
+    , cameraWorldDir(glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)))
+    , up(glm::vec3(0.0f, 1.0f, 0.0f))
+    , yaw(glm::degrees(glm::atan(cameraWorldDir.z, cameraWorldDir.x)))
+    , pitch(glm::degrees(glm::asin(cameraWorldDir.y)))
+    , fov(45.0f)
+    , aspectRatio(3840.f / 2160.f)
+    , near(0.1f)
+    , far(100.0f)
 {
-    view = glm::lookAt(camWorldPos, camWorldPos + cameraWorldDir, glm::vec3(0.0f, 1.0f, 0.0f));
-    projection = glm::perspective(glm::radians(45.0f), 3840.0f / 2160.0f, 0.1f, 100.0f);
 }
 
 glm::vec3 Camera::getCamWorldPos() const
@@ -24,17 +29,17 @@ glm::vec3 Camera::getCameraWorldDir() const
 
 glm::mat4 Camera::getView() const
 {
-    return view;
+    return glm::lookAt(camWorldPos, camWorldPos + cameraWorldDir, up);
 }
 
 glm::mat4 Camera::getProjection() const
 {
-    return projection;
+    return glm::perspective(glm::radians(fov), aspectRatio, near, far);
 }
 
 glm::mat4 Camera::getVP() const
 {
-    return projection * view;
+    return getProjection() * getView();
 }
 
 void Camera::setCamWorldPos(const glm::vec3& pos)
@@ -44,14 +49,30 @@ void Camera::setCamWorldPos(const glm::vec3& pos)
 
 void Camera::setCameraWorldDir(const glm::vec3& dir)
 {
-    cameraWorldDir = dir;
-}
-void Camera::setView(const glm::mat4& view)
-{
-    this->view = view;
+    cameraWorldDir = glm::normalize(dir);
 }
 
-void Camera::setProjection(const glm::mat4& projection)
+void Camera::move(const glm::vec2& deltaPos)
 {
-    this->projection = projection;
+    camWorldPos += cameraWorldDir * deltaPos.x;
+    camWorldPos += glm::normalize(glm::cross(cameraWorldDir, up)) * deltaPos.y;
+}
+
+void Camera::addYaw(float deltaDegrees)
+{
+    yaw += deltaDegrees;
+    cameraWorldDir.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+    cameraWorldDir.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+}
+
+void Camera::addPitch(float deltaDegrees)
+{
+    pitch += deltaDegrees;
+
+    pitch = pitch > 89.0f ? 89.0f : pitch;
+    pitch = pitch < -89.0f ? -89.0f : pitch;
+
+    cameraWorldDir.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+    cameraWorldDir.y = glm::sin(glm::radians(pitch));
+    cameraWorldDir.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
 }

@@ -13,14 +13,14 @@
 App* App::instance = nullptr;
 
 App::App()
+    : width(3840)  // initial width and height
+    , height(2160)
 {
     assert(!instance);
     if (instance == nullptr)
     {
         instance = this;
     }
-
-    this->gui = new Gui();
 
     LOG_CORE_INFO("GUI has been successfully initialized");
 }
@@ -46,7 +46,9 @@ int App::initialize()
         return 1;
     }
 
-    gui->initialize(nullptr, window);
+    gui.initialize(nullptr, window);
+    maze = Maze("deferred");
+    inputDispatcher = InputDispatcher(width, height);
 
 #if PRINT_GL_CALLBACKS
     glEnable(GL_DEBUG_OUTPUT);
@@ -94,9 +96,6 @@ int App::initializeGLFW()
 
     glfwWindowHint(GLFW_SAMPLES, 8);  // 8x antialiasing
 
-    // for debugging adjust to your display resolution
-    const auto width = 3840;
-    const auto height = 2160;
     window =
         glfwCreateWindow(width, height, "Doomed", nullptr /*glfwGetPrimaryMonitor()*/, nullptr);
 
@@ -108,18 +107,31 @@ int App::initializeGLFW()
 
     glfwMakeContextCurrent(window);
 
-    glfwSetWindowSizeCallback(
-        window, [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); });
+    glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        glViewport(0, 0, width, height);
+        getInstance()->setWidth(width);
+        getInstance()->setHeight(height);
+    });
 
-    // TODO: Register event callback
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xPos, double yPos) {
+        getInstance()->inputDispatcher.processMouseMovement(
+            getInstance()->getMaze().getCamera(), xPos, yPos);
+    });
+
+    glfwSetCursorEnterCallback(window, [](GLFWwindow* window, int entered) {
+        if (!entered)
+        {
+            getInstance()->getInputDispatcher().onMouseOut();
+        }
+    });
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     return 1;
 }
 
 int App::mainLoop()
 {
-    Maze maze("deferred");
-
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 0.05f, 0.05f));
     modelMatrix = glm::rotate(
         modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -135,11 +147,13 @@ int App::mainLoop()
     {
         glfwPollEvents();
 
-        gui->prepare();
-        gui->defineWindow();
+        processInput();
+
+        gui.prepare();
+        gui.defineWindow();
 
         // TODO one ui for game one for rendering debug
-        if (gui->isWireframeModeEnabled)
+        if (gui.isWireframeModeEnabled)
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
@@ -156,11 +170,9 @@ int App::mainLoop()
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glEnable(GL_DEPTH_TEST);
-
         maze.draw(/*gui->ambient*/);
 
-        gui->render();
+        gui.render();
 
         glfwSwapBuffers(window);
     }
@@ -170,9 +182,41 @@ int App::mainLoop()
     return 0;
 }
 
+void App::processInput()
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
+
+    InputDispatcher::Movement keys = InputDispatcher::Movement::NONE;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        keys |= InputDispatcher::Movement::FRONT;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        keys |= InputDispatcher::Movement::BACK;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        keys |= InputDispatcher::Movement::LEFT;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        keys |= InputDispatcher::Movement::RIGHT;
+    }
+
+    inputDispatcher.processKeyInput(keys, maze.getCamera());
+}
+
 void App::shutdown()
 {
-    gui->shutdown();
+    gui.shutdown();
     LOG_CLEANUP();
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -183,12 +227,31 @@ GLFWwindow* App::getWindow()
     return window;
 }
 
-Gui* App::getGui()
+const Gui& App::getGui() const
 {
     return gui;
+}
+
+InputDispatcher& App::getInputDispatcher()
+{
+    return inputDispatcher;
+}
+
+Maze& App::getMaze()
+{
+    return maze;
 }
 
 App* App::getInstance()
 {
     return instance;
+}
+
+void App::setWidth(float width)
+{
+    this->width = width;
+}
+void App::setHeight(float height)
+{
+    this->height = height;
 }

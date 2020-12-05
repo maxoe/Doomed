@@ -14,12 +14,19 @@ public:
 
     void setCamWorldPos(const glm::vec3& pos);
     void setCameraWorldDir(const glm::vec3& dir);
-    void setView(const glm::mat4& view);
-    void setProjection(const glm::mat4& projection);
+    void move(const glm::vec2& deltaPos);
+    void addYaw(float deltaDegrees);
+    void addPitch(float deltaDegrees);
 
 private:
     glm::vec3 camWorldPos;
     glm::vec3 cameraWorldDir;
-    glm::mat4 view;
-    glm::mat4 projection;
+    glm::vec3 up;
+    float yaw;
+    float pitch;
+
+    float fov;
+    float aspectRatio;
+    float near;
+    float far;
 };

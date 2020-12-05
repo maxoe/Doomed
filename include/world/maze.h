@@ -23,7 +23,7 @@ public:
     MazeNode* addNode();
     [[nodiscard]] const std::vector<MazeNode*>& getNodes();
     [[nodiscard]] MazeNode* getActiveNode();
-    [[nodiscard]] const Camera& getCamera() const;
+    [[nodiscard]] Camera* getCamera();
 
 private:
     Camera camera;

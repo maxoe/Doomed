@@ -37,7 +37,7 @@ MazeNode* Maze::getActiveNode()
     return nodes.empty() ? nullptr : nodes[0];
 }
 
-const Camera& Maze::getCamera() const
+Camera* Maze::getCamera()
 {
-    return camera;
+    return &camera;
 }

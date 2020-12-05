@@ -56,8 +56,8 @@ void AppDeferredRenderer::render(Maze* maze)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    const auto& c = maze->getCamera();
-    geometryShader.setMat4f("VP", c.getVP());
+    const auto* c = maze->getCamera();
+    geometryShader.setMat4f("VP", c->getVP());
 
     for (auto* node : maze->getNodes())
     {
@@ -73,7 +73,7 @@ void AppDeferredRenderer::render(Maze* maze)
     stencilPassShader.use();
 
     // camera uniforms
-    stencilPassShader.setMat4f("VP", c.getVP());
+    stencilPassShader.setMat4f("VP", c->getVP());
 
     // point light pass setup
     pointLightShader.use();
@@ -81,8 +81,8 @@ void AppDeferredRenderer::render(Maze* maze)
     pointLightShader.setVec2f("screenSize", width, height);
 
     // camera uniforms
-    pointLightShader.setMat4f("VP", c.getVP());
-    pointLightShader.setVec3f("camWorldPos", c.getCamWorldPos());
+    pointLightShader.setMat4f("VP", c->getVP());
+    pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
 
     // need light position and distance
     for (const auto& l : maze->getActiveNode()->getPointLights())
