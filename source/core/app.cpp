@@ -92,7 +92,7 @@ int App::initializeGLFW()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);  // macOS
 
-    glfwWindowHint(GLFW_SAMPLES, 0);  // 8x antialiasing
+    glfwWindowHint(GLFW_SAMPLES, 8);  // 8x antialiasing
 
     // for debugging adjust to your display resolution
     const auto width = 3840;
@@ -127,9 +127,9 @@ int App::mainLoop()
     maze.addNode()
         ->addModel("sci-fi/hallway.obj", modelMatrix)
         ->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(1.0f, 0.8f, 0.3f), 20)
-        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(0.3f, 1.0f, 0.8f), 20)
-        /*->setDirectionalLight(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.05f))*/;
+        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(1.0f, 0.8f, 0.3f), 50)
+        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(0.3f, 1.0f, 0.8f), 50)
+        ->setDirectionalLight(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.05f));
 
     while (!glfwWindowShouldClose(window))
     {
