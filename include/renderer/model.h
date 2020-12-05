@@ -22,7 +22,7 @@ public:
         }
     }
 
-    void draw(AppShader& shader) const;
+    void draw(const AppShader& shader) const;
 
     void setModelMatrix(const glm::mat4& matrix);
     void addModelTransformation(const glm::mat4& matrix);

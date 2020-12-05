@@ -15,6 +15,7 @@ AppShader::AppShader()
 }
 
 AppShader::AppShader(const char* name)
+    : type(name)
 {
     programId = glCreateProgram();
 
@@ -135,6 +136,16 @@ void AppShader::setFloat(const std::string& name, float value) const
     glUniform1f(glGetUniformLocation(programId, name.c_str()), value);
 }
 
+void AppShader::setVec2f(const std::string& name, float x, float y) const
+{
+    glUniform2f(glGetUniformLocation(programId, name.c_str()), x, y);
+}
+
+void AppShader::setVec2f(const std::string& name, const glm::vec2& vec) const
+{
+    glUniform2fv(glGetUniformLocation(programId, name.c_str()), 1, glm::value_ptr(vec));
+}
+
 void AppShader::setVec3f(const std::string& name, float x, float y, float z) const
 {
     glUniform3f(glGetUniformLocation(programId, name.c_str()), x, y, z);
@@ -204,4 +215,14 @@ void AppShader::setDirectionalLight(const glm::vec3& dir, const glm::vec3& inten
 GLuint AppShader::getMaxPointLights() const
 {
     return maxPointLights;
+}
+
+const std::string& AppShader::getType() const
+{
+    return type;
+}
+
+void AppShader::setMaxPointLights(GLuint num)
+{
+    maxPointLights = num;
 }

@@ -16,13 +16,8 @@ MazeNode::MazeNode()
 {
 }
 
-void MazeNode::draw()
+void MazeNode::setLightUniforms(const AppShader& shader) const
 {
-    shader.use();
-
-    shader.setMat4f("VP", camera.getVP());
-    shader.setVec3f("camWorldPos", camera.getCamWorldPos());
-
     shader.setVec3f("ambient", ambient);
 
     if (hasDirectionalLight)
@@ -36,8 +31,11 @@ void MazeNode::draw()
     }
 
     shader.setInt(std::string("pointLightCount"), pointLights.size());
+}
 
-    for (auto* model : models)
+void MazeNode::draw(const AppShader& shader)
+{
+    for (const auto* model : models)
     {
         model->draw(shader);
     }
@@ -153,23 +151,9 @@ glm::vec3 MazeNode::calcAttachmentOffset(
 
 MazeNode* MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist)
 {
-    if (pointLights.size() == shader.getMaxPointLights())
-    {
-        LOG_WORLD_ERROR(
-            "Error setting point light in maze node: Max point lights " +
-            std::to_string(shader.getMaxPointLights()) + " exceeded.");
-    }
-    else
-    {
-        pointLights.emplace_back(PointLight(pos, intensity, dist));
-    }
+    pointLights.emplace_back(PointLight(pos, intensity, dist));
 
     return this;
-}
-
-Camera& MazeNode::getCamera()
-{
-    return camera;
 }
 
 glm::vec3 MazeNode::getDirectionalLightDirection() const
@@ -189,4 +173,14 @@ MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& i
     hasDirectionalLight = true;
 
     return this;
+}
+
+const std::vector<PointLight>& MazeNode::getPointLights() const
+{
+    return pointLights;
+}
+
+bool MazeNode::getHasDirectionalLight() const
+{
+    return hasDirectionalLight;
 }

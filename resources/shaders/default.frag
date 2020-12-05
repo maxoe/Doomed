@@ -1,4 +1,4 @@
-#version 330 core	
+#version 400 core
 
 /* NOT AVAILABLE ANYMORE AS CONSTANTS --> READ FROM TEXTURE OR WAIT UNTIL MATERIAL IS READ  */
 //uniform vec3 kS; // specular material parameter  NOT AVAILABLE ANYMORE

@@ -77,7 +77,7 @@ Mesh::Mesh(
     }
 }
 
-void Mesh::draw(AppShader& shader) const
+void Mesh::draw(const AppShader& shader) const
 {
     GLuint diffuseNr = 0;
     GLuint specularNr = 0;

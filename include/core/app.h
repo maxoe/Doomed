@@ -19,6 +19,8 @@ public:
     void shutdown();
     static App* getInstance();
     int mainLoop();
+    GLFWwindow* getWindow();
+    Gui* getGui();
 
 private:
     static App* instance;

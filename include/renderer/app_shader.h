@@ -21,6 +21,8 @@ public:
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;
     void setFloat(const std::string& name, float value) const;
+    void setVec2f(const std::string& name, float x, float y) const;
+    void setVec2f(const std::string& name, const glm::vec2& vec) const;
     void setVec3f(const std::string& name, float x, float y, float z) const;
     void setVec3f(const std::string& name, const glm::vec3& vec) const;
     void setVec4f(const std::string& name, float x, float y, float z, float w) const;
@@ -31,11 +33,14 @@ public:
     void setPointLight(const PointLight& pointLight, GLuint index) const;
     void setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const;
 
+    void setMaxPointLights(GLuint num);
     [[nodiscard]] GLuint getMaxPointLights() const;
+    [[nodiscard]] const std::string& getType() const;
 
 private:
     inline static const auto shaderDir = std::filesystem::path(APP_SHADER_DIR);
+    const std::string type;
     GLuint programId;
-    // CHANGE IN FRAGMENT SHADER TOO OR LEAVE IT
-    const GLuint maxPointLights = 10;
+    // MUST FIT VALUE IN FRAGMENT SHADER
+    GLuint maxPointLights = 10;
 };

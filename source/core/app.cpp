@@ -8,6 +8,8 @@
 #include "world/maze_node.h"
 #include "core/logger.h"
 
+#define PRINT_GL_CALLBACKS 0
+
 App* App::instance = nullptr;
 
 App::App()
@@ -46,7 +48,26 @@ int App::initialize()
 
     gui->initialize(nullptr, window);
 
-    glEnable(GL_DEPTH_TEST);
+#if PRINT_GL_CALLBACKS
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(
+        [](GLenum source,
+           GLenum type,
+           GLuint id,
+           GLenum severity,
+           GLsizei length,
+           const GLchar* message,
+           const void* userParam) {
+            fprintf(
+                stderr,
+                "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+                (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+                type,
+                severity,
+                message);
+        },
+        nullptr);
+#endif
 
     return 0;
 }
@@ -59,12 +80,14 @@ int App::initializeGLFW()
     }
 
 #if __APPLE__
-    glslVersion = "#version 150";                   // does not match gl version below 3.3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // 3.2 because
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);  // mac
+    glslVersion = "#version 150";  // does not match gl version below 3.3
+    glfwWindowHint(
+        GLFW_CONTEXT_VERSION_MAJOR,
+        3);  // 3.2 because 4.3 only for debugging and don't know if works well on osx
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);  // and mac does not like 3.3
 #else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // 3.3 because
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // not everyone can do 4.x
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // need 4.3 because error callbacks
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 #endif
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);  // macOS
@@ -95,7 +118,8 @@ int App::initializeGLFW()
 
 int App::mainLoop()
 {
-    Maze maze;
+    Maze maze("deferred");
+
     glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 0.05f, 0.05f));
     modelMatrix = glm::rotate(
         modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -103,8 +127,9 @@ int App::mainLoop()
     maze.addNode()
         ->addModel("sci-fi/hallway.obj", modelMatrix)
         ->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(9.0f, 7.0f, 3.0f), 7)
-        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(3.0f, 9.0f, 7.0f), 7);
+        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(1.0f, 0.8f, 0.3f), 50)
+        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(0.3f, 1.0f, 0.8f), 50)
+        ->setDirectionalLight(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.05f));
 
     while (!glfwWindowShouldClose(window))
     {
@@ -122,13 +147,16 @@ int App::mainLoop()
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
+
         // render
         auto width = 0;
         auto height = 0;
         glfwGetFramebufferSize(window, &width, &height);
+
         glViewport(0, 0, width, height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_TEST);
 
         maze.draw(/*gui->ambient*/);
 
@@ -148,4 +176,19 @@ void App::shutdown()
     LOG_CLEANUP();
     glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+GLFWwindow* App::getWindow()
+{
+    return window;
+}
+
+Gui* App::getGui()
+{
+    return gui;
+}
+
+App* App::getInstance()
+{
+    return instance;
 }
