@@ -45,5 +45,4 @@ private:
     float movementSpeed;
 
     float lastMovementFrame;
-    float lastMouseFrame;
 };

@@ -5,12 +5,11 @@
 
 InputDispatcher::InputDispatcher()
     : firstMouse(true)
-    , mouseSensitivity(0.2f)
-    , movementSpeed(5.0f)
+    , mouseSensitivity(0.05f)
     , lastMouseX(0.0f)
     , lastMouseY(0.0f)
+    , movementSpeed(0.5f)
     , lastMovementFrame(glfwGetTime())
-    , lastMouseFrame(glfwGetTime())
 {
 }
 
@@ -28,10 +27,6 @@ void InputDispatcher::onMouseOut()
 
 void InputDispatcher::processMouseMovement(Camera* camera, double xPos, double yPos)
 {
-    float currentMouseFrame = glfwGetTime();
-    float currentMouseDelta = currentMouseFrame - lastMouseFrame;
-    lastMouseFrame = currentMouseFrame;
-
     if (firstMouse)
     {
         lastMouseX = xPos;
@@ -41,8 +36,8 @@ void InputDispatcher::processMouseMovement(Camera* camera, double xPos, double y
 
     float xMouseOffset = xPos - lastMouseX;
     float yMouseOffset = lastMouseY - yPos;
-    xMouseOffset *= mouseSensitivity * currentMouseDelta;
-    yMouseOffset *= mouseSensitivity * currentMouseDelta;
+    xMouseOffset *= mouseSensitivity;
+    yMouseOffset *= mouseSensitivity;
 
     lastMouseX = xPos;
     lastMouseY = yPos;

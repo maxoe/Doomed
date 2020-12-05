@@ -35,6 +35,11 @@ public:
         glDeleteBuffers(1, &vbo);
         glDeleteBuffers(1, &ebo);
         glDeleteVertexArrays(1, &vao);
+
+        for (const auto& t : textures)
+        {
+            glDeleteTextures(1, &t.id);
+        }
     };
 
     void draw(const AppShader& shader) const;

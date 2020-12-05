@@ -5,8 +5,8 @@
 #include <glm/ext/matrix_transform.hpp>
 
 Camera::Camera()
-    : camWorldPos(0.0f, 0.0f, -5.0f)
-    , cameraWorldDir(glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)))
+    : camWorldPos(0.0f, 0.0f, 0.0f)
+    , cameraWorldDir(glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)))
     , up(glm::vec3(0.0f, 1.0f, 0.0f))
     , yaw(glm::degrees(glm::atan(cameraWorldDir.z, cameraWorldDir.x)))
     , pitch(glm::degrees(glm::asin(cameraWorldDir.y)))
