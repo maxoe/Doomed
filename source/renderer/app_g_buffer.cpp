@@ -75,7 +75,8 @@ void AppGBuffer::bindForGeometryPass() const
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
     // enable drawing to all textures
-    GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+    GLenum drawBuffers[] = {
+        GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
     glDrawBuffers(sizeof(drawBuffers) / sizeof(GLenum), drawBuffers);
 }
 
@@ -108,5 +109,6 @@ void AppGBuffer::setUniforms(const AppShader& shader) const
 {
     shader.setInt("positionMap", GBUFFER_TEXTURE_TYPE_POSITION);
     shader.setInt("diffuseMap", GBUFFER_TEXTURE_TYPE_DIFFUSE);
+    shader.setInt("specularMap", GBUFFER_TEXTURE_TYPE_SPECULAR);
     shader.setInt("normalMap", GBUFFER_TEXTURE_TYPE_NORMAL);
 }
