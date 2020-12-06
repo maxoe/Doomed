@@ -139,9 +139,9 @@ int App::mainLoop()
     maze.addNode()
         ->addModel("debug/sponza/sponza.obj", 50.0f)
         //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        //->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(0.3f, 1.0f, 0.8f), 50)
-        ->addPointLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), 50)
-        ->setDirectionalLight(glm::vec3(0.0f, -1.0f, 1.0f), glm::vec3(0.5f));
+        ->addPointLight(glm::vec3(15.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 20)
+        ->addPointLight(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(2.0f), 50)
+        ->setDirectionalLight(glm::vec3(0.0f, -1.0f, 1.0f), glm::vec3(0.3f));
 
     while (!glfwWindowShouldClose(window))
     {
