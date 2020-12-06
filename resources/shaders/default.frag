@@ -5,7 +5,7 @@
 //uniform vec3 kD; // diffuse material parameter   NOT AVAILABLE ANYMORE
 //uniform float n;  // phong exponent of the material  NOT AVAILABLE ANYMORE
 float n = 10;
-vec3 kS = vec3(1.0f, 1.0f, 1.0f);
+vec3 kS = vec3(0.0f);
 
 struct Light
 {

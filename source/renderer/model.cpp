@@ -6,8 +6,13 @@
 
 #include <string>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtx/transform.hpp>
 
-Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const std::string& tDir)
+Model::Model(
+    std::vector<Mesh*>& loadedMeshes,
+    const std::string& mPath,
+    const std::string& tDir,
+    float maxDimLength)
     : modelPath(mPath)
     , textureDir(tDir)
     , meshes(loadedMeshes)
@@ -48,6 +53,11 @@ Model::Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const s
     }
 
     ownSize = glm::abs(maxValues - minValues);
+
+    if (maxDimLength != std::numeric_limits<float>::infinity())
+    {
+        resize(maxDimLength);
+    }
 }
 
 void Model::draw(const AppShader& shader) const
@@ -76,6 +86,14 @@ void Model::addModelTransformation(const glm::mat4& matrix)
 {
     modelMatrix = matrix * modelMatrix;
     normalMatrix = glm::inverseTranspose(glm::mat3(modelMatrix));
+}
+
+void Model::resize(float maxDimensionLength)
+{
+    auto s = getObjectSize();
+    float maxLength = glm::max(s.x, glm::max(s.y, s.z));
+
+    addModelTransformation(glm::scale(glm::vec3(maxDimensionLength / maxLength)));
 }
 
 const glm::mat4& Model::getModelMatrix() const

@@ -2,7 +2,7 @@
 
 
 float n = 10;
-vec3 kS = vec3(1.0f, 1.0f, 1.0f);
+vec3 kS = vec3(0.0f);
 
 struct Light
 {
@@ -41,9 +41,9 @@ vec3 getPointLightContribution(vec3 worldPos, vec3 worldNormal, vec3 color)
 	
 	float dist = length(lightDir);
 	vec3 intensity = lightIntensity / (pointLights[0].constAtt + pointLights[0].linAtt * dist + 
-    		    pointLights[0].quadAtt * (dist * dist));    
+    		    pointLights[0].quadAtt * (dist * dist));
 
-	return vec3((diffuse + specular ) * intensity);
+	return (diffuse + specular ) * intensity;
 }
 
 vec2 calcTexCoord()
@@ -59,5 +59,5 @@ void main()
 	vec3 diff = texture(diffuseMap, gBufferTexCoord).xyz;
 	vec3 worldNormal = texture(normalMap, gBufferTexCoord).xyz;
 	
-	fragColor = vec4(getPointLightContribution(worldPos, worldNormal, diff), 1.0);
+	fragColor = vec4(getPointLightContribution(worldPos, worldNormal, diff), 0.3);
 }

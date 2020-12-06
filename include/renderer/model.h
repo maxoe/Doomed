@@ -12,7 +12,11 @@ class Model
 {
 public:
     Model() = default;
-    Model(std::vector<Mesh*>& loadedMeshes, const std::string& mPath, const std::string& tDir);
+    Model(
+        std::vector<Mesh*>& loadedMeshes,
+        const std::string& mPath,
+        const std::string& tDir,
+        float maxDimensionLength = std::numeric_limits<float>::infinity());
 
     ~Model()
     {
@@ -25,6 +29,7 @@ public:
     void draw(const AppShader& shader) const;
 
     void setModelMatrix(const glm::mat4& matrix);
+    void resize(float maxDimensionLength);
     void addModelTransformation(const glm::mat4& matrix);
 
     [[nodiscard]] const std::unordered_map<std::string, GLuint>& getTextureRegistry() const;

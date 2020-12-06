@@ -49,6 +49,14 @@ MazeNode* MazeNode::addModel(const std::string& relModelPath, const glm::mat4& m
     return this;
 }
 
+MazeNode* MazeNode::addModel(const std::string& relModelPath, float maxDimensionLength)
+{
+    models.emplace_back(ModelLoader::load(relModelPath));
+    models.back()->resize(maxDimensionLength);
+
+    return this;
+}
+
 MazeNode* MazeNode::addModel(const std::string& relModelPath)
 {
     glm::mat4 modelMatrix = glm::identity<glm::mat4>();

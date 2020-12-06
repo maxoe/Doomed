@@ -38,6 +38,7 @@ public:
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);
+    MazeNode* addModel(const std::string& relModelPath, float maxDimensionLength);
     MazeNode* attachModelToLast(
         const std::string& relModelPath,
         AttachmentPoint ap,

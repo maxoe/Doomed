@@ -1,7 +1,7 @@
 #version 400 core
 
 float n = 10;
-vec3 kS = vec3(1.0f, 1.0f, 1.0f);
+vec3 kS = vec3(0.0);
 
 uniform vec3 directionalLightDir;
 uniform vec3 directionalLightIntensity;
@@ -32,7 +32,7 @@ vec3 getDirLightContribution(vec3 worldPos, vec3 worldNormal, vec3 color)
 //  no attenuation
 //	vec3 intensity = directionalLightIntensity / pow(length(lightDir), 2);
 
-	return vec3((diffuse + specular ) * directionalLightIntensity);
+	return (diffuse + specular) * directionalLightIntensity;
 }
 
 vec2 calcTexCoord()

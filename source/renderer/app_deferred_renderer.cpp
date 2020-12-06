@@ -24,7 +24,6 @@ AppDeferredRenderer::AppDeferredRenderer()
     gBuffer = std::make_shared<AppGBuffer>(width, height);
     boundingSphere = ModelLoader::load("deferred_shading/sphere.obj");
     quad = ModelLoader::load("deferred_shading/quad.obj");
-    quad->setModelMatrix(glm::identity<glm::mat4>());
 
     LOG_RENDERER_INFO("Using " + getTypeNameStatic() + " renderer");
 }
@@ -75,15 +74,6 @@ void AppDeferredRenderer::render(Maze* maze)
     // camera uniforms
     stencilPassShader.setMat4f("VP", c->getVP());
 
-    // point light pass setup
-    pointLightShader.use();
-    gBuffer->setUniforms(pointLightShader);
-    pointLightShader.setVec2f("screenSize", width, height);
-
-    // camera uniforms
-    pointLightShader.setMat4f("VP", c->getVP());
-    pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
-
     // need light position and distance
     for (const auto& l : maze->getActiveNode()->getPointLights())
     {
@@ -108,13 +98,22 @@ void AppDeferredRenderer::render(Maze* maze)
         // point light pass
         pointLightShader.use();
         gBuffer->bindForLightPass();
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_ONE, GL_ONE);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
+
+        // point light pass setup
+
+        gBuffer->setUniforms(pointLightShader);
+        pointLightShader.setVec2f("screenSize", width, height);
+
+        // camera uniforms
+        pointLightShader.setMat4f("VP", c->getVP());
+        pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
 
         // only one light per draw call so index is 0
         pointLightShader.setPointLight(l, 0);
@@ -132,19 +131,26 @@ void AppDeferredRenderer::render(Maze* maze)
     {
         dirLightShader.use();
         gBuffer->setUniforms(dirLightShader);
+        dirLightShader.setVec2f("screenSize", width, height);
+        dirLightShader.setDirectionalLight(
+            n->getDirectionalLightDirection(), n->getDirectionalLightIntensity());
+        // camera uniforms
+        // dirLightShader.setMat4f("VP", c->getVP());
+        dirLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
+
         gBuffer->bindForLightPass();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_ONE, GL_ONE);
+        glDisable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
-        dirLightShader.setVec2f("screenSize", width, height);
-        dirLightShader.setDirectionalLight(
-            n->getDirectionalLightDirection(), n->getDirectionalLightIntensity());
-
-        quad->draw(pointLightShader);
+        quad->setModelMatrix(glm::identity<glm::mat4>());
+        quad->draw(dirLightShader);
 
         glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
     }
 
     gBuffer->bindForFinalPass();

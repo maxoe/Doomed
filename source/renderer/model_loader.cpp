@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <filesystem>
+#include <iostream>
 
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
@@ -93,9 +94,9 @@ Mesh* ModelLoader::processMesh(
 
     // vertices
     vertices.reserve(mesh->mNumVertices);
-    aiQuaternion rotation;
-    aiVector3D trash;
-    transform->Decompose(trash, rotation, trash);
+    /*aiQuaternion rotation;
+     aiVector3D trash;
+     transform->Decompose(trash, rotation, trash);*/
 
     for (std::size_t i = 0; i < mesh->mNumVertices; ++i)
     {

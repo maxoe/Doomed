@@ -132,16 +132,16 @@ int App::initializeGLFW()
 
 int App::mainLoop()
 {
-    glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.005f, 0.005f, 0.005f));
+    // glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.005f, 0.005f, 0.005f));
     // modelMatrix = glm::rotate(
     // modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
     maze.addNode()
-        ->addModel("debug/crytek_sponza/sponza.obj", modelMatrix)
+        ->addModel("debug/crytek_sponza/sponza.obj", 50.0f)
         //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(0.3f, 1.0f, 0.8f), 50)
-        ->addPointLight(glm::vec3(-2.0f, 0.0f, 5.0f), glm::vec3(1.0f, 0.8f, 0.3f), 50)
-        ->setDirectionalLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.5f));
+        //->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(0.3f, 1.0f, 0.8f), 50)
+        ->addPointLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), 50)
+        ->setDirectionalLight(glm::vec3(0.0f, -1.0f, 1.0f), glm::vec3(0.5f));
 
     while (!glfwWindowShouldClose(window))
     {
