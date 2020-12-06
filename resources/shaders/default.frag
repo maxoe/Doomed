@@ -33,6 +33,9 @@ uniform vec3 camWorldPos; // the camera position in world space
 uniform sampler2D textureDiffuse0; // NUMBER OF TEXTURES CURRENTLY SUPPORTED IS 1 EACH
 uniform sampler2D textureSpecular0;
 
+uniform int diffuseNr;
+uniform int specularNr;
+
 in vec3 worldPosition;            // the (interpolated) world space position corresponding to the fragment
 in vec3 worldNormalInterpolated; // the (interpolated) world space normal
 in vec2 texCoord;
@@ -45,13 +48,21 @@ vec3 getPointLightContribution(int index)
 	vec3 lightIntensity = pointLights[index].intensity;
 	vec3 lightDir = pointLights[index].pos - worldPosition;
 	vec3 normalizedLightDir = normalize(lightDir);
-	vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
 	vec3 N = normalize(worldNormalInterpolated);
 	vec3 camDir = camWorldPos - worldPosition;
 	vec3 reflectedDir = normalize(reflect(camDir, N));
-	
-	vec3 diffuse = kDTex * max(0, dot(normalizedLightDir, N));
-	vec3 specular = kS * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
+
+	vec3 diffuse = vec3(0.0);
+	if (diffuseNr == 1) {
+		vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
+		diffuse = kDTex * max(0, dot(normalizedLightDir, N));
+	}
+
+	vec3 specular = vec3(0.0);
+	if (specularNr == 1) {
+		vec3 kSTex = texture(textureSpecular0, texCoord).rgb;
+		specular = kSTex * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
+	}
 	
 	float dist = length(lightDir);
 	vec3 intensity = lightIntensity / (pointLights[index].constAtt + pointLights[index].linAtt * dist + 
@@ -64,14 +75,21 @@ vec3 getDirectionalLightContribution()
 {
 	vec3 lightDir = -directionalLightDir;
 	vec3 normalizedLightDir = normalize(lightDir);
-	vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
 	vec3 N = normalize(worldNormalInterpolated);
 	vec3 camDir = camWorldPos - worldPosition;
 	vec3 reflectedDir = normalize(reflect(camDir, N));
 	
-	vec3 diffuse = kDTex * max(0, dot(normalizedLightDir, N));
-	vec3 specular = kS * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
+	vec3 diffuse = vec3(0.0);
+	if (diffuseNr == 1) {
+		vec3 kDTex = texture(textureDiffuse0, texCoord).rgb;
+		diffuse = kDTex * max(0, dot(normalizedLightDir, N));
+	}
 	
+	vec3 specular = vec3(0.0);
+	if (specularNr == 1) {
+		vec3 kSTex = texture(textureSpecular0, texCoord).rgb;
+		specular = kSTex * pow(max(0, dot(reflectedDir, normalizedLightDir)), n);
+	}
 //  no attenuation
 //	vec3 intensity = directionalLightIntensity / pow(length(lightDir), 2);
 

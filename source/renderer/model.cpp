@@ -40,16 +40,13 @@ Model::Model(
             texture.isValid = true;
         }
 
-        for (const auto* m : loadedMeshes)
-        {
-            minValues.x = minValues.x > m->getMinValues().x ? m->getMinValues().x : minValues.x;
-            minValues.y = minValues.y > m->getMinValues().y ? m->getMinValues().y : minValues.y;
-            minValues.z = minValues.z > m->getMinValues().z ? m->getMinValues().z : minValues.z;
+        minValues.x = minValues.x > mesh->getMinValues().x ? mesh->getMinValues().x : minValues.x;
+        minValues.y = minValues.y > mesh->getMinValues().y ? mesh->getMinValues().y : minValues.y;
+        minValues.z = minValues.z > mesh->getMinValues().z ? mesh->getMinValues().z : minValues.z;
 
-            maxValues.x = maxValues.x < m->getMaxValues().x ? m->getMaxValues().x : maxValues.x;
-            maxValues.y = maxValues.y < m->getMaxValues().y ? m->getMaxValues().y : maxValues.y;
-            maxValues.z = maxValues.z < m->getMaxValues().z ? m->getMaxValues().z : maxValues.z;
-        }
+        maxValues.x = maxValues.x < mesh->getMaxValues().x ? mesh->getMaxValues().x : maxValues.x;
+        maxValues.y = maxValues.y < mesh->getMaxValues().y ? mesh->getMaxValues().y : maxValues.y;
+        maxValues.z = maxValues.z < mesh->getMaxValues().z ? mesh->getMaxValues().z : maxValues.z;
     }
 
     ownSize = glm::abs(maxValues - minValues);

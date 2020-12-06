@@ -9,7 +9,6 @@
 GLuint TextureLoader::load(const TextureData& td)
 {
     GLuint textureId;
-    glGenTextures(1, &textureId);
 
     int width, height, nrComponents;
     unsigned char* data = stbi_load(td.path.c_str(), &width, &height, &nrComponents, 0);
@@ -30,6 +29,7 @@ GLuint TextureLoader::load(const TextureData& td)
             format = GL_RGBA;
         }
 
+        glGenTextures(1, &textureId);
         glBindTexture(GL_TEXTURE_2D, textureId);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
@@ -43,10 +43,8 @@ GLuint TextureLoader::load(const TextureData& td)
         stbi_image_free(data);
         return textureId;
     }
-    else
-    {
-        LOG_LOADER_ERROR("Texture failed to load at path: " + td.path);
-        stbi_image_free(data);
-        return GL_FALSE;
-    }
+
+    LOG_LOADER_ERROR("Texture failed to load at path: " + td.path);
+    stbi_image_free(data);
+    return GL_FALSE;
 }

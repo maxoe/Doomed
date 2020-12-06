@@ -47,7 +47,7 @@ int App::initialize()
     }
 
     gui.initialize(nullptr, window);
-    maze = Maze("deferred");
+    maze = Maze("default");
     inputDispatcher = InputDispatcher(width, height);
 
 #if PRINT_GL_CALLBACKS
@@ -137,7 +137,7 @@ int App::mainLoop()
     // modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
     maze.addNode()
-        ->addModel("debug/crytek_sponza/sponza.obj", 50.0f)
+        ->addModel("debug/sponza/sponza.obj", 50.0f)
         //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
         //->addPointLight(glm::vec3(0.0f, 0.0f, 25.0f), glm::vec3(0.3f, 1.0f, 0.8f), 50)
         ->addPointLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), 50)

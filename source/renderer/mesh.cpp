@@ -91,7 +91,6 @@ void Mesh::draw(const AppShader& shader) const
             continue;
         }
 
-        glActiveTexture(GL_TEXTURE0 + i);  // activate proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
         std::string number;
         std::string type = textures[i].type;
@@ -105,9 +104,13 @@ void Mesh::draw(const AppShader& shader) const
                 "Type " + type + " of texture " + textures[i].path + " was not found");
         }
 
-        shader.setInt("material." + type.append(number), i);
+        shader.setInt(type.append(number), i);
+        glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
+
+    shader.setInt("diffuseNr", diffuseNr);
+    shader.setInt("specularNr", specularNr);
 
     // draw mesh
     glBindVertexArray(vao);
