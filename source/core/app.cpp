@@ -47,7 +47,7 @@ int App::initialize()
     }
 
     gui.initialize(nullptr, window);
-    maze = Maze("default");
+    maze = Maze("deferred");
     inputDispatcher = InputDispatcher(width, height);
 
 #if PRINT_GL_CALLBACKS

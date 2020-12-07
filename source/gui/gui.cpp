@@ -16,6 +16,7 @@ void Gui::initialize(const char* glslVersion, GLFWwindow* window)
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glslVersion);
+
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     // Adapt style
@@ -32,6 +33,8 @@ void Gui::initialize(const char* glslVersion, GLFWwindow* window)
     style->GrabMinSize = 5.0f;
     style->GrabRounding = 3.0f;
     style->WindowTitleAlign = ImVec2(0.5F, 0.5F);
+
+    style->WindowMinSize = ImVec2(700, 300);
 }
 
 void Gui::prepare()
