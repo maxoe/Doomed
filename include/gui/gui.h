@@ -20,5 +20,10 @@ public:
     glm::vec3 lightWorldPos;
     glm::vec3 lightIntensity;
 
+    int numDrawcalls = 0;
+    float lastFrameStart = 0;
+    float lastFrameTime = 0;
+
 private:
+    int m_numDrawcalls = 0;
 };

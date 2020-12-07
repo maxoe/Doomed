@@ -21,7 +21,7 @@ public:
     void processInput();
 
     GLFWwindow* getWindow();
-    const Gui& getGui() const;
+    Gui& getGui();
     InputDispatcher& getInputDispatcher();
     Maze& getMaze();
 

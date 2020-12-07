@@ -47,7 +47,7 @@ int App::initialize()
     }
 
     gui.initialize(nullptr, window);
-    maze = Maze("deferred");
+    maze = Maze("default");
     inputDispatcher = InputDispatcher(width, height);
 
 #if PRINT_GL_CALLBACKS
@@ -145,6 +145,9 @@ int App::mainLoop()
 
     while (!glfwWindowShouldClose(window))
     {
+        gui.lastFrameTime = glfwGetTime() - gui.lastFrameStart;
+        gui.lastFrameStart = glfwGetTime();
+
         glfwPollEvents();
 
         processInput();
@@ -227,7 +230,7 @@ GLFWwindow* App::getWindow()
     return window;
 }
 
-const Gui& App::getGui() const
+Gui& App::getGui()
 {
     return gui;
 }

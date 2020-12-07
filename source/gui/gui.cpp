@@ -1,4 +1,7 @@
 #include "gui/gui.h"
+
+#include <GLFW/glfw3.h>
+
 #include "core/logger.h"
 
 Gui::Gui()
@@ -33,6 +36,9 @@ void Gui::initialize(const char* glslVersion, GLFWwindow* window)
 
 void Gui::prepare()
 {
+    m_numDrawcalls = numDrawcalls;
+    numDrawcalls = 0;
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -56,6 +62,16 @@ void Gui::defineWindow()
     ImGui::DragFloat("R", &lightIntensity[0], 10.0f);
     ImGui::DragFloat("G", &lightIntensity[1], 10.0f);
     ImGui::DragFloat("B", &lightIntensity[2], 10.0f);*/
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Number of Drawcalls");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d", m_numDrawcalls);
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Rendering performance");
+    ImGui::TextColored(
+        ImVec4(1, 1, 0, 1),
+        "Time per frame %d ms (%d fps)",
+        static_cast<int>(1000 * lastFrameTime),
+        static_cast<int>(1.0f / lastFrameTime));
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
     ImGui::BeginChild("Scrolling");

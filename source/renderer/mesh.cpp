@@ -3,6 +3,7 @@
 #include "core/logger.h"
 
 #include <string>
+#include <core/app.h>
 
 Mesh::Mesh(
     const std::vector<VertexData>& vertexWithData,
@@ -79,6 +80,8 @@ Mesh::Mesh(
 
 void Mesh::draw(const AppShader& shader) const
 {
+    App::getInstance()->getGui().numDrawcalls++;
+
     GLuint diffuseNr = 0;
     GLuint specularNr = 0;
 
