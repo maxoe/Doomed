@@ -61,41 +61,27 @@ void AppDefaultRenderer::render(Maze* maze)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    shader.use();
+
     shadowMaps.back()->setUniforms(shadowMapShader);
     shadowMaps.back()->bindForReading(GL_TEXTURE0);
 
-    // shadowMapShader.setInt(std::string("shadowMap"), 0);
-    // shadowMaps.back().bindForReading(GL_TEXTURE0);
-
-    /*glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 20);
-    glm::mat4 depthViewMatrix = glm::lookAt(
-        maze->getActiveNode()->getPointLights()[0].getPos(),
-        glm::vec3(0, 0, 0),
-        glm::vec3(0, 1, 0));
-    glm::mat4 depthModelMatrix = glm::mat4(1.0);
-    glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;*/
-    auto quad = ModelLoader::load("deferred_shading/quad.obj");
-    quad->setModelMatrix(glm::identity<glm::mat4>());
-
-    // shader.use();
     // camera uniforms
     const auto* c = maze->getCamera();
-    shadowMapShader.setMat4f("VP", glm::identity<glm::mat4>());
+    shadowMapShader.setMat4f("VP", c->getVP());
     shadowMapShader.setVec3f("camWorldPos", c->getCamWorldPos());
-    quad->draw(shadowMapShader);
 
-    // glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
-    // glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_BACK);
-
-    // for (auto* node : maze->getNodes())
-    //{
-    //    node->setLightUniforms(shader);
-    //    node->draw(shader);
-    //}
+    for (auto* node : maze->getNodes())
+    {
+        node->setLightUniforms(shader);
+        // texture unit 0 is shadow map
+        node->draw(shader, 1);
+    }
 }
 
 std::string AppDefaultRenderer::getTypeName() const

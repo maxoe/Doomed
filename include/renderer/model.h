@@ -26,7 +26,7 @@ public:
         }
     }
 
-    void draw(AppShader& shader) const;
+    void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
 
     void setModelMatrix(const glm::mat4& matrix);
     void resize(float maxDimensionLength);

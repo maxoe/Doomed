@@ -57,14 +57,14 @@ Model::Model(
     }
 }
 
-void Model::draw(AppShader& shader) const
+void Model::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
 {
     shader.setMat4f("modelMatrix", modelMatrix);
     shader.setMat3f("normalMatrix", normalMatrix);
 
     for (auto* mesh : meshes)
     {
-        mesh->draw(shader);
+        mesh->draw(shader, nextFreeTextureUnit);
     }
 }
 

@@ -78,7 +78,10 @@ Mesh::Mesh(
     }
 }
 
-void Mesh::draw(AppShader& shader) const
+/*
+ * Next free texture unit a.k.a. the k in GL_TEXTURE0 + k
+ */
+void Mesh::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
 {
     App::getInstance()->getGui().numDrawcalls++;
 
@@ -107,8 +110,8 @@ void Mesh::draw(AppShader& shader) const
                 "Type " + type + " of texture " + textures[i].path + " was not found");
         }
 
-        shader.setInt(type.append(number), i);
-        glActiveTexture(GL_TEXTURE0 + i);
+        shader.setInt(type.append(number), nextFreeTextureUnit + i);
+        glActiveTexture(GL_TEXTURE0 + nextFreeTextureUnit + i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
 

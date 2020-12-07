@@ -32,18 +32,21 @@ uniform vec3 camWorldPos; // the camera position in world space
 
 uniform sampler2D textureDiffuse0; // NUMBER OF TEXTURES CURRENTLY SUPPORTED IS 1 EACH
 uniform sampler2D textureSpecular0;
+uniform sampler2D shadowMap;
 
 uniform int diffuseNr;
 uniform int specularNr;
 
+
 in vec3 worldPosition;            // the (interpolated) world space position corresponding to the fragment
 in vec3 worldNormalInterpolated; // the (interpolated) world space normal
 in vec2 texCoord;
+in vec4 lightSpacePos;      
 
 out vec4 fragColor; // the resulting color value (will be written into the framebuffer)
 
 // lightDir must be not normalized
-vec3 getPointLightContribution(int index)
+vec3 getPointLightContribution(int index, float shadowFactor)
 {
 	vec3 lightIntensity = pointLights[index].intensity;
 	vec3 lightDir = pointLights[index].pos - worldPosition;
@@ -68,7 +71,7 @@ vec3 getPointLightContribution(int index)
 	vec3 intensity = lightIntensity / (pointLights[index].constAtt + pointLights[index].linAtt * dist + 
     		    pointLights[index].quadAtt * (dist * dist));    
 
-	return vec3((diffuse + specular ) * intensity);
+	return (diffuse + specular ) * intensity * shadowFactor;
 }
 
 vec3 getDirectionalLightContribution()
@@ -96,6 +99,23 @@ vec3 getDirectionalLightContribution()
 	return vec3((diffuse + specular ) * directionalLightIntensity);
 }
 
+// do perspective division for light space position
+float calcShadow()
+{
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    
+	float u = 0.5 * projCoords.x + 0.5;
+    float v = 0.5 * projCoords.y + 0.5;
+    
+	float z = 0.5 * projCoords.z + 0.5;
+    float depth = texture(shadowMap, vec2(u, v)).x;
+    
+	if (depth < (z + 0.00001))
+        return 0.5;
+    else
+        return 1.0;
+}
+
 void main()
 {
 	vec3 color = vec3(0.0f);
@@ -105,7 +125,7 @@ void main()
 	}
 
 	for (int i = 0; i < pointLightCount; ++i) {
-		color += getPointLightContribution(i);
+		color += getPointLightContribution(i, calcShadow());
 	}
 
 	fragColor = vec4(color + ambient, 1.0);

@@ -42,8 +42,7 @@ public:
         }
     };
 
-    void draw(AppShader& shader) const;
-
+    void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
     std::vector<TextureData>& getTextureData();
 
     [[nodiscard]] const glm::vec3& getMaxValues() const;

@@ -8,7 +8,7 @@ InputDispatcher::InputDispatcher()
     , mouseSensitivity(0.05f)
     , lastMouseX(0.0f)
     , lastMouseY(0.0f)
-    , movementSpeed(0.7f)
+    , movementSpeed(1.0f)
     , lastMovementFrame(glfwGetTime())
 {
 }
