@@ -27,6 +27,8 @@ public:
 
     void setWidth(float width);
     void setHeight(float height);
+    [[nodiscard]] float getWidth() const;
+    [[nodiscard]] float getHeight() const;
 
 private:
     static App* instance;

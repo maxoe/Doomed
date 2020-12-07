@@ -32,11 +32,12 @@ uniform vec3 camWorldPos; // the camera position in world space
 
 uniform sampler2D textureDiffuse0; // NUMBER OF TEXTURES CURRENTLY SUPPORTED IS 1 EACH
 uniform sampler2D textureSpecular0;
-uniform sampler2D shadowMap;
+uniform samplerCube shadowMap;
 
 uniform int diffuseNr;
 uniform int specularNr;
 
+uniform float far_plane;
 
 in vec3 worldPosition;            // the (interpolated) world space position corresponding to the fragment
 in vec3 worldNormalInterpolated; // the (interpolated) world space normal
@@ -99,22 +100,19 @@ vec3 getDirectionalLightContribution()
 	return vec3((diffuse + specular ) * directionalLightIntensity);
 }
 
-// do perspective division for light space position
+// check depth in cube shadow map
 float calcShadow()
 {
-    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-    
-	float u = 0.5 * projCoords.x + 0.5;
-    float v = 0.5 * projCoords.y + 0.5;
-    
-	float z = 0.5 * projCoords.z + 0.5;
-    float depth = texture(shadowMap, vec2(u, v)).x;
-    
-	if (depth < (z + 0.00001))
-        return 0.5;
-    else
-        return 1.0;
-}
+    vec3 lightDir = worldPosition - pointLights[0].pos; 
+    float closestDepth = texture(shadowMap, lightDir).r;
+	// closestDepth is normalize to [0, 1]
+	closestDepth *= far_plane;
+	float fragDepth = length(lightDir);
+
+	float bias = 0.05; 
+	return fragDepth - bias > closestDepth ? 1.0 : 0.0; 
+}  
+
 
 void main()
 {

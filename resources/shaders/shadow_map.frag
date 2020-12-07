@@ -1,14 +1,14 @@
 #version 400 core
-                                                                                    
-in vec2 texCoord;      
 
-uniform sampler2D shadowMap;                                                       
-                                                                                    
-out vec4 fragColor;                                                                 
-                                                                                    
-void main()                                                                         
-{                                                                                   
-    float depth = texture(shadowMap, texCoord).x;
-    depth = 1.0 - (1.0 - depth) * 25.0;
-    fragColor = vec4(depth);
-}
+in vec4 fragPos;
+
+uniform vec3 lightPos;
+uniform float far_plane;
+
+void main()
+{
+    float dist = length(fragPos.xyz - lightPos);
+    dist = dist / far_plane;
+    
+    gl_FragDepth = dist;
+}  

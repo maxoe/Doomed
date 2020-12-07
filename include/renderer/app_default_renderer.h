@@ -1,4 +1,5 @@
 #pragma once
+
 #include <renderer/app_renderer.h>
 #include "renderer/app_shader.h"
 #include "renderer/shadow_map.h"
@@ -31,7 +32,8 @@ public:
 
 private:
     AppShader shader;
-    AppShader shadowMapShader = AppShader("shadow_map");
-    std::vector<ShadowMap*> shadowMaps;
+
     bool shadows = false;
+    AppShader shadowMapShader = AppShader("shadow_map", true);
+    std::vector<ShadowMap*> shadowMaps;
 };

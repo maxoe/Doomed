@@ -1,5 +1,6 @@
 #include "../../build/include/renderer/app_default_renderer.h"
 
+#include <array>
 #include <iostream>
 
 #include "core/app.h"
@@ -31,17 +32,29 @@ AppDefaultRenderer::AppDefaultRenderer(bool shadows)
 void AppDefaultRenderer::createShadowMaps(Maze* maze)
 {
     shadowMapShader.use();
-
+    glViewport(0, 0, ShadowMap::shadowWidth, ShadowMap::shadowHeight);
     shadowMaps.back()->bindForWriting();
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     const auto* c = maze->getCamera();
     const auto& l = maze->getActiveNode()->getPointLights()[0];
-    shadowMapShader.setMat4f(
+    /*shadowMapShader.setMat4f(
         "VP",
         glm::perspective(glm::radians(90.0f), 3840.f / 2160.f, 0.01f, 100.0f) *
-            glm::lookAt(l.getPos(), c->getCamWorldPos() - l.getPos(), glm::vec3(0.0f, 1.0f, 0.0f)));
+            glm::lookAt(l.getPos(), c->getCamWorldPos() - l.getPos(), glm::vec3(0.0f, 1.0f,
+       0.0f)));*/
+
+    const auto& shadowTransformations = ShadowMap::getShadowTransformations(l);
+    for (GLuint i = 0; i < 6; ++i)
+    {
+        shadowMapShader.setMat4f(
+            "shadowMatrices[" + std::to_string(i) + "]", shadowTransformations[i]);
+    }
+
+    // TODO fix magic numbers
+    shadowMapShader.setFloat("far_plane", 25.0f);
+    shadowMapShader.setVec3f("lightPos", l.getPos());
 
     for (auto* node : maze->getNodes())
     {
@@ -59,18 +72,22 @@ void AppDefaultRenderer::render(Maze* maze)
         createShadowMaps(maze);
     }
 
+    glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.use();
 
-    shadowMaps.back()->setUniforms(shadowMapShader);
+    shadowMaps.back()->setUniforms(shader);
     shadowMaps.back()->bindForReading(GL_TEXTURE0);
 
     // camera uniforms
     const auto* c = maze->getCamera();
-    shadowMapShader.setMat4f("VP", c->getVP());
-    shadowMapShader.setVec3f("camWorldPos", c->getCamWorldPos());
+    shader.setMat4f("VP", c->getVP());
+    shader.setVec3f("camWorldPos", c->getCamWorldPos());
+
+    // TODO fix magic numbers
+    shader.setFloat("far_plane", 25.0f);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

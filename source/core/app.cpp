@@ -258,3 +258,13 @@ void App::setHeight(float height)
 {
     this->height = height;
 }
+
+float App::getWidth() const
+{
+    return width;
+}
+
+float App::getHeight() const
+{
+    return height;
+}

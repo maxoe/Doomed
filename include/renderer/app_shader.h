@@ -13,7 +13,7 @@ class AppShader
 public:
     AppShader();
     AppShader(const AppShader&) = delete;
-    AppShader(const char* name);
+    AppShader(const char* name, bool geometryShader = false);
     GLuint compile(const std::filesystem::path& shaderPath, GLenum shaderType);
     GLuint getProgramId() const;
     void use() const;

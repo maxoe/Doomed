@@ -14,7 +14,7 @@ AppShader::AppShader()
     LOG_RENDERER_WARN("Falling back to default shader");
 }
 
-AppShader::AppShader(const char* name)
+AppShader::AppShader(const char* name, bool geometryShader)
     : type(name)
 {
     programId = glCreateProgram();
@@ -42,6 +42,23 @@ AppShader::AppShader(const char* name)
             glAttachShader(programId, fragmentShaderId);
         }
 
+        GLuint geomShaderId = GL_FALSE;
+        if (geometryShader)
+        {
+            std::filesystem::path geomShaderPath(shaderDir / name);
+            geomShaderPath += APP_GEOMETRY_SHADER_EXTENSION;
+            if (!std::filesystem::exists(geomShaderPath))
+            {
+                LOG_RENDERER_ERROR(
+                    "Error: No geometry shader found for shader " + geomShaderPath.string());
+            }
+            else
+            {
+                geomShaderId = compile(geomShaderPath, GL_GEOMETRY_SHADER);
+                glAttachShader(programId, geomShaderId);
+            }
+        }
+
         glLinkProgram(programId);
 
         // check for linking errors
@@ -61,6 +78,12 @@ AppShader::AppShader(const char* name)
 
         glDeleteShader(vertexShaderId);
         glDeleteShader(fragmentShaderId);
+
+        if (geometryShader)
+        {
+            glDetachShader(programId, geomShaderId);
+            glDeleteShader(geomShaderId);
+        }
     }
     else
     {
