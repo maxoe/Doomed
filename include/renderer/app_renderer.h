@@ -9,4 +9,5 @@ public:
     virtual ~AppRenderer() = default;
     virtual void render(Maze* maze) = 0;
     [[nodiscard]] virtual std::string getTypeName() const = 0;
+    virtual void createShadowMaps(Maze* maze) = 0;
 };

@@ -7,7 +7,7 @@ Maze::Maze(const std::string& rendererType)
 {
     if (rendererType == "default")
     {
-        renderer = std::make_shared<AppDefaultRenderer>();
+        renderer = std::make_shared<AppDefaultRenderer>(true);
     }
     else
     {

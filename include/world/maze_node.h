@@ -34,7 +34,7 @@ public:
     }
 
     void setLightUniforms(const AppShader& shader) const;
-    void draw(const AppShader& shader);
+    void draw(AppShader& shader);
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);

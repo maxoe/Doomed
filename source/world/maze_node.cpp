@@ -33,7 +33,7 @@ void MazeNode::setLightUniforms(const AppShader& shader) const
     shader.setInt(std::string("pointLightCount"), pointLights.size());
 }
 
-void MazeNode::draw(const AppShader& shader)
+void MazeNode::draw(AppShader& shader)
 {
     for (const auto* model : models)
     {

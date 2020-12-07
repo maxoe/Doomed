@@ -19,6 +19,7 @@ public:
     }
 
     void render(Maze* maze) override;
+    void createShadowMaps(Maze* maze) override;
 
     [[nodiscard]] std::string getTypeName() const override;
 

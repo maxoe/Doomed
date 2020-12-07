@@ -42,7 +42,7 @@ public:
         }
     };
 
-    void draw(const AppShader& shader) const;
+    void draw(AppShader& shader) const;
 
     std::vector<TextureData>& getTextureData();
 

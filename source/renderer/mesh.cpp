@@ -78,7 +78,7 @@ Mesh::Mesh(
     }
 }
 
-void Mesh::draw(const AppShader& shader) const
+void Mesh::draw(AppShader& shader) const
 {
     App::getInstance()->getGui().numDrawcalls++;
 

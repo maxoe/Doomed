@@ -8,7 +8,7 @@
 #include "world/maze_node.h"
 #include "core/logger.h"
 
-#define PRINT_GL_CALLBACKS 0
+#define PRINT_GL_CALLBACKS 1
 
 App* App::instance = nullptr;
 
@@ -47,7 +47,7 @@ int App::initialize()
     }
 
     gui.initialize(nullptr, window);
-    maze = Maze("deferred");
+    maze = Maze("default");
     inputDispatcher = InputDispatcher(width, height);
 
 #if PRINT_GL_CALLBACKS

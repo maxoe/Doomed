@@ -28,13 +28,17 @@ AppDeferredRenderer::AppDeferredRenderer()
     LOG_RENDERER_INFO("Using " + getTypeNameStatic() + " renderer");
 }
 
+void AppDeferredRenderer::createShadowMaps(Maze* maze)
+{
+}
+
 void AppDeferredRenderer::render(Maze* maze)
 {
     // 0 geometry 1 point light 2 directional light 3 null pass
-    const auto& geometryShader = shader[0];
-    const auto& pointLightShader = shader[1];
-    const auto& dirLightShader = shader[2];
-    const auto& stencilPassShader = shader[3];
+    auto& geometryShader = shader[0];
+    auto& pointLightShader = shader[1];
+    auto& dirLightShader = shader[2];
+    auto& stencilPassShader = shader[3];
 
     auto width = 0;
     auto height = 0;

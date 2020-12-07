@@ -41,6 +41,8 @@ private:
     inline static const auto shaderDir = std::filesystem::path(APP_SHADER_DIR);
     const std::string type;
     GLuint programId;
+    GLuint activeTexture = GL_TEXTURE0;
+
     // MUST FIT VALUE IN FRAGMENT SHADER
     GLuint maxPointLights = 10;
 };

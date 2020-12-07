@@ -57,7 +57,7 @@ Model::Model(
     }
 }
 
-void Model::draw(const AppShader& shader) const
+void Model::draw(AppShader& shader) const
 {
     shader.setMat4f("modelMatrix", modelMatrix);
     shader.setMat3f("normalMatrix", normalMatrix);
