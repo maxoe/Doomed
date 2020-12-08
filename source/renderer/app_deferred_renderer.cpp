@@ -16,24 +16,92 @@
 
 AppDeferredRenderer::AppDeferredRenderer()
 {
+    LOG_RENDERER_INFO("Using " + getTypeNameStatic() + " renderer");
+}
+
+AppDeferredRenderer::AppDeferredRenderer(bool renderShadows)
+    : AppDeferredRenderer()
+{
+    shadows = renderShadows;
+}
+
+void AppDeferredRenderer::initialize(Maze* mazePtr)
+{
+    maze = mazePtr;
+
     auto width = 0;
     auto height = 0;
 
     glfwGetFramebufferSize(App::getInstance()->getWindow(), &width, &height);
 
+    // init deferred shading
     gBuffer = std::make_shared<AppGBuffer>(width, height);
     boundingSphere = ModelLoader::load("deferred_shading/sphere.obj");
     quad = ModelLoader::load("deferred_shading/quad.obj");
 
-    LOG_RENDERER_INFO("Using " + getTypeNameStatic() + " renderer");
+    // init shadow mapping
+
+    if (this->shadows)
+    {
+        for (auto& l : maze->getActiveNode()->getPointLights())
+        {
+            if (l.hasShadows())
+            {
+                shadowMaps.emplace_back(ShadowMap::createShadowMap(), &l);
+            }
+            else
+            {
+                shadowMaps.emplace_back(ShadowMap::createDummy(), &l);
+            }
+        }
+
+        createShadowMaps(true);
+    }
 }
 
-void AppDeferredRenderer::initialize(Maze* maze)
-{
-}
-
+/*
+ * Skips non-dynamic lights if updateAll is false
+ */
 void AppDeferredRenderer::createShadowMaps(bool updateAll)
 {
+    shadowMapShader.use();
+    glViewport(0, 0, ShadowMap::shadowWidth, ShadowMap::shadowHeight);
+    glEnable(GL_DEPTH_TEST);
+    const auto* c = maze->getCamera();
+
+    // TODO fix magic numbers
+    shadowMapShader.setFloat("far_plane", 25.0f);
+
+    for (auto& lightPair : shadowMaps)
+    {
+        if (lightPair.first->isDummy() || (!updateAll && !lightPair.second->getIsDynamic()))
+        {
+            continue;
+        }
+
+        lightPair.first->bindForWriting();
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        const auto* l = lightPair.second;
+
+        const auto& shadowTransformations = ShadowMap::getShadowTransformations(*l);
+
+        for (GLuint i = 0; i < 6; ++i)
+        {
+            shadowMapShader.setMat4f(
+                "shadowMatrices[" + std::to_string(i) + "]", shadowTransformations[i]);
+        }
+
+        shadowMapShader.setVec3f("lightPos", l->getPos());
+
+        for (auto* node : maze->getNodes())
+        {
+            node->draw(shadowMapShader);
+        }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
 }
 
 void AppDeferredRenderer::render()
@@ -44,9 +112,8 @@ void AppDeferredRenderer::render()
     auto& dirLightShader = shader[2];
     auto& stencilPassShader = shader[3];
 
-    auto width = 0;
-    auto height = 0;
-    glfwGetFramebufferSize(App::getInstance()->getWindow(), &width, &height);
+    auto width = App::getInstance()->getWidth();
+    auto height = App::getInstance()->getHeight();
 
     gBuffer->startFrame();
 
@@ -83,11 +150,13 @@ void AppDeferredRenderer::render()
     stencilPassShader.setMat4f("VP", c->getVP());
 
     // need light position and distance
-    for (const auto& l : maze->getActiveNode()->getPointLights())
+    for (auto& lightPair : shadowMaps)
     {
+        auto* l = lightPair.second;
+
         // setup bounding sphere
-        float lightDist = l.getDist();
-        glm::mat4 modelMatrix = glm::translate(glm::identity<glm::mat4>(), l.getPos());
+        float lightDist = l->getDist();
+        glm::mat4 modelMatrix = glm::translate(glm::identity<glm::mat4>(), l->getPos());
         modelMatrix = glm::scale(modelMatrix, glm::vec3(lightDist));
         boundingSphere->setModelMatrix(modelMatrix);
 
@@ -123,8 +192,16 @@ void AppDeferredRenderer::render()
         pointLightShader.setMat4f("VP", c->getVP());
         pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
 
+        // TODO fix magic numbers
+        pointLightShader.setFloat("far_plane", 25.0f);
+        pointLightShader.setVec3f("ambient", glm::vec3(0.05f));
+
+        // shadow mapping, unit GL_TEXTURE4 for shadow map, (0-3) are gbuffer textures
+       lightPair.first->bindForReading(GL_TEXTURE4);
+
         // only one light per draw call
-        pointLightShader.setPointLight(l, 0);
+        pointLightShader.setPointLight(*l, 4, 0);
+
         boundingSphere->draw(pointLightShader);
 
         glCullFace(GL_BACK);

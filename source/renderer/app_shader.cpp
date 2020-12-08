@@ -233,6 +233,15 @@ void AppShader::setPointLight(const PointLight& pointLight, GLuint index) const
     setInt("shadowMaps[" + std::to_string(index) + "]", index);
 }
 
+void AppShader::setPointLight(
+    const PointLight& pointLight,
+    GLuint index,
+    GLuint shadowMapIdOverride) const
+{
+    setPointLight(pointLight, shadowMapIdOverride);
+    setInt("shadowMaps[" + std::to_string(shadowMapIdOverride) + "]", index);
+}
+
 void AppShader::setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const
 {
     setVec3f(std::string("directionalLightDir"), dir);

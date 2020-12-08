@@ -9,6 +9,7 @@ struct Light
   float constAtt;
   float linAtt;
   float quadAtt;
+  bool shadows;
 };
 
 uniform Light pointLights[1];
@@ -19,6 +20,11 @@ uniform sampler2D positionMap;
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
+
+uniform samplerCube shadowMaps[1];
+
+uniform float far_plane;
+uniform vec3 ambient;
 
 uniform vec2 screenSize;
 
@@ -51,6 +57,54 @@ vec2 calcTexCoord()
     return gl_FragCoord.xy / screenSize;
 }
 
+// check depth in cube shadow map
+float calcShadow(vec3 worldPosition)
+{
+    vec3 lightDir = worldPosition - pointLights[0].pos; 
+    float closestDepth = texture(shadowMaps[0], lightDir).r;
+	// closestDepth is normalized to [0, 1]
+	closestDepth *= far_plane;
+
+	//for debugging uncomment this and comment the original fragColor out
+	//fragColor = vec4(vec3(closestDepth / far_plane), 1.0); 
+
+	float fragDepth = length(lightDir);
+
+	float bias = 0.05; 
+	return fragDepth - bias > closestDepth ? 0.0 : 1.0; 
+}
+
+// percentage-closer filtering
+// see https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+); 
+
+float calcShadowPCF(vec3 worldPosition) {
+	vec3 lightDir = worldPosition - pointLights[0].pos;
+	float fragDepth = length(lightDir);
+	float shadow  = 0.0;
+	float bias    = 0.15; 
+	float viewDistance = length(camWorldPos - worldPosition);
+	float diskRadius = 0.05;
+
+	int samples  = 20;
+
+	for (int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(shadowMaps[0], lightDir + sampleOffsetDirections[i] * diskRadius).r;
+		closestDepth *= far_plane;   // undo mapping [0;1]
+		if(fragDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+
+	return 1.0 - (shadow / float(samples));
+}
 
 void main()
 {
@@ -60,5 +114,10 @@ void main()
 	vec3 spec = texture(specularMap, gBufferTexCoord).xyz;
 	vec3 worldNormal = texture(normalMap, gBufferTexCoord).xyz;
 	
-	fragColor = vec4(getPointLightContribution(worldPos, worldNormal, diff, spec), 1.0);
+	float shadowFactor = pointLights[0].shadows ? calcShadowPCF(worldPos) : 1.0f;
+
+	vec3 ambientColor = ambient * diff;
+	vec3 color = getPointLightContribution(worldPos, worldNormal, diff, spec) * shadowFactor;
+
+	fragColor = vec4(color + ambientColor, 1.0);
 }

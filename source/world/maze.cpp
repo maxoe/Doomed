@@ -11,7 +11,7 @@ Maze::Maze(const std::string& rendererType)
     }
     else
     {
-        renderer = std::make_shared<AppDeferredRenderer>();
+        renderer = std::make_shared<AppDeferredRenderer>(true);
     }
 }
 

@@ -88,12 +88,12 @@ void AppDefaultRenderer::createShadowMaps(bool updateAll)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
 }
 
 void AppDefaultRenderer::render()
 
 {
-    glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -105,7 +105,6 @@ void AppDefaultRenderer::render()
     shader.setVec3f("camWorldPos", c->getCamWorldPos());
 
     // TODO fix magic numbers
-    // TODO FIX DIRECTIONAL LIGHT = FALSE IMPLICITLY, MAKE IT EXPLICIT
     shader.setFloat("far_plane", 25.0f);
     shader.setVec3f("ambient", glm::vec3(0.05f));
 

@@ -4,6 +4,7 @@
 
 #include "renderer/app_g_buffer.h"
 #include "renderer/app_shader.h"
+#include "renderer/shadow_map.h"
 
 #include <array>
 
@@ -13,10 +14,18 @@ class AppDeferredRenderer : public AppRenderer
 {
 public:
     AppDeferredRenderer();
+    AppDeferredRenderer(bool shadows);
+
     AppDeferredRenderer(const AppDeferredRenderer& renderer) = delete;
     ~AppDeferredRenderer()
     {
         delete boundingSphere;
+        delete quad;
+
+        for (auto& m : shadowMaps)
+        {
+            delete m.first;
+        }
     }
 
     void initialize(Maze* maze) override;
@@ -41,4 +50,8 @@ private:
     std::shared_ptr<AppGBuffer> gBuffer;
     Model* boundingSphere;
     Model* quad;
+
+    bool shadows = false;
+    AppShader shadowMapShader = AppShader("shadow_map", true);
+    std::vector<std::pair<ShadowMap*, PointLight*>> shadowMaps;
 };

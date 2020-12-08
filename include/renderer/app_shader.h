@@ -31,6 +31,8 @@ public:
     void setMat4f(const std::string& name, const glm::mat4& mat) const;
 
     void setPointLight(const PointLight& pointLight, GLuint index) const;
+    void
+    setPointLight(const PointLight& pointLight, GLuint index, GLuint shadowMapIdOverride) const;
     void setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const;
 
     void setMaxPointLights(GLuint num);
