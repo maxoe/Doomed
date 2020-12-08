@@ -14,6 +14,8 @@ uniform sampler2D normalMap;
 
 uniform vec2 screenSize;
 
+uniform vec3 ambient;
+
 out vec4 fragColor; // the resulting color value (will be written into the framebuffer)
 
 // lightDir must be not normalized
@@ -50,5 +52,7 @@ void main()
 	vec3 spec = texture(specularMap, gBufferTexCoord).xyz;
 	vec3 worldNormal = texture(normalMap, gBufferTexCoord).xyz;
 	
-	fragColor = vec4(getDirLightContribution(worldPos, worldNormal, diff, spec), 1.0);
+	vec3 ambientColor = ambient * diff;
+
+	fragColor = vec4(getDirLightContribution(worldPos, worldNormal, diff, spec) + ambientColor, 1.0);
 }

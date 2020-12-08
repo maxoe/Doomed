@@ -8,7 +8,7 @@
 #include "world/maze_node.h"
 #include "core/logger.h"
 
-#define PRINT_GL_CALLBACKS 1
+#define PRINT_GL_CALLBACKS 0
 
 App* App::instance = nullptr;
 
@@ -139,7 +139,7 @@ int App::mainLoop()
     maze.addNode()
         ->addModel("debug/sponza/sponza.obj", 30.0f)
         //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(9.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 20, true)
+        ->addPointLight(glm::vec3(9.0f, 1.7f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 20, true)
         ->addPointLight(glm::vec3(1.0f, 3.0f, 0.0f), glm::vec3(1.0f), 20, true)
         //->setDirectionalLight(glm::vec3(0.0f, -1.0f, 1.0f), glm::vec3(0.3f))
         ;

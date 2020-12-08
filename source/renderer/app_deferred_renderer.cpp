@@ -150,6 +150,8 @@ void AppDeferredRenderer::render()
     stencilPassShader.setMat4f("VP", c->getVP());
 
     // need light position and distance
+    bool ambientIsDone = false;
+
     for (auto& lightPair : shadowMaps)
     {
         auto* l = lightPair.second;
@@ -194,10 +196,17 @@ void AppDeferredRenderer::render()
 
         // TODO fix magic numbers
         pointLightShader.setFloat("far_plane", 25.0f);
-        pointLightShader.setVec3f("ambient", glm::vec3(0.05f));
+
+        pointLightShader.setVec3f("ambient", glm::vec3(0.00f));
+        if (!ambientIsDone)
+        {
+            // smuggle in ambient
+            pointLightShader.setVec3f("ambient", glm::vec3(0.05f));
+            ambientIsDone = true;
+        }
 
         // shadow mapping, unit GL_TEXTURE4 for shadow map, (0-3) are gbuffer textures
-       lightPair.first->bindForReading(GL_TEXTURE4);
+        lightPair.first->bindForReading(GL_TEXTURE4);
 
         // only one light per draw call
         pointLightShader.setPointLight(*l, 4, 0);
@@ -230,6 +239,17 @@ void AppDeferredRenderer::render()
         glBlendFunc(GL_ONE, GL_ONE);
         glDisable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+
+        if (!ambientIsDone)
+        {
+            // smuggle in ambient
+            dirLightShader.setVec3f("ambient", glm::vec3(0.05f));
+            ambientIsDone = true;
+        }
+        else
+        {
+            dirLightShader.setVec3f("ambient", glm::vec3(0.00f));
+        }
 
         quad->setModelMatrix(glm::identity<glm::mat4>());
         quad->draw(dirLightShader);
