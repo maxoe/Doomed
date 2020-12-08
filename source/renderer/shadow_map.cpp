@@ -87,12 +87,9 @@ std::array<glm::mat4, 6> ShadowMap::getShadowTransformations(const PointLight& l
 
     float near = 1.0f;
     float far = 25.0f;
-    auto width = 0;
-    auto height = 0;
-    glfwGetFramebufferSize(App::getInstance()->getWindow(), &width, &height);
 
-    glm::mat4 shadowProj =
-        glm::perspective(glm::radians(90.0f), static_cast<float>(width) / height, near, far);
+    glm::mat4 shadowProj = glm::perspective(
+        glm::radians(90.0f), static_cast<float>(shadowWidth) / shadowHeight, near, far);
 
     return std::array<glm::mat4, 6>{
         shadowProj *

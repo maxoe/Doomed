@@ -105,13 +105,49 @@ float calcShadow()
 {
     vec3 lightDir = worldPosition - pointLights[0].pos; 
     float closestDepth = texture(shadowMap, lightDir).r;
-	// closestDepth is normalize to [0, 1]
+	// closestDepth is normalized to [0, 1]
 	closestDepth *= far_plane;
+
+	//for debugging uncomment this and comment the original fragColor out
+	//fragColor = vec4(vec3(closestDepth / far_plane), 1.0); 
+
 	float fragDepth = length(lightDir);
 
 	float bias = 0.05; 
-	return fragDepth - bias > closestDepth ? 1.0 : 0.0; 
-}  
+	return fragDepth - bias > closestDepth ? 0.0 : 1.0; 
+}
+
+// percentage-closer filtering
+// see https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+); 
+
+float calcShadowPCF() {
+	vec3 lightDir = worldPosition - pointLights[0].pos;
+	float fragDepth = length(lightDir);
+	float shadow  = 0.0;
+	float bias    = 0.15; 
+	float viewDistance = length(camWorldPos - worldPosition);
+	float diskRadius = 0.05;
+
+	int samples  = 20;
+
+	for (int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(shadowMap, lightDir + sampleOffsetDirections[i] * diskRadius).r;
+		closestDepth *= far_plane;   // undo mapping [0;1]
+		if(fragDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+
+	return shadow / float(samples);
+}
 
 
 void main()
