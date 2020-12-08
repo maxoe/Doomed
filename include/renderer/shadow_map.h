@@ -30,6 +30,10 @@ public:
     void bindForReading(GLenum textureUnit) const;
 
     static ShadowMap* createShadowMap();
+    static ShadowMap* ShadowMap::createDummy();
+
+    bool ShadowMap::isDummy() const;
+
     static std::array<glm::mat4, 6> getShadowTransformations(const PointLight& l);
 
 private:

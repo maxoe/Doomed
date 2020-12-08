@@ -18,19 +18,21 @@ MazeNode::MazeNode()
 
 void MazeNode::setLightUniforms(const AppShader& shader) const
 {
-    shader.setVec3f("ambient", ambient);
+    // TODO KICK THIS STUPID FUNCTION OUT OF THIS UNIVERSE
+    /* shader.setVec3f("ambient", ambient);
 
-    if (hasDirectionalLight)
-    {
-        shader.setDirectionalLight(directionalLightDir, directionalLightIntensity);
-    }
+     if (hasDirectionalLight)
+     {
+         shader.setDirectionalLight(directionalLightDir, directionalLightIntensity);
+     }*/
 
-    for (std::size_t i = 0; i < pointLights.size(); ++i)
+    // TODO MOVE THIS PROPERLY
+    /*for (std::size_t i = 0; i < pointLights.size(); ++i)
     {
         shader.setPointLight(pointLights[i], i);
     }
 
-    shader.setInt(std::string("pointLightCount"), pointLights.size());
+    shader.setInt(std::string("pointLightCount"), pointLights.size());*/
 }
 
 void MazeNode::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
@@ -157,9 +159,10 @@ glm::vec3 MazeNode::calcAttachmentOffset(
     return glm::vec3();
 }
 
-MazeNode* MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist)
+MazeNode*
+MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist, bool shadows)
 {
-    pointLights.emplace_back(PointLight(pos, intensity, dist));
+    pointLights.emplace_back(PointLight(pos, intensity, dist, shadows));
 
     return this;
 }
@@ -169,7 +172,7 @@ glm::vec3 MazeNode::getDirectionalLightDirection() const
     return directionalLightDir;
 }
 
-[[nodiscard]] glm::vec3 MazeNode::getDirectionalLightIntensity() const
+glm::vec3 MazeNode::getDirectionalLightIntensity() const
 {
     return directionalLightIntensity;
 }
@@ -183,7 +186,7 @@ MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& i
     return this;
 }
 
-const std::vector<PointLight>& MazeNode::getPointLights() const
+std::vector<PointLight>& MazeNode::getPointLights()
 {
     return pointLights;
 }

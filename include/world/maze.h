@@ -9,6 +9,7 @@ class Maze
 {
 public:
     Maze() = default;
+    Maze(const Maze&) = delete;
     Maze(const std::string& rendererType);
 
     ~Maze()
@@ -19,6 +20,7 @@ public:
         }
     }
 
+    void initialize();
     void draw();
     MazeNode* addNode();
     [[nodiscard]] const std::vector<MazeNode*>& getNodes();

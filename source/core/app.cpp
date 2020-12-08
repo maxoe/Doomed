@@ -137,12 +137,14 @@ int App::mainLoop()
     // modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
     maze.addNode()
-        ->addModel("debug/sponza/sponza.obj", 50.0f)
+        ->addModel("debug/sponza/sponza.obj", 30.0f)
         //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        //->addPointLight(glm::vec3(15.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 20)
-        ->addPointLight(glm::vec3(1.0f, 3.0f, 0.0f), glm::vec3(2.0f), 50)
+        ->addPointLight(glm::vec3(15.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 20, true)
+        ->addPointLight(glm::vec3(1.0f, 3.0f, 0.0f), glm::vec3(1.0f), 20, true)
         //->setDirectionalLight(glm::vec3(0.0f, -1.0f, 1.0f), glm::vec3(0.3f))
         ;
+
+    maze.initialize();
 
     while (!glfwWindowShouldClose(window))
     {

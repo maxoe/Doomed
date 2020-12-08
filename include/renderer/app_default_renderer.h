@@ -12,18 +12,21 @@ public:
     AppDefaultRenderer();
     AppDefaultRenderer(bool shadows);
 
-    ~AppDefaultRenderer()
+    AppDefaultRenderer(const AppDefaultRenderer& renderer) = delete;
+
+    ~AppDefaultRenderer() override
     {
-        for (auto* m : shadowMaps)
+        for (auto& m : shadowMaps)
         {
-            delete m;
+            delete m.first;
         }
     }
 
-    void render(Maze* maze) override;
+    void initialize(Maze* maze) override;
+    void render() override;
 
     [[nodiscard]] std::string getTypeName() const override;
-    void createShadowMaps(Maze* maze) override;
+    void createShadowMaps(bool updateAll = false) override;
 
     static std::string getTypeNameStatic()
     {
@@ -31,9 +34,10 @@ public:
     }
 
 private:
+    Maze* maze;
     AppShader shader;
 
     bool shadows = false;
     AppShader shadowMapShader = AppShader("shadow_map", true);
-    std::vector<ShadowMap*> shadowMaps;
+    std::vector<std::pair<ShadowMap*, PointLight*>> shadowMaps;
 };

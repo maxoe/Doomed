@@ -13,7 +13,12 @@ public:
     // float linAtt,
     // float quadAtt);
 
-    PointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist = 7.0f /*arbitrary*/);
+    PointLight(
+        const glm::vec3& pos,
+        const glm::vec3& intensity,
+        float dist = 20.0f /*arbitrary*/,
+        bool hasShadows = false,
+        bool dynamic = false);
 
     [[nodiscard]] glm::vec3 getPos() const;
     [[nodiscard]] glm::vec3 getIntensity() const;
@@ -21,6 +26,11 @@ public:
     [[nodiscard]] float getLinAttenuation() const;
     [[nodiscard]] float getQuadAttenuation() const;
     [[nodiscard]] float getDist() const;
+    [[nodiscard]] bool hasShadows() const;
+    [[nodiscard]] bool getIsDynamic() const;
+
+    void enableShadows();
+    void disableShadows();
 
 private:
     glm::vec3 pos;
@@ -29,6 +39,8 @@ private:
     float constAttenuation;
     float linAttenuation;
     float quadAttenuation;
+    bool shadows = false;
+    bool isDynamic = false;
 
     static glm::vec3 attenuationFromDist(float dist);
 };

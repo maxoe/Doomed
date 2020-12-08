@@ -13,13 +13,15 @@ class AppDeferredRenderer : public AppRenderer
 {
 public:
     AppDeferredRenderer();
+    AppDeferredRenderer(const AppDeferredRenderer& renderer) = delete;
     ~AppDeferredRenderer()
     {
         delete boundingSphere;
     }
 
-    void render(Maze* maze) override;
-    void createShadowMaps(Maze* maze) override;
+    void initialize(Maze* maze) override;
+    void render() override;
+    void createShadowMaps(bool updateAll = false) override;
 
     [[nodiscard]] std::string getTypeName() const override;
 
@@ -29,6 +31,8 @@ public:
     }
 
 private:
+    Maze* maze;
+
     std::array<AppShader, 4> shader{
         "deferred_geometry",
         "deferred_point_light",

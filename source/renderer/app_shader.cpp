@@ -226,6 +226,11 @@ void AppShader::setPointLight(const PointLight& pointLight, GLuint index) const
     setFloat(
         std::string("pointLights[") + std::to_string(index) + std::string("].quadAtt"),
         pointLight.getQuadAttenuation());
+    setBool(
+        std::string("pointLights[") + std::to_string(index) + std::string("].shadows"),
+        pointLight.hasShadows());
+
+    setInt("shadowMaps[" + std::to_string(index) + "]", index);
 }
 
 void AppShader::setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity) const

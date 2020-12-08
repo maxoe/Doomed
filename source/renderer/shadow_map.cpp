@@ -16,6 +16,14 @@ ShadowMap::ShadowMap(GLuint width, GLuint height)
     : fbo(0)
     , shadowMap(0)
 {
+    // for cube map
+    assert(width == height);
+
+    if (width == 0 || height == 0)
+    {
+        return;
+    }
+
     glGenFramebuffers(1, &fbo);
 
     glGenTextures(1, &shadowMap);
@@ -79,6 +87,16 @@ void ShadowMap::bindForReading(GLenum textureUnit) const
 ShadowMap* ShadowMap::createShadowMap()
 {
     return new ShadowMap();
+}
+
+ShadowMap* ShadowMap::createDummy()
+{
+    return new ShadowMap(0, 0);
+}
+
+bool ShadowMap::isDummy() const
+{
+    return fbo == 0;
 }
 
 std::array<glm::mat4, 6> ShadowMap::getShadowTransformations(const PointLight& l)

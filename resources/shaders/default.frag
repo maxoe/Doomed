@@ -14,11 +14,14 @@ struct Light
   float constAtt;
   float linAtt;
   float quadAtt;
+  bool shadows;
 };
 
 #define MAX_POINT_LIGHTS 10
 uniform Light pointLights[MAX_POINT_LIGHTS];
+uniform samplerCube shadowMaps[MAX_POINT_LIGHTS];
 uniform int pointLightCount;
+
 
 uniform vec3 directionalLightDir;
 uniform vec3 directionalLightIntensity;
@@ -32,7 +35,6 @@ uniform vec3 camWorldPos; // the camera position in world space
 
 uniform sampler2D textureDiffuse0; // NUMBER OF TEXTURES CURRENTLY SUPPORTED IS 1 EACH
 uniform sampler2D textureSpecular0;
-uniform samplerCube shadowMap;
 
 uniform int diffuseNr;
 uniform int specularNr;
@@ -47,10 +49,10 @@ in vec4 lightSpacePos;
 out vec4 fragColor; // the resulting color value (will be written into the framebuffer)
 
 // lightDir must be not normalized
-vec3 getPointLightContribution(int index, float shadowFactor)
+vec3 getPointLightContribution(float shadowFactor, int i)
 {
-	vec3 lightIntensity = pointLights[index].intensity;
-	vec3 lightDir = pointLights[index].pos - worldPosition;
+	vec3 lightIntensity = pointLights[i].intensity;
+	vec3 lightDir = pointLights[i].pos - worldPosition;
 	vec3 normalizedLightDir = normalize(lightDir);
 	vec3 N = normalize(worldNormalInterpolated);
 	vec3 camDir = camWorldPos - worldPosition;
@@ -69,8 +71,8 @@ vec3 getPointLightContribution(int index, float shadowFactor)
 	}
 	
 	float dist = length(lightDir);
-	vec3 intensity = lightIntensity / (pointLights[index].constAtt + pointLights[index].linAtt * dist + 
-    		    pointLights[index].quadAtt * (dist * dist));    
+	vec3 intensity = lightIntensity / (pointLights[i].constAtt + pointLights[i].linAtt * dist + 
+    		    pointLights[i].quadAtt * (dist * dist));
 
 	return (diffuse + specular ) * intensity * shadowFactor;
 }
@@ -101,10 +103,10 @@ vec3 getDirectionalLightContribution()
 }
 
 // check depth in cube shadow map
-float calcShadow()
+float calcShadow(int index)
 {
-    vec3 lightDir = worldPosition - pointLights[0].pos; 
-    float closestDepth = texture(shadowMap, lightDir).r;
+    vec3 lightDir = worldPosition - pointLights[index].pos; 
+    float closestDepth = texture(shadowMaps[index], lightDir).r;
 	// closestDepth is normalized to [0, 1]
 	closestDepth *= far_plane;
 
@@ -128,8 +130,8 @@ vec3 sampleOffsetDirections[20] = vec3[]
    vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
 ); 
 
-float calcShadowPCF() {
-	vec3 lightDir = worldPosition - pointLights[0].pos;
+float calcShadowPCF(int index) {
+	vec3 lightDir = worldPosition - pointLights[index].pos;
 	float fragDepth = length(lightDir);
 	float shadow  = 0.0;
 	float bias    = 0.15; 
@@ -140,13 +142,13 @@ float calcShadowPCF() {
 
 	for (int i = 0; i < samples; ++i)
 	{
-		float closestDepth = texture(shadowMap, lightDir + sampleOffsetDirections[i] * diskRadius).r;
+		float closestDepth = texture(shadowMaps[index], lightDir + sampleOffsetDirections[i] * diskRadius).r;
 		closestDepth *= far_plane;   // undo mapping [0;1]
 		if(fragDepth - bias > closestDepth)
 			shadow += 1.0;
 	}
 
-	return shadow / float(samples);
+	return 1.0 - (shadow / float(samples));
 }
 
 
@@ -157,10 +159,13 @@ void main()
 	if (hasDirectionalLight) {
 		color = getDirectionalLightContribution();
 	}
-
+	
 	for (int i = 0; i < pointLightCount; ++i) {
-		color += getPointLightContribution(i, calcShadow());
+		float shadowFactor = pointLights[i].shadows ? calcShadowPCF(i) : 1.0f; 
+		color += getPointLightContribution(shadowFactor, i);
 	}
 
-	fragColor = vec4(color + ambient, 1.0);
+	vec3 ambientColor = ambient * texture(textureDiffuse0, texCoord).rgb;
+
+	fragColor = vec4(color + ambientColor, 1.0);
 }

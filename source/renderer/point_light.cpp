@@ -20,10 +20,17 @@ PointLight::PointLight()
 //}
 
 /* See http://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation */
-PointLight::PointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist)
+PointLight::PointLight(
+    const glm::vec3& pos,
+    const glm::vec3& intensity,
+    float dist,
+    bool hasShadows,
+    bool dynamic)
     : pos(pos)
     , intensity(intensity)
     , dist(dist)
+    , shadows(hasShadows)
+    , isDynamic(dynamic)
 {
     const auto& att = attenuationFromDist(dist);
     constAttenuation = att[0];
@@ -139,4 +146,34 @@ float PointLight::getDist() const
     //                          4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
     // (2 * quadAttenuation);
     return dist;
+}
+
+bool PointLight::hasShadows() const
+{
+    return shadows;
+}
+
+void PointLight::enableShadows()
+{
+    if (!isDynamic)
+    {
+        return;
+    }
+
+    shadows = true;
+}
+
+void PointLight::disableShadows()
+{
+    if (!isDynamic)
+    {
+        return;
+    }
+
+    shadows = false;
+}
+
+bool PointLight::getIsDynamic() const
+{
+    return isDynamic;
 }

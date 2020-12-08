@@ -15,9 +15,17 @@ Maze::Maze(const std::string& rendererType)
     }
 }
 
+void Maze::initialize()
+{
+    renderer->initialize(this);
+}
+
 void Maze::draw()
 {
-    renderer->render(this);
+    if (!nodes.empty())
+    {
+        renderer->render();
+    }
 }
 
 MazeNode* Maze::addNode()

@@ -28,11 +28,15 @@ AppDeferredRenderer::AppDeferredRenderer()
     LOG_RENDERER_INFO("Using " + getTypeNameStatic() + " renderer");
 }
 
-void AppDeferredRenderer::createShadowMaps(Maze* maze)
+void AppDeferredRenderer::initialize(Maze* maze)
 {
 }
 
-void AppDeferredRenderer::render(Maze* maze)
+void AppDeferredRenderer::createShadowMaps(bool updateAll)
+{
+}
+
+void AppDeferredRenderer::render()
 {
     // 0 geometry 1 point light 2 directional light 3 null pass
     auto& geometryShader = shader[0];
@@ -119,7 +123,7 @@ void AppDeferredRenderer::render(Maze* maze)
         pointLightShader.setMat4f("VP", c->getVP());
         pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
 
-        // only one light per draw call so index is 0
+        // only one light per draw call
         pointLightShader.setPointLight(l, 0);
         boundingSphere->draw(pointLightShader);
 

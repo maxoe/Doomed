@@ -44,8 +44,12 @@ public:
         AttachmentPoint ap,
         bool preserveRotation = false);
 
-    MazeNode* addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist);
-    const std::vector<PointLight>& getPointLights() const;
+    MazeNode* addPointLight(
+        const glm::vec3& pos,
+        const glm::vec3& intensity,
+        float dist,
+        bool shadows = false);
+    std::vector<PointLight>& getPointLights();
 
     MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);
     [[nodiscard]] glm::vec3 MazeNode::getDirectionalLightDirection() const;
