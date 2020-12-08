@@ -136,16 +136,17 @@ float PointLight::getQuadAttenuation() const
 
 /*
  * Modified from http://ogldev.atspace.co.uk/www/tutorial36/tutorial36.html
+ * It's larger than the dist which was used for initialization
  */
 float PointLight::getDist() const
 {
     float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
 
-    // return (-linAttenuation + sqrtf(
-    //                            linAttenuation * linAttenuation -
-    //                          4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
-    // (2 * quadAttenuation);
-    return dist;
+    return (-linAttenuation + sqrtf(
+                                  linAttenuation * linAttenuation -
+                                  4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
+           (2 * quadAttenuation);
+    // return dist;
 }
 
 bool PointLight::hasShadows() const
