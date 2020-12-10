@@ -22,6 +22,8 @@ public:
 
     void initialize();
     void draw();
+    void update();
+
     MazeNode* addNode();
     [[nodiscard]] const std::vector<MazeNode*>& getNodes();
     [[nodiscard]] MazeNode* getActiveNode();

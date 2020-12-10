@@ -35,6 +35,7 @@ public:
 
     void setLightUniforms(const AppShader& shader) const;
     void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
+    void update();
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);
@@ -49,6 +50,14 @@ public:
         const glm::vec3& intensity,
         float dist,
         bool shadows = false);
+
+    MazeNode* MazeNode::addPointLight(
+        const glm::vec3& pos,
+        const glm::vec3& intensity,
+        float dist,
+        bool shadows,
+        const std::vector<glm::vec4>& initKeyframes);
+
     std::vector<PointLight>& getPointLights();
 
     MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);

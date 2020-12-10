@@ -20,6 +20,14 @@ void Maze::initialize()
     renderer->initialize(this);
 }
 
+void Maze::update()
+{
+    for (auto* node : nodes)
+    {
+        node->update();
+    }
+}
+
 void Maze::draw()
 {
     if (!nodes.empty())

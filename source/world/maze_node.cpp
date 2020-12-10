@@ -43,6 +43,14 @@ void MazeNode::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
     }
 }
 
+void MazeNode::update()
+{
+    for (auto& l : pointLights)
+    {
+        l.update();
+    }
+}
+
 MazeNode* MazeNode::addModel(const std::string& relModelPath, const glm::mat4& modelMatrix)
 {
     models.emplace_back(ModelLoader::load(relModelPath));
@@ -163,6 +171,18 @@ MazeNode*
 MazeNode::addPointLight(const glm::vec3& pos, const glm::vec3& intensity, float dist, bool shadows)
 {
     pointLights.emplace_back(PointLight(pos, intensity, dist, shadows));
+
+    return this;
+}
+
+MazeNode* MazeNode::addPointLight(
+    const glm::vec3& pos,
+    const glm::vec3& intensity,
+    float dist,
+    bool shadows,
+    const std::vector<glm::vec4>& initKeyframes)
+{
+    pointLights.emplace_back(PointLight(pos, intensity, dist, shadows, initKeyframes));
 
     return this;
 }

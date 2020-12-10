@@ -1,5 +1,7 @@
 #include "renderer/point_light.h"
 
+#include <GLFW/glfw3.h>
+
 PointLight::PointLight()
     : PointLight(glm::vec3(0.0f), glm::vec3(0.0f))
 {
@@ -18,6 +20,17 @@ PointLight::PointLight()
 //    , quadAttenuation(quadAtt)
 //{
 //}
+
+PointLight::PointLight(
+    const glm::vec3& pos,
+    const glm::vec3& intensity,
+    float dist,
+    bool hasShadows,
+    const std::vector<glm::vec4>& initKeyframes)
+    : PointLight(pos, intensity, dist, hasShadows, true)
+{
+    keyframes = initKeyframes;
+}
 
 /* See http://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation */
 PointLight::PointLight(
@@ -152,6 +165,45 @@ float PointLight::getDist() const
 bool PointLight::hasShadows() const
 {
     return shadows;
+}
+
+void PointLight::update()
+{
+    if (!isDynamic)
+    {
+        return;
+    }
+
+    float time = glfwGetTime();
+    float timeDelta = time - lastTime;
+    timeLeft -= timeDelta;
+    lastTime = time;
+    int nextKeyFrameIndex = (lastKeyFrameIndex + 1) % keyframes.size();
+
+    while (timeLeft < 0)
+    {
+        lastKeyFrameIndex = nextKeyFrameIndex;
+        nextKeyFrameIndex = (nextKeyFrameIndex + 1) % keyframes.size();
+        timeLeft = -timeLeft;
+        timeLeft = keyframes.at(nextKeyFrameIndex).w - timeLeft;
+    }
+
+    // update position
+    float relativeLeft = timeLeft / keyframes.at(nextKeyFrameIndex).w;
+    pos = (1 - relativeLeft) * glm::vec3(keyframes.at(nextKeyFrameIndex)) +
+          relativeLeft * glm::vec3(keyframes.at(lastKeyFrameIndex));
+
+    // add more as necessary
+}
+
+void PointLight::addKeyFrame(const glm::vec4& kf)
+{
+    keyframes.emplace_back(kf);
+}
+
+void PointLight::addKeyFrame(const glm::vec3& keyFramePos, float timeDelta)
+{
+    addKeyFrame(keyFramePos, timeDelta);
 }
 
 void PointLight::enableShadows()
