@@ -80,6 +80,7 @@ void AppDeferredRenderer::createShadowMaps(bool updateAll)
         }
 
         lightPair.first->bindForWriting();
+        glDepthMask(true);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         const auto* l = lightPair.second;
@@ -106,6 +107,8 @@ void AppDeferredRenderer::createShadowMaps(bool updateAll)
 
 void AppDeferredRenderer::render()
 {
+    createShadowMaps();
+
     // 0 geometry 1 point light 2 directional light 3 null pass
     auto& geometryShader = shader[0];
     auto& pointLightShader = shader[1];
