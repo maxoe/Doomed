@@ -150,6 +150,9 @@ int App::mainLoop()
     {
         gui.lastFrameTime = glfwGetTime() - gui.lastFrameStart;
         gui.lastFrameStart = glfwGetTime();
+        gui.worldPos = maze.getCamera()->getCamWorldPos();
+        gui.cameraYaw = maze.getCamera()->getYaw();
+        gui.cameraPitch = maze.getCamera()->getPitch();
 
         glfwPollEvents();
 

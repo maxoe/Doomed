@@ -76,7 +76,14 @@ void Gui::defineWindow()
         static_cast<int>(1000 * lastFrameTime),
         static_cast<int>(1.0f / lastFrameTime));
 
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Position");
+    ImGui::TextColored(
+        ImVec4(1, 1, 0, 1), "x: %.2f y: %.2f z: %.2f", worldPos.x, worldPos.y, worldPos.z);
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Camera");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "yaw: %.2f pitch: %.2f", cameraYaw, cameraPitch);
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Log");
+
     ImGui::BeginChild("Scrolling");
     ImGui::TextUnformatted(Logger::getUiLogStream()->str().c_str());
     ImGui::EndChild();

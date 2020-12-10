@@ -24,6 +24,10 @@ public:
     float lastFrameStart = 0;
     float lastFrameTime = 0;
 
+    glm::vec3 worldPos = glm::vec3(0.0f);
+    float cameraYaw = 0.0f;
+    float cameraPitch = 0.0f;
+
 private:
     int m_numDrawcalls = 0;
 };

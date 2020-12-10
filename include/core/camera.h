@@ -11,6 +11,8 @@ public:
     glm::mat4 getView() const;
     glm::mat4 getProjection() const;
     glm::mat4 getVP() const;
+    float getYaw() const;
+    float getPitch() const;
 
     void setCamWorldPos(const glm::vec3& pos);
     void setCameraWorldDir(const glm::vec3& dir);

@@ -42,6 +42,16 @@ glm::mat4 Camera::getVP() const
     return getProjection() * getView();
 }
 
+float Camera::getYaw() const
+{
+    return yaw;
+}
+
+float Camera::getPitch() const
+{
+    return pitch;
+}
+
 void Camera::setCamWorldPos(const glm::vec3& pos)
 {
     camWorldPos = pos;
