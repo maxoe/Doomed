@@ -24,7 +24,6 @@ uniform sampler2D normalMap;
 uniform samplerCube shadowMaps[1];
 
 uniform float far_plane;
-uniform vec3 ambient;
 
 uniform vec2 screenSize;
 
@@ -116,8 +115,7 @@ void main()
 	
 	float shadowFactor = pointLights[0].shadows ? calcShadowPCF(worldPos) : 1.0f;
 
-	vec3 ambientColor = ambient * diff;
 	vec3 color = getPointLightContribution(worldPos, worldNormal, diff, spec) * shadowFactor;
 
-	fragColor = vec4(color + ambientColor, 1.0);
+	fragColor = vec4(color, 1.0);
 }

@@ -152,8 +152,8 @@ void AppDeferredRenderer::render()
     // camera uniforms
     stencilPassShader.setMat4f("VP", c->getVP());
 
-    // need light position and distance
-    bool ambientIsDone = false;
+    // TODO move this to gui or so
+    bool ambient = true;
 
     for (auto& lightPair : shadowMaps)
     {
@@ -198,15 +198,7 @@ void AppDeferredRenderer::render()
         pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
 
         // TODO fix magic numbers
-        pointLightShader.setFloat("far_plane", 25.0f);
-
-        pointLightShader.setVec3f("ambient", glm::vec3(0.00f));
-        if (!ambientIsDone)
-        {
-            // smuggle in ambient
-            pointLightShader.setVec3f("ambient", glm::vec3(0.05f));
-            ambientIsDone = true;
-        }
+        pointLightShader.setFloat("far_plane", 100.0f);
 
         // shadow mapping, unit GL_TEXTURE4 for shadow map, (0-3) are gbuffer textures
         lightPair.first->bindForReading(GL_TEXTURE4);
@@ -224,15 +216,11 @@ void AppDeferredRenderer::render()
 
     // directional light pass
     const auto* n = maze->getActiveNode();
-    if (n->getHasDirectionalLight())
+    if (n->getHasDirectionalLight() || ambient)
     {
         dirLightShader.use();
         gBuffer->setUniforms(dirLightShader);
         dirLightShader.setVec2f("screenSize", width, height);
-        dirLightShader.setDirectionalLight(
-            n->getDirectionalLightDirection(), n->getDirectionalLightIntensity());
-        // camera uniforms
-        // dirLightShader.setMat4f("VP", c->getVP());
         dirLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
 
         gBuffer->bindForLightPass();
@@ -243,15 +231,24 @@ void AppDeferredRenderer::render()
         glDisable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        if (!ambientIsDone)
+        if (ambient)
         {
-            // smuggle in ambient
+            // TODO fix magic
             dirLightShader.setVec3f("ambient", glm::vec3(0.05f));
-            ambientIsDone = true;
         }
         else
         {
             dirLightShader.setVec3f("ambient", glm::vec3(0.00f));
+        }
+
+        if (n->getHasDirectionalLight())
+        {
+            dirLightShader.setDirectionalLight(
+                n->getDirectionalLightDirection(), n->getDirectionalLightIntensity());
+        }
+        else
+        {
+            dirLightShader.setDirectionalLight(glm::vec3(0.0f), glm::vec3(0.0f));
         }
 
         quad->setModelMatrix(glm::identity<glm::mat4>());

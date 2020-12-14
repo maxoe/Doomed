@@ -47,12 +47,19 @@ vec2 calcTexCoord()
 void main()
 {
 	vec2 gBufferTexCoord = calcTexCoord();
-	vec3 worldPos = texture(positionMap, gBufferTexCoord).xyz;
 	vec3 diff = texture(diffuseMap, gBufferTexCoord).xyz;
+	vec3 worldPos = texture(positionMap, gBufferTexCoord).xyz;
 	vec3 spec = texture(specularMap, gBufferTexCoord).xyz;
 	vec3 worldNormal = texture(normalMap, gBufferTexCoord).xyz;
-	
 	vec3 ambientColor = ambient * diff;
 
-	fragColor = vec4(getDirLightContribution(worldPos, worldNormal, diff, spec) + ambientColor, 1.0);
+	if (length(directionalLightDir) != 0)
+	{
+		// has directional light
+		fragColor = vec4(getDirLightContribution(worldPos, worldNormal, diff, spec) + ambientColor, 1.0);
+	}
+	else
+	{
+		fragColor = vec4(ambientColor, 1.0);
+	}	
 }
