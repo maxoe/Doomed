@@ -70,7 +70,7 @@ void AppDeferredRenderer::createShadowMaps(bool updateAll)
     const auto* c = maze->getCamera();
 
     // TODO fix magic numbers
-    shadowMapShader.setFloat("far_plane", 25.0f);
+    shadowMapShader.setFloat("far_plane", 100.0f);
 
     for (auto& lightPair : shadowMaps)
     {

@@ -57,7 +57,7 @@ void AppDefaultRenderer::createShadowMaps(bool updateAll)
     const auto* c = maze->getCamera();
 
     // TODO fix magic numbers
-    shadowMapShader.setFloat("far_plane", 25.0f);
+    shadowMapShader.setFloat("far_plane", 100.0f);
 
     for (auto& lightPair : shadowMaps)
     {
@@ -108,7 +108,7 @@ void AppDefaultRenderer::render()
     shader.setVec3f("camWorldPos", c->getCamWorldPos());
 
     // TODO fix magic numbers
-    shader.setFloat("far_plane", 25.0f);
+    shader.setFloat("far_plane", 100.0f);
     shader.setVec3f("ambient", glm::vec3(0.05f));
 
     shader.setInt("pointLightCount", shadowMaps.size());
