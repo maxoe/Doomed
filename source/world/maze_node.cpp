@@ -1,6 +1,7 @@
 #include "world/maze_node.h"
 
 #include <iostream>
+#include <core/app.h>
 #include <glm/ext/matrix_transform.hpp>
 #include "glm/gtx/string_cast.hpp"
 
@@ -41,6 +42,11 @@ void MazeNode::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
     {
         model->draw(shader, nextFreeTextureUnit);
     }
+
+    for (const auto& portal : portals)
+    {
+        portal.draw(shader, nextFreeTextureUnit);
+    }
 }
 
 void MazeNode::update()
@@ -49,8 +55,50 @@ void MazeNode::update()
     {
         l.update();
     }
+
+    for (auto& portal : portals)
+    {
+        if (portal.collide())
+        {
+            App::getInstance()->getMaze().getCamera()->setCamWorldPos(glm::vec3(8.2f, 0.9f, -0.3f));
+            App::getInstance()->getMaze().getCamera()->setYaw(-0.85f);
+            App::getInstance()->getMaze().getCamera()->setPitch(14.18f);
+            break;
+        }
+    }
 }
 
+MazeNode* MazeNode::addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height)
+{
+    portals.emplace_back(this, this, pos, dir, width, height);
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    MazeNode* destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height)
+{
+    portals.emplace_back(this, destination, pos, dir, width, height);
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    const std::string& relModelPath,
+    MazeNode* destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height)
+{
+    portals.emplace_back(relModelPath, this, destination, pos, dir, width, height);
+
+    return this;
+}
 MazeNode* MazeNode::addModel(const std::string& relModelPath, const glm::mat4& modelMatrix)
 {
     models.emplace_back(ModelLoader::load(relModelPath));

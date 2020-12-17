@@ -8,6 +8,7 @@
 #include "renderer/app_shader.h"
 #include "core/camera.h"
 #include "renderer/model.h"
+#include <world/portal.h>
 
 enum class AttachmentPoint
 {
@@ -36,6 +37,22 @@ public:
     void setLightUniforms(const AppShader& shader) const;
     void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
     void update();
+
+    MazeNode* addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height);
+    MazeNode* addPortal(
+        MazeNode* destination,
+        const glm::vec3& pos,
+        const glm::vec3& dir,
+        float width,
+        float height);
+
+    MazeNode* addPortal(
+        const std::string& relModelPath,
+        MazeNode* destination,
+        const glm::vec3& pos,
+        const glm::vec3& dir,
+        float width,
+        float height);
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);
@@ -70,6 +87,7 @@ private:
     calcAttachmentOffset(const Model* oldModel, const Model* newModel, AttachmentPoint ap) const;
 
     std::vector<Model*> models;
+    std::vector<Portal> portals;
     std::unordered_map<std::string, GLuint> loadedTextures;
 
     glm::vec3 ambient;

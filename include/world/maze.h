@@ -21,7 +21,7 @@ public:
     }
 
     void initialize();
-    void draw();
+    void render();
     void update();
 
     MazeNode* addNode();

@@ -17,6 +17,8 @@ public:
     void setCamWorldPos(const glm::vec3& pos);
     void setCameraWorldDir(const glm::vec3& dir);
     void move(const glm::vec2& deltaPos);
+    void setYaw(float degrees);
+    void setPitch(float degrees);
     void addYaw(float deltaDegrees);
     void addPitch(float deltaDegrees);
 

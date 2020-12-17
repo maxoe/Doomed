@@ -28,7 +28,7 @@ void Maze::update()
     }
 }
 
-void Maze::draw()
+void Maze::render()
 {
     if (!nodes.empty())
     {

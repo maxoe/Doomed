@@ -68,16 +68,21 @@ void Camera::move(const glm::vec2& deltaPos)
     camWorldPos += glm::normalize(glm::cross(cameraWorldDir, up)) * deltaPos.y;
 }
 
-void Camera::addYaw(float deltaDegrees)
+void Camera::setYaw(float degrees)
 {
-    yaw += deltaDegrees;
+    yaw = degrees;
     cameraWorldDir.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
     cameraWorldDir.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
 }
 
-void Camera::addPitch(float deltaDegrees)
+void Camera::addYaw(float deltaDegrees)
 {
-    pitch += deltaDegrees;
+    setYaw(deltaDegrees + yaw);
+}
+
+void Camera::setPitch(float degrees)
+{
+    pitch = degrees;
 
     pitch = pitch > 89.0f ? 89.0f : pitch;
     pitch = pitch < -89.0f ? -89.0f : pitch;
@@ -85,4 +90,9 @@ void Camera::addPitch(float deltaDegrees)
     cameraWorldDir.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
     cameraWorldDir.y = glm::sin(glm::radians(pitch));
     cameraWorldDir.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+}
+
+void Camera::addPitch(float deltaDegrees)
+{
+    setPitch(pitch + deltaDegrees);
 }
