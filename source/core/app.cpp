@@ -167,7 +167,7 @@ int App::mainLoop()
             glm::vec3(0.0f),
             glm::vec3(1.0f, 0.0f, 0.0f),
             2.0f,
-            10.0f,
+            4.0f,
             glm::vec3(0.0f),
             glm::vec3(8.2f, 0.9f, -0.3f),
             true);
@@ -200,12 +200,12 @@ int App::mainLoop()
         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.1f))
         ->addPortal(
             0,
-            glm::vec3(0.0f),
-            glm::vec3(1.0f, 0.0f, 0.0f),
+            glm::vec3(-5.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 1.0f),
             2.0f,
-            10.0f,
+            4.0f,
+            glm::vec3(-5.0f, 0.0f, 0.0f),
             glm::vec3(0.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
             true);
 
     maze.initialize();

@@ -59,7 +59,7 @@ public:
     void teleport();
 
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
-    [[nodiscard]] const std::size_t getDestinationNode() const;
+    [[nodiscard]] std::size_t getDestinationNode() const;
 
 private:
     Model* portalObject;

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <core/app.h>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtx/vector_angle.hpp>
 #include <renderer/model_loader.h>
 
 Portal::Portal(
@@ -105,7 +106,12 @@ Portal::Portal(
     const auto& matrix =
         glm::scale(glm::identity<glm::mat4>(), glm::vec3(width / size.x, height / size.y, 1.0f));
 
-    portalObject->setModelMatrix(glm::lookAt(pos, pos + dir, glm::vec3(0.0f, 1.0f, 0.0f)) * matrix);
+    // note that dir is inverted because given direction is the direction of travel through the
+    // portal
+    portalObject->setModelMatrix(glm::translate(
+        glm::rotate(
+            matrix, glm::angle(normal, glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(0.0f, 1.0f, 0.0f)),
+        pos));
 }
 
 void Portal::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
@@ -127,7 +133,7 @@ bool Portal::collide()
 
     // check if we are on the correct side of the portal so we could have walked into it since the
     // last step
-    if (lastScalarProjOnNormal >= 0.0f)
+    if (scalarProjOnNormal <= 0.0f)
     {
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
@@ -168,8 +174,7 @@ void Portal::teleport()
     if (!seemless)
     {
         cam->setCamWorldPos(targetPos);
-        cam->setYaw(-0.85f);
-        cam->setPitch(14.18f);
+        cam->setCameraWorldDir(targetDir);
     }
     else
     {
@@ -181,7 +186,7 @@ void Portal::teleport()
     LOG_WORLD_INFO("Teleported from " + std::to_string(from) + " to " + std::to_string(target));
 }
 
-const std::size_t Portal::getDestinationNode() const
+std::size_t Portal::getDestinationNode() const
 {
     return target;
 }
