@@ -59,6 +59,33 @@ void AppDeferredRenderer::initialize(Maze* mazePtr)
     }
 }
 
+void AppDeferredRenderer::afterActiveNodeChange()
+{
+    for (auto& m : shadowMaps)
+    {
+        delete m.first;
+    }
+
+    shadowMaps.clear();
+
+    if (this->shadows)
+    {
+        for (auto& l : maze->getActiveNode()->getPointLights())
+        {
+            if (l.hasShadows())
+            {
+                shadowMaps.emplace_back(ShadowMap::createShadowMap(), &l);
+            }
+            else
+            {
+                shadowMaps.emplace_back(ShadowMap::createDummy(), &l);
+            }
+        }
+
+        createShadowMaps(true);
+    }
+}
+
 /*
  * Skips non-dynamic lights if updateAll is false
  */
@@ -138,7 +165,10 @@ void AppDeferredRenderer::render()
 
     for (auto* node : maze->getNodes())
     {
-        node->draw(geometryShader);
+        if (node->getIsVisible())
+        {
+            node->draw(geometryShader);
+        }
     }
 
     // need depth buffer read only for stencil pass

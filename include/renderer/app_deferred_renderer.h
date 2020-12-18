@@ -29,6 +29,7 @@ public:
     }
 
     void initialize(Maze* maze) override;
+    void afterActiveNodeChange() override;
     void render() override;
     void createShadowMaps(bool updateAll = false) override;
 

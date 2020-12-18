@@ -87,7 +87,7 @@ void Model::addModelTransformation(const glm::mat4& matrix)
 
 void Model::resize(float maxDimensionLength)
 {
-    auto s = getObjectSize();
+    auto& s = getObjectSize();
     float maxLength = glm::max(s.x, glm::max(s.y, s.z));
 
     addModelTransformation(glm::scale(glm::vec3(maxDimensionLength / maxLength)));

@@ -11,9 +11,6 @@
 #include "core/logger.h"
 
 MazeNode::MazeNode()
-    : ambient(glm::vec3(0.f))
-    , directionalLightDir(0.f)
-    , directionalLightIntensity(glm::vec3(0.f))
 {
 }
 
@@ -60,9 +57,7 @@ void MazeNode::update()
     {
         if (portal.collide())
         {
-            App::getInstance()->getMaze().getCamera()->setCamWorldPos(glm::vec3(8.2f, 0.9f, -0.3f));
-            App::getInstance()->getMaze().getCamera()->setYaw(-0.85f);
-            App::getInstance()->getMaze().getCamera()->setPitch(14.18f);
+            portal.teleport();
             break;
         }
     }
@@ -70,35 +65,106 @@ void MazeNode::update()
 
 MazeNode* MazeNode::addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height)
 {
-    portals.emplace_back(this, this, pos, dir, width, height);
+    portals.emplace_back(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        App::getInstance()->getMaze().getNodeIndex(this),
+        pos,
+        dir,
+        width,
+        height,
+        false);
 
     return this;
 }
 
 MazeNode* MazeNode::addPortal(
-    MazeNode* destination,
     const glm::vec3& pos,
     const glm::vec3& dir,
     float width,
-    float height)
+    float height,
+    const glm::vec3& posInTarget,
+    const glm::vec3& cameraDirectionInTarget)
 {
-    portals.emplace_back(this, destination, pos, dir, width, height);
+    portals.emplace_back(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        App::getInstance()->getMaze().getNodeIndex(this),
+        pos,
+        dir,
+        width,
+        height,
+        posInTarget,
+        cameraDirectionInTarget,
+        false);
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    std::size_t destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height,
+    bool seemless)
+{
+    portals.emplace_back(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        destination,
+        pos,
+        dir,
+        width,
+        height,
+        seemless);
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    std::size_t destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height,
+    const glm::vec3& posInTarget,
+    const glm::vec3& cameraDirectionInTarget,
+    bool seemless)
+{
+    portals.emplace_back(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        destination,
+        pos,
+        dir,
+        width,
+        height,
+        posInTarget,
+        cameraDirectionInTarget,
+        seemless);
 
     return this;
 }
 
 MazeNode* MazeNode::addPortal(
     const std::string& relModelPath,
-    MazeNode* destination,
+    std::size_t destination,
     const glm::vec3& pos,
     const glm::vec3& dir,
     float width,
-    float height)
+    float height,
+    bool seemless)
 {
-    portals.emplace_back(relModelPath, this, destination, pos, dir, width, height);
+    portals.emplace_back(
+        relModelPath,
+        App::getInstance()->getMaze().getNodeIndex(this),
+        destination,
+        pos,
+        dir,
+        width,
+        height,
+        seemless);
 
     return this;
 }
+
 MazeNode* MazeNode::addModel(const std::string& relModelPath, const glm::mat4& modelMatrix)
 {
     models.emplace_back(ModelLoader::load(relModelPath));
@@ -262,4 +328,14 @@ std::vector<PointLight>& MazeNode::getPointLights()
 bool MazeNode::getHasDirectionalLight() const
 {
     return hasDirectionalLight;
+}
+
+bool MazeNode::getIsVisible() const
+{
+    return isVisible;
+}
+
+void MazeNode::setIsVisible(bool visible)
+{
+    isVisible = visible;
 }

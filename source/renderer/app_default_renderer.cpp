@@ -46,6 +46,33 @@ void AppDefaultRenderer::initialize(Maze* mazePtr)
     }
 }
 
+void AppDefaultRenderer::afterActiveNodeChange()
+{
+    for (auto& m : shadowMaps)
+    {
+        delete m.first;
+    }
+
+    shadowMaps.clear();
+
+    if (this->shadows)
+    {
+        for (auto& l : maze->getActiveNode()->getPointLights())
+        {
+            if (l.hasShadows())
+            {
+                shadowMaps.emplace_back(ShadowMap::createShadowMap(), &l);
+            }
+            else
+            {
+                shadowMaps.emplace_back(ShadowMap::createDummy(), &l);
+            }
+        }
+
+        createShadowMaps(true);
+    }
+}
+
 /*
  * Skips non-dynamic lights if updateAll is false
  */

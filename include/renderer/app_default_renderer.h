@@ -23,6 +23,7 @@ public:
     }
 
     void initialize(Maze* maze) override;
+    void afterActiveNodeChange() override;
     void render() override;
 
     [[nodiscard]] std::string getTypeName() const override;

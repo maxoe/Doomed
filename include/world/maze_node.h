@@ -39,20 +39,41 @@ public:
     void update();
 
     MazeNode* addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height);
+
     MazeNode* addPortal(
-        MazeNode* destination,
         const glm::vec3& pos,
         const glm::vec3& dir,
         float width,
-        float height);
+        float height,
+        const glm::vec3& posInTarget,
+        const glm::vec3& cameraDirectionInTarget);
+
+    MazeNode* addPortal(
+        std::size_t destination,
+        const glm::vec3& pos,
+        const glm::vec3& dir,
+        float width,
+        float height,
+        bool seemless);
 
     MazeNode* addPortal(
         const std::string& relModelPath,
-        MazeNode* destination,
+        std::size_t destination,
         const glm::vec3& pos,
         const glm::vec3& dir,
         float width,
-        float height);
+        float height,
+        bool seemless);
+
+    MazeNode* addPortal(
+        std::size_t destination,
+        const glm::vec3& pos,
+        const glm::vec3& dir,
+        float width,
+        float height,
+        const glm::vec3& posInTarget,
+        const glm::vec3& cameraDirectionInTarget,
+        bool seemless);
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);
@@ -82,6 +103,9 @@ public:
     [[nodiscard]] glm::vec3 getDirectionalLightIntensity() const;
     [[nodiscard]] bool getHasDirectionalLight() const;
 
+    void setIsVisible(bool visible);
+    [[nodiscard]] bool getIsVisible() const;
+
 private:
     glm::vec3
     calcAttachmentOffset(const Model* oldModel, const Model* newModel, AttachmentPoint ap) const;
@@ -90,10 +114,15 @@ private:
     std::vector<Portal> portals;
     std::unordered_map<std::string, GLuint> loadedTextures;
 
-    glm::vec3 ambient;
-    glm::vec3 directionalLightDir;
-    glm::vec3 directionalLightIntensity;
+    glm::vec3 ambient = glm::vec3(0.0f);
+    glm::vec3 directionalLightDir = glm::vec3(0.0f);
+    glm::vec3 directionalLightIntensity = glm::vec3(0.0f);
     bool hasDirectionalLight = false;
 
     std::vector<PointLight> pointLights;
+
+    const glm::vec3 initialPosition = glm::vec3(0.0f, 1.0f, 0.0f);
+    const glm::vec3 initialCameraDirection = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    bool isVisible = false;
 };

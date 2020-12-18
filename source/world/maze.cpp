@@ -1,7 +1,8 @@
 #include "world/maze.h"
 
-#include <renderer/app_deferred_renderer.h>
+#include "renderer/app_deferred_renderer.h"
 #include "renderer/app_default_renderer.h"
+#include "core/logger.h"
 
 Maze::Maze(const std::string& rendererType)
 {
@@ -18,13 +19,25 @@ Maze::Maze(const std::string& rendererType)
 void Maze::initialize()
 {
     renderer->initialize(this);
+
+    if (nodes.empty())
+    {
+        LOG_WORLD_WARN("Initialising maze with zero nodes");
+    }
+    else
+    {
+        nodes.at(0)->setIsVisible(true);
+    }
 }
 
 void Maze::update()
 {
     for (auto* node : nodes)
     {
-        node->update();
+        if (node->getIsVisible())
+        {
+            node->update();
+        }
     }
 }
 
@@ -42,6 +55,20 @@ MazeNode* Maze::addNode()
     return nodes.back();
 }
 
+void Maze::setActiveNode(std::size_t nodeIndex)
+{
+    nodes[activeIndex]->setIsVisible(false);
+    activeIndex = nodeIndex;
+    nodes[activeIndex]->setIsVisible(true);
+
+    renderer->afterActiveNodeChange();
+}
+
+void Maze::setActiveNode(const MazeNode* node)
+{
+    activeIndex = getNodeIndex(node);
+}
+
 const std::vector<MazeNode*>& Maze::getNodes()
 {
     return nodes;
@@ -50,10 +77,15 @@ const std::vector<MazeNode*>& Maze::getNodes()
 MazeNode* Maze::getActiveNode()
 {
     // TODO implement
-    return nodes.empty() ? nullptr : nodes[0];
+    return nodes.empty() ? nullptr : nodes[activeIndex];
 }
 
 Camera* Maze::getCamera()
 {
     return &camera;
+}
+
+std::size_t Maze::getNodeIndex(const MazeNode* node) const
+{
+    return std::distance(nodes.begin(), std::find(nodes.begin(), nodes.end(), node));
 }

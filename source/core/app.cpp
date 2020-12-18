@@ -162,12 +162,20 @@ int App::mainLoop()
                 {9.1f, 5.0f, -3.8f, 7.6f},
                 {-9.1f, 5.0f, -3.8f, 18.2f}})
         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.1f))
-        ->addPortal(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 2.0f, 10.0f);
+        ->addPortal(
+            1,
+            glm::vec3(0.0f),
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            2.0f,
+            10.0f,
+            glm::vec3(0.0f),
+            glm::vec3(8.2f, 0.9f, -0.3f),
+            true);
 
     maze.addNode()
         ->addModel("debug/sponza/sponza.obj", 30.0f)
         //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)
-        ->addPointLight(glm::vec3(9.0f, 1.7f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 20, true)
+        ->addPointLight(glm::vec3(9.0f, 1.7f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 20, true)
         ->addPointLight(glm::vec3(1.0f, 3.0f, 0.0f), glm::vec3(1.0f, .9f, 0.7f), 20, true)
         ->addPointLight(
             glm::vec3(1.0f, 3.0f, 0.0f),
@@ -190,7 +198,15 @@ int App::mainLoop()
                 {9.1f, 5.0f, -3.8f, 7.6f},
                 {-9.1f, 5.0f, -3.8f, 18.2f}})
         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.1f))
-        ->addPortal(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 2.0f, 10.0f);
+        ->addPortal(
+            0,
+            glm::vec3(0.0f),
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            2.0f,
+            10.0f,
+            glm::vec3(0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            true);
 
     maze.initialize();
 

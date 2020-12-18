@@ -25,12 +25,17 @@ public:
     void update();
 
     MazeNode* addNode();
+    void setActiveNode(std::size_t nodeIndex);
+    void setActiveNode(const MazeNode* node);
+
     [[nodiscard]] const std::vector<MazeNode*>& getNodes();
     [[nodiscard]] MazeNode* getActiveNode();
     [[nodiscard]] Camera* getCamera();
+    [[nodiscard]] std::size_t getNodeIndex(const MazeNode* node) const;
 
 private:
     Camera camera;
     std::vector<MazeNode*> nodes;
     std::shared_ptr<AppRenderer> renderer;
+    std::size_t activeIndex = 0;
 };
