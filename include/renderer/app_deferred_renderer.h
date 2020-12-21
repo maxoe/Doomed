@@ -43,12 +43,13 @@ public:
 private:
     Maze* maze;
 
-    std::array<AppShader, 5> shader{
+    std::array<AppShader, 6> shader{
         "deferred_geometry",
         "deferred_point_light",
         "deferred_dir_light",
         "null_pass",
-        "null_pass_set_depth"};
+        "null_pass_set_depth",
+        "deferred_geometry_portal"};
     std::shared_ptr<AppGBuffer> gBuffer;
     Model* boundingSphere;
     Model* quad;

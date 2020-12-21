@@ -154,6 +154,16 @@ glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
                glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
+glm::vec3 Portal::getTargetPosition() const
+{
+    return targetPos;
+}
+
+glm::vec3 Portal::getTargetDirection() const
+{
+    return targetDir;
+}
+
 bool Portal::collide()
 {
     auto worldPos = App::getInstance()->getMaze().getCamera()->getCamWorldPos();

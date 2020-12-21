@@ -142,6 +142,7 @@ void AppDeferredRenderer::render()
     auto& dirLightShader = shader[2];
     auto& stencilPassShader = shader[3];
     auto& depthStencilPassShader = shader[4];
+    auto& geometryPortalShader = shader[5];
 
     auto width = App::getInstance()->getWidth();
     auto height = App::getInstance()->getHeight();
@@ -265,8 +266,9 @@ void AppDeferredRenderer::render()
     glDepthFunc(GL_LESS);
 
     // geometry pass for portals
+    // discards fragments between camera and portal
     gBuffer->bindForGeometryPass();
-    geometryShader.use();
+    geometryPortalShader.use();
 
     // no depth test because information is in stencil buffer
     glDepthMask(GL_TRUE);
@@ -280,9 +282,21 @@ void AppDeferredRenderer::render()
     glStencilFunc(GL_EQUAL, ~portalStencilMask + 1, portalStencilMask);
 
     // place virtual camera
-    geometryShader.setMat4f(
+    geometryPortalShader.setMat4f(
         "VP", maze->getNodes().at(0)->getPortals().at(0).getVirtualVPMatrix(*c));
-    maze->getNodes().at(1)->draw(geometryShader);
+
+    // additional clip plane (portal plane) ax+bx+cx+d=0
+    glm::vec4 portalPlane(
+        maze->getNodes().at(0)->getPortals().at(0).getTargetDirection(),
+        -glm::dot(
+            maze->getNodes().at(0)->getPortals().at(0).getTargetDirection(),
+            maze->getNodes().at(0)->getPortals().at(0).getTargetPosition()));
+
+    geometryPortalShader.setVec4f("nearClipPortalPlane", portalPlane);
+
+    glEnable(GL_CLIP_DISTANCE0);
+    maze->getNodes().at(1)->draw(geometryPortalShader);
+    glDisable(GL_CLIP_DISTANCE0);
 
     //}
     //}
