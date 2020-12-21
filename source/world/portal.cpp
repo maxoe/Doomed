@@ -126,13 +126,32 @@ const glm::mat4& Portal::getModelMatrix() const
 
 glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
 {
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto worldPos = camera.getCamWorldPos();
+    auto spanTwo = glm::normalize(glm::cross(normal, up));
+    auto toCamera = worldPos - centerPoint;
+
     const auto& portalToCam = camera.getCamWorldPos() - centerPoint;
     const auto& camDir = camera.getCameraWorldDir();
 
-    return camera.getProjection() * glm::lookAt(
-                                        targetPos + portalToCam,
-                                        targetPos + portalToCam + camDir,
-                                        glm::vec3(0.0f, 1.0f, 0.0f));
+    auto scalarProjOnNormal = glm::dot(portalToCam, normal);
+    auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
+    auto scalarProjOnUp = glm::dot(portalToCam, up);
+
+    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+
+    auto dirScalarProjOnNormal = glm::dot(camDir, normal);
+    auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
+    auto dirScalarProjOnUp = glm::dot(camDir, up);
+
+    return camera.getProjection() *
+           glm::lookAt(
+               targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+                   scalarProjOnWidth * targetSpanTwo,
+               targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+                   scalarProjOnWidth * targetSpanTwo + dirScalarProjOnNormal * targetDir +
+                   dirScalarProjOnUp * up + dirScalarProjOnWidth * targetSpanTwo,
+               glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 bool Portal::collide()
