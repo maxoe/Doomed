@@ -80,7 +80,7 @@ MazeNode* Maze::getActiveNode()
     return nodes.empty() ? nullptr : nodes[activeIndex];
 }
 
-Camera* Maze::getCamera()
+AppCamera* Maze::getCamera()
 {
     return &camera;
 }

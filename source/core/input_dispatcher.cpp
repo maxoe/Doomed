@@ -25,7 +25,7 @@ void InputDispatcher::onMouseOut()
     firstMouse = true;
 }
 
-void InputDispatcher::processMouseMovement(Camera* camera, double xPos, double yPos)
+void InputDispatcher::processMouseMovement(AppCamera* camera, double xPos, double yPos)
 {
     if (firstMouse)
     {
@@ -46,7 +46,7 @@ void InputDispatcher::processMouseMovement(Camera* camera, double xPos, double y
     camera->addPitch(yMouseOffset);
 }
 
-void InputDispatcher::processKeyInput(Movement dir, Camera* camera)
+void InputDispatcher::processKeyInput(Movement dir, AppCamera* camera)
 {
     float currentMovementFrame = glfwGetTime();
     float currentMovementDelta = currentMovementFrame - lastMovementFrame;

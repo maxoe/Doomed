@@ -7,7 +7,7 @@
 
 #include "renderer/model_loader.h"
 #include "renderer/point_light.h"
-#include "core/camera.h"
+#include "core/app_camera.h"
 #include "core/logger.h"
 
 MazeNode::MazeNode()
@@ -39,7 +39,10 @@ void MazeNode::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
     {
         model->draw(shader, nextFreeTextureUnit);
     }
+}
 
+void MazeNode::drawPortals(AppShader& shader, GLuint nextFreeTextureUnit) const
+{
     for (const auto& portal : portals)
     {
         portal.draw(shader, nextFreeTextureUnit);
@@ -318,6 +321,11 @@ MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& i
     hasDirectionalLight = true;
 
     return this;
+}
+
+std::vector<Portal>& MazeNode::getPortals()
+{
+    return portals;
 }
 
 std::vector<PointLight>& MazeNode::getPointLights()

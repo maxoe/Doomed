@@ -1,10 +1,10 @@
 #pragma once
 #include <glm/glm.hpp>
 
-class Camera
+class AppCamera
 {
 public:
-    Camera();
+    AppCamera();
 
     glm::vec3 getCamWorldPos() const;
     glm::vec3 getCameraWorldDir() const;

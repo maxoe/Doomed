@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "renderer/app_shader.h"
-#include "core/camera.h"
+#include "core/app_camera.h"
 #include "renderer/model.h"
 #include <world/portal.h>
 
@@ -36,6 +36,7 @@ public:
 
     void setLightUniforms(const AppShader& shader) const;
     void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
+    void drawPortals(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
     void update();
 
     MazeNode* addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height);
@@ -74,6 +75,8 @@ public:
         const glm::vec3& posInTarget,
         const glm::vec3& cameraDirectionInTarget,
         bool seemless);
+
+    [[nodiscard]] std::vector<Portal>& getPortals();
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);

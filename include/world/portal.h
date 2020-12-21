@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/model.h"
+#include "core/app_camera.h"
 
 class MazeNode;
 
@@ -59,6 +60,7 @@ public:
     void teleport();
 
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
+    [[nodiscard]] glm::mat4 getVirtualVPMatrix(const AppCamera& camera) const;
     [[nodiscard]] std::size_t getDestinationNode() const;
 
 private:
