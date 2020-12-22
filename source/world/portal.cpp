@@ -171,8 +171,6 @@ bool Portal::collide()
     auto toCamera = worldPos - centerPoint;
     auto scalarProjOnNormal = glm::dot(toCamera, normal);
 
-    std::cout << scalarProjOnNormal << std::endl;
-
     // bias because near plane clips away portal so stuff behind gets visible for a short time when
     // going through the portal
     const float bias = 0.15f;

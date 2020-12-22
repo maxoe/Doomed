@@ -136,6 +136,13 @@ void AppDeferredRenderer::render()
 {
     createShadowMaps();
 
+    const auto& renderingOrder = maze->getRenderingOrder(4, false);
+
+    for (auto& n : renderingOrder)
+    {
+        std::cout << n << " ";
+    }
+    std::cout << std::endl;
     // 0 geometry 1 point light 2 directional light 3 null pass
     auto& geometryShader = shader[0];
     auto& pointLightShader = shader[1];

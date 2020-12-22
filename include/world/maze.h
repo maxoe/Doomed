@@ -29,9 +29,12 @@ public:
     void setActiveNode(const MazeNode* node);
 
     [[nodiscard]] const std::vector<MazeNode*>& getNodes();
-    [[nodiscard]] MazeNode* getActiveNode();
+    [[nodiscard]] MazeNode* getActiveNode() const;
     [[nodiscard]] AppCamera* getCamera();
     [[nodiscard]] std::size_t getNodeIndex(const MazeNode* node) const;
+
+    [[nodiscard]] std::vector<std::size_t>
+    getRenderingOrder(std::size_t depth = 0, bool allowCycles = false) const;
 
 private:
     AppCamera camera;

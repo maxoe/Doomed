@@ -60,6 +60,8 @@ void AppCamera::setCamWorldPos(const glm::vec3& pos)
 void AppCamera::setCameraWorldDir(const glm::vec3& dir)
 {
     cameraWorldDir = glm::normalize(dir);
+    pitch = glm::asin(-cameraWorldDir.y);
+    yaw = atan2(cameraWorldDir.x, cameraWorldDir.z);
 }
 
 void AppCamera::move(const glm::vec2& deltaPos)

@@ -1,5 +1,7 @@
 #include "world/maze.h"
 
+#include <queue>
+
 #include "renderer/app_deferred_renderer.h"
 #include "renderer/app_default_renderer.h"
 #include "core/logger.h"
@@ -74,7 +76,7 @@ const std::vector<MazeNode*>& Maze::getNodes()
     return nodes;
 }
 
-MazeNode* Maze::getActiveNode()
+MazeNode* Maze::getActiveNode() const
 {
     // TODO implement
     return nodes.empty() ? nullptr : nodes[activeIndex];
@@ -88,4 +90,55 @@ AppCamera* Maze::getCamera()
 std::size_t Maze::getNodeIndex(const MazeNode* node) const
 {
     return std::distance(nodes.begin(), std::find(nodes.begin(), nodes.end(), node));
+}
+
+/*
+ * Returns vector of node ids in the order of being scanned by a bfs, up to bfs distance depth
+ */
+std::vector<std::size_t> Maze::getRenderingOrder(std::size_t depth, bool allowCycles) const
+{
+    struct BFSAttributes
+    {
+        bool scanned = false;
+        std::size_t dist = 0;
+    };
+
+    std::vector<BFSAttributes> attr(nodes.size());
+
+    std::fill(attr.begin(), attr.end(), BFSAttributes{false});
+    std::queue<std::size_t> q;
+    std::vector<std::size_t> result;
+
+    std::size_t start = getNodeIndex(getActiveNode());
+    q.push(start);
+    attr[start] = {true, 0};
+
+    while (!q.empty())
+    {
+        const std::size_t nodeId = q.front();
+        q.pop();
+
+        result.emplace_back(nodeId);
+
+        if (attr[nodeId].dist == depth)
+        {
+            continue;
+        }
+
+        for (auto neighborIt = nodes.at(nodeId)->getPortals().begin();
+             neighborIt != nodes.at(nodeId)->getPortals().end();
+             ++neighborIt)
+        {
+            std::size_t neighborId = neighborIt->getDestinationNode();
+            auto& neighborAttr = attr[neighborId];
+
+            if (!neighborAttr.scanned || allowCycles)
+            {
+                q.push(neighborId);
+                neighborAttr = {true, attr[nodeId].dist + 1};
+            }
+        }
+    }
+
+    return result;
 }
