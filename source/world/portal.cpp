@@ -171,9 +171,15 @@ bool Portal::collide()
     auto toCamera = worldPos - centerPoint;
     auto scalarProjOnNormal = glm::dot(toCamera, normal);
 
+    std::cout << scalarProjOnNormal << std::endl;
+
+    // bias because near plane clips away portal so stuff behind gets visible for a short time when
+    // going through the portal
+    const float bias = 0.15f;
     // check if we are on the correct side of the portal so we could have walked into it since the
     // last step
-    if (scalarProjOnNormal <= 0.0f)
+
+    if (scalarProjOnNormal <= 0.0f - bias)
     {
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
@@ -196,13 +202,15 @@ bool Portal::collide()
         return false;
     }
 
-    // we are in front of the portal, check if we walked through the portal since the last step
-    if (scalarProjOnNormal > 0.0f && lastScalarProjOnNormal < 0.0f)
+    // we are in the bias area in front of the portal, check if we walk into the portals direction
+    // since the last step
+    if (lastScalarProjOnNormal < scalarProjOnNormal)
     {
         lastScalarProjOnNormal = scalarProjOnNormal;
         return true;
     }
 
+    lastScalarProjOnNormal = scalarProjOnNormal;
     return false;
 }
 
@@ -211,14 +219,42 @@ void Portal::teleport()
     lastScalarProjOnNormal = 0.0f;
     auto* cam = App::getInstance()->getMaze().getCamera();
 
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto worldPos = cam->getCamWorldPos();
+    auto spanTwo = glm::normalize(glm::cross(normal, up));
+    auto toCamera = worldPos - centerPoint;
+
+    const auto& portalToCam = cam->getCamWorldPos() - centerPoint;
+    const auto& camDir = cam->getCameraWorldDir();
+
+    auto scalarProjOnNormal = glm::dot(portalToCam, normal);
+    auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
+    auto scalarProjOnUp = glm::dot(portalToCam, up);
+
+    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+
+    auto dirScalarProjOnNormal = glm::dot(camDir, normal);
+    auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
+    auto dirScalarProjOnUp = glm::dot(camDir, up);
+
+    // TODO remove seemless?
     if (!seemless)
     {
-        cam->setCamWorldPos(targetPos);
-        cam->setCameraWorldDir(targetDir);
+        cam->setCamWorldPos(
+            targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+            scalarProjOnWidth * targetSpanTwo);
+        cam->setCameraWorldDir(
+            dirScalarProjOnNormal * targetDir + dirScalarProjOnUp * up +
+            dirScalarProjOnWidth * targetSpanTwo);
     }
     else
     {
-        cam->setCamWorldPos(targetPos + (cam->getCamWorldPos() - centerPoint));
+        cam->setCamWorldPos(
+            targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+            scalarProjOnWidth * targetSpanTwo);
+        cam->setCameraWorldDir(
+            dirScalarProjOnNormal * targetDir + dirScalarProjOnUp * up +
+            dirScalarProjOnWidth * targetSpanTwo);
     }
 
     App::getInstance()->getMaze().setActiveNode(target);
