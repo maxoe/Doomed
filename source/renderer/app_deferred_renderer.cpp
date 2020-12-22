@@ -138,11 +138,12 @@ void AppDeferredRenderer::render()
 
     const auto& renderingOrder = maze->getRenderingOrder(4, false);
 
-    for (auto& n : renderingOrder)
-    {
-        std::cout << n << " ";
-    }
-    std::cout << std::endl;
+    // for (auto& n : renderingOrder)
+    //{
+    // std::cout << n << " ";
+    //}
+    // std::cout << std::endl;
+
     // 0 geometry 1 point light 2 directional light 3 null pass
     auto& geometryShader = shader[0];
     auto& pointLightShader = shader[1];
@@ -199,7 +200,7 @@ void AppDeferredRenderer::render()
     // draw scene normally
     geometryShader.setMat4f("VP", c->getVP());
     glStencilFunc(GL_EQUAL, ~portalStencilMask + 0, portalStencilMask);
-    maze->getNodes().at(0)->draw(geometryShader);
+    maze->getNodes().at(renderingOrder[0])->draw(geometryShader);
 
     // portals stencil pass
     gBuffer->bindForStencilPass();
@@ -214,27 +215,28 @@ void AppDeferredRenderer::render()
 
     // use highest 4 bits for portals but clear all
     glStencilMask(0xff);
+    glClearStencil(0);
     glClear(GL_STENCIL_BUFFER_BIT);
     glStencilMask(portalStencilMask);
 
     // stencil stuff
-    for (int i = maze->getNodes().size() - 1; i >= 0; --i)
-    {
-        auto* node = maze->getNodes().at(i);
+    // for (int i = maze->getNodes().size() - 1; i >= 0; --i)
+    //{
+    auto* node = maze->getNodes().at(renderingOrder[0]);
 
-        // if (node->getIsVisible())
-        //{
+    // if (node->getIsVisible())
+    //{
 
-        // we set the stencil value to the node id and discard every fragment which would
-        // overwrite an already processed fragment or is occluded
-        // already processed fragments have a higher stencil value than the reference
-        // TODO REMOVE TEMPORARY HACK
-        glStencilFunc(GL_GEQUAL, ~portalStencilMask + (1 - i), portalStencilMask);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    // we set the stencil value to the node id and discard every fragment which would
+    // overwrite an already processed fragment or is occluded
+    // already processed fragments have a higher stencil value than the reference
+    // TODO REMOVE TEMPORARY HACK
+    glStencilFunc(GL_GEQUAL, ~portalStencilMask + (1 - 0), portalStencilMask);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-        node->drawPortals(stencilPassShader);
-        //}
-    }
+    node->drawPortals(stencilPassShader);
+    //}
+    //}
 
     // clear depth in portal area
     gBuffer->bindForStencilPass();
@@ -253,22 +255,22 @@ void AppDeferredRenderer::render()
     // the portal
     depthStencilPassShader.setFloat("depth", 1.0f);
 
-    for (int i = maze->getNodes().size() - 1; i >= 0; --i)
-    {
-        auto* node = maze->getNodes().at(i);
+    // for (int i = maze->getNodes().size() - 1; i >= 0; --i)
+    //{
+    node = maze->getNodes().at(renderingOrder[0]);
 
-        // if (node->getIsVisible())
-        //{
+    // if (node->getIsVisible())
+    //{
 
-        // we set the stencil value to the node id and discard every fragment which would
-        // overwrite an already processed fragment or is occluded
-        // already processed fragments have a higher stencil value than the reference
-        // TODO REMOVE TEMPORARY HACK
-        glStencilFunc(GL_GEQUAL, ~portalStencilMask + (1 - i), portalStencilMask);
+    // we set the stencil value to the node id and discard every fragment which would
+    // overwrite an already processed fragment or is occluded
+    // already processed fragments have a higher stencil value than the reference
+    // TODO REMOVE TEMPORARY HACK
+    glStencilFunc(GL_GEQUAL, ~portalStencilMask + (1 - 0), portalStencilMask);
 
-        node->drawPortals(depthStencilPassShader);
-        //}
-    }
+    node->drawPortals(depthStencilPassShader);
+    //}
+    //}
 
     glDepthFunc(GL_LESS);
 
@@ -290,19 +292,19 @@ void AppDeferredRenderer::render()
 
     // place virtual camera
     geometryPortalShader.setMat4f(
-        "VP", maze->getNodes().at(0)->getPortals().at(0).getVirtualVPMatrix(*c));
+        "VP", maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getVirtualVPMatrix(*c));
 
     // additional clip plane (portal plane) ax+bx+cx+d=0
     glm::vec4 portalPlane(
-        maze->getNodes().at(0)->getPortals().at(0).getTargetDirection(),
+        maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getTargetDirection(),
         -glm::dot(
-            maze->getNodes().at(0)->getPortals().at(0).getTargetDirection(),
-            maze->getNodes().at(0)->getPortals().at(0).getTargetPosition()));
+            maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getTargetDirection(),
+            maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getTargetPosition()));
 
     geometryPortalShader.setVec4f("nearClipPortalPlane", portalPlane);
 
     glEnable(GL_CLIP_DISTANCE0);
-    maze->getNodes().at(1)->draw(geometryPortalShader);
+    maze->getNodes().at(renderingOrder[1])->draw(geometryPortalShader);
     glDisable(GL_CLIP_DISTANCE0);
 
     //}
