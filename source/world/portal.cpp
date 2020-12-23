@@ -89,7 +89,10 @@ Portal::Portal(
     const glm::vec3& posInTarget,
     const glm::vec3& cameraDirectionInTarget,
     bool seemless)
-    : portalObject(ModelLoader::load(relModelPath))
+    : /*fbo(0)
+    , texture(0)
+    , */
+    portalObject(ModelLoader::load(relModelPath))
     , from(fromNode)
     , target(toNode)
     , targetPos(posInTarget)
@@ -112,6 +115,39 @@ Portal::Portal(
     glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(rot * glm::vec4(pos, 1.0f)));
 
     portalObject->setModelMatrix(scaleMatrix * rot * trans);
+
+    //// setup texture target
+    // auto windowHeight = App::getInstance()->getHeight();
+    // auto windowWidth = App::getInstance()->getWidth();
+    //// fbo
+    // glGenFramebuffers(1, &fbo);
+    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+
+    //// texture
+    // glGenTextures(1, &texture);
+    // glBindTexture(GL_TEXTURE_2D, texture);
+
+    // glTexImage2D(
+    //    GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    // glGenerateMipmap(GL_TEXTURE_2D);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //// glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //// glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    // if (status != GL_FRAMEBUFFER_COMPLETE)
+    //{
+    //    LOG_WORLD_ERROR("Error initializing framebuffer for portal: " + std::to_string(status));
+    //}
+
+    //// restore default fbo
+    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 void Portal::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
@@ -127,15 +163,9 @@ const glm::mat4& Portal::getModelMatrix() const
 glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
 {
     auto up = glm::vec3(0.0f, 1.0f, 0.0f);
-    auto worldPos = camera.getCamWorldPos();
     auto spanTwo = glm::normalize(glm::cross(normal, up));
 
-    const auto& portalToCam = camera.getCamWorldPos() - centerPoint;
     const auto& camDir = camera.getCameraWorldDir();
-
-    auto scalarProjOnNormal = glm::dot(portalToCam, normal);
-    auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
-    auto scalarProjOnUp = glm::dot(portalToCam, up);
 
     auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
 
@@ -143,14 +173,44 @@ glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
     auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
     auto dirScalarProjOnUp = glm::dot(camDir, up);
 
-    return camera.getProjection() *
-           glm::lookAt(
-               targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
-                   scalarProjOnWidth * targetSpanTwo,
-               targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
-                   scalarProjOnWidth * targetSpanTwo + dirScalarProjOnNormal * targetDir +
-                   dirScalarProjOnUp * up + dirScalarProjOnWidth * targetSpanTwo,
-               glm::vec3(0.0f, 1.0f, 0.0f));
+    return camera.getProjection() /*glm::perspective(
+               glm::radians(45.0f), width / height, 0.01f, 100.0f)*/
+           * glm::lookAt(
+                 getVirtualCameraPosition(camera),
+                 getVirtualCameraPosition(camera) + targetDir * dirScalarProjOnNormal +
+                     targetSpanTwo * dirScalarProjOnWidth + up * dirScalarProjOnUp,
+                 glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+float Portal::getWidth() const
+{
+    return width;
+}
+
+float Portal::getHeight() const
+{
+    return height;
+}
+
+glm::vec2 Portal::getSize() const
+{
+    return glm::vec2(portalObject->getObjectSize());
+}
+
+glm::vec3 Portal::getVirtualCameraPosition(const AppCamera& camera) const
+{
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto spanTwo = glm::normalize(glm::cross(normal, up));
+
+    const auto& portalToCam = camera.getCamWorldPos() - centerPoint;
+    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+
+    auto scalarProjOnNormal = glm::dot(portalToCam, normal);
+    auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
+    auto scalarProjOnUp = glm::dot(portalToCam, up);
+
+    return targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+           scalarProjOnWidth * targetSpanTwo;
 }
 
 glm::vec3 Portal::getTargetPosition() const

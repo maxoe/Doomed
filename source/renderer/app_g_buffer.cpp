@@ -50,6 +50,11 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glBindTexture(GL_TEXTURE_2D, finalTexture);
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, finalTexture, 0);
 
     const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -103,6 +108,14 @@ void AppGBuffer::bindForFinalPass() const
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glReadBuffer(GL_COLOR_ATTACHMENT4);
+}
+
+void AppGBuffer::bindForPortalPass(const AppShader& shader) const
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, finalTexture);
+    shader.setInt("portalTexture", 0);
 }
 
 void AppGBuffer::setUniforms(const AppShader& shader) const

@@ -44,6 +44,7 @@ public:
     void bindForGeometryPass() const;
     void bindForStencilPass() const;
     void bindForLightPass() const;
+    void bindForPortalPass(const AppShader& shader) const;
     void bindForFinalPass() const;
 
     void setUniforms(const AppShader& shader) const;

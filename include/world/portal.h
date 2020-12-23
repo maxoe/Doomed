@@ -53,6 +53,16 @@ public:
     ~Portal()
     {
         delete portalObject;
+
+        // if (fbo != 0)
+        //{
+        //    glDeleteFramebuffers(1, &fbo);
+        //}
+
+        // if (texture != 0)
+        //{
+        //    glDeleteTextures(1, &texture);
+        //}
     }
 
     void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
@@ -61,12 +71,18 @@ public:
 
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
     [[nodiscard]] glm::mat4 getVirtualVPMatrix(const AppCamera& camera) const;
+    [[nodiscard]] glm::vec3 getVirtualCameraPosition(const AppCamera& camera) const;
     [[nodiscard]] std::size_t getDestinationNode() const;
     [[nodiscard]] glm::vec3 getTargetPosition() const;
     [[nodiscard]] glm::vec3 getTargetDirection() const;
+    [[nodiscard]] float getWidth() const;
+    [[nodiscard]] float getHeight() const;
+    [[nodiscard]] glm::vec2 getSize() const;
 
 private:
     Model* portalObject;
+    /*GLuint fbo;
+    GLuint texture;*/
 
     std::size_t from;
     std::size_t target;

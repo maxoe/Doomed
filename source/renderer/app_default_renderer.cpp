@@ -119,7 +119,7 @@ void AppDefaultRenderer::createShadowMaps(bool updateAll)
     glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
 }
 
-void AppDefaultRenderer::render()
+void AppDefaultRenderer::render(Portal* portal)
 
 {
     createShadowMaps();

@@ -132,7 +132,7 @@ void AppDeferredRenderer::createShadowMaps(bool updateAll)
     glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
 }
 
-void AppDeferredRenderer::render()
+void AppDeferredRenderer::render(Portal* portal)
 {
     createShadowMaps();
 
@@ -164,158 +164,30 @@ void AppDeferredRenderer::render()
     // only geometry pass writes to depth buffer and does depth tests
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // for (int i = 0; i < maze->getNodes().size(); ++i)
-    //{
-    // auto* node = maze->getNodes().at(i);
+    glm::mat4 vp;
+    glm::vec3 camPos;
 
-    // draw portals
-    // resolve this hack
-    // for (const auto& portal : node->getPortals())
-    //{
-    // if (node->getIsVisible())
-    //{
-    // place virtual camera
-    /*geometryShader.setMat4f(
-        "VP", maze->getNodes().at(0)->getPortals().at(0).getVirtualVPMatrix(*c));
+    if (portal == nullptr)
+    {
+        const auto* c = maze->getCamera();
+        vp = c->getVP();
+        camPos = c->getCamWorldPos();
+    }
+    else
+    {
+        const auto* c = maze->getCamera();
+        vp = portal->getVirtualVPMatrix(*c);
+        camPos = portal->getVirtualCameraPosition(*c);
+        // glViewport(0, 0, portal->getWidth(), portal->getHeight());
+    }
 
-    */
-
-    const char portalStencilMask = 0xf0;
-    const auto* c = maze->getCamera();
-
-    // 1. draw geometry in scene and correct stencil values if portal occluded
-    // 2. draw portals using corrected stencil buffer
-
-    // overwrite value in stencil buffer if depth test succeeds
-    // this draws the scene over the portal's area and corrects the stencil buffer for occluded
-    // portals
-    glDisable(GL_STENCIL_TEST);
-
-    // draw scene normally
-    geometryShader.setMat4f("VP", c->getVP());
-    glStencilFunc(GL_EQUAL, ~portalStencilMask + 0, portalStencilMask);
+    geometryShader.setMat4f("VP", vp);
     maze->getNodes().at(renderingOrder[0])->draw(geometryShader);
-
-    // portals stencil pass
-    gBuffer->bindForStencilPass();
-    stencilPassShader.use();
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glEnable(GL_STENCIL_TEST);
-
-    stencilPassShader.setMat4f("VP", c->getVP());
-
-    // use highest 4 bits for portals but clear all
-    glStencilMask(0xff);
-    glClearStencil(0);
-    glClear(GL_STENCIL_BUFFER_BIT);
-    glStencilMask(portalStencilMask);
-
-    // stencil stuff
-    // for (int i = maze->getNodes().size() - 1; i >= 0; --i)
-    //{
-    auto* node = maze->getNodes().at(renderingOrder[0]);
-
-    // if (node->getIsVisible())
-    //{
-
-    // we set the stencil value to the node id and discard every fragment which would
-    // overwrite an already processed fragment or is occluded
-    // already processed fragments have a higher stencil value than the reference
-    // TODO REMOVE TEMPORARY HACK
-    glStencilFunc(GL_GEQUAL, ~portalStencilMask + (1 - 0), portalStencilMask);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-    node->drawPortals(stencilPassShader);
-    //}
-    //}
-
-    // clear depth in portal area
-    gBuffer->bindForStencilPass();
-    depthStencilPassShader.use();
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_ALWAYS);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glEnable(GL_STENCIL_TEST);
-    glStencilMask(GL_FALSE);
-
-    depthStencilPassShader.setMat4f("VP", c->getVP());
-
-    // reset depth where the portal is visible so it doesn't interfere with drawing the scene behind
-    // the portal
-    depthStencilPassShader.setFloat("depth", 1.0f);
-
-    // for (int i = maze->getNodes().size() - 1; i >= 0; --i)
-    //{
-    node = maze->getNodes().at(renderingOrder[0]);
-
-    // if (node->getIsVisible())
-    //{
-
-    // we set the stencil value to the node id and discard every fragment which would
-    // overwrite an already processed fragment or is occluded
-    // already processed fragments have a higher stencil value than the reference
-    // TODO REMOVE TEMPORARY HACK
-    glStencilFunc(GL_GEQUAL, ~portalStencilMask + (1 - 0), portalStencilMask);
-
-    node->drawPortals(depthStencilPassShader);
-    //}
-    //}
-
-    glDepthFunc(GL_LESS);
-
-    // geometry pass for portals
-    // discards fragments between camera and portal
-    gBuffer->bindForGeometryPass();
-    geometryPortalShader.use();
-
-    // no depth test because information is in stencil buffer
-    glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    // draw scene behind portal with corrected stencil buffer
-    // read only stencil buffer
-    glStencilMask(0x0);
-    glStencilFunc(GL_EQUAL, ~portalStencilMask + 1, portalStencilMask);
-
-    // place virtual camera
-    geometryPortalShader.setMat4f(
-        "VP", maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getVirtualVPMatrix(*c));
-
-    // additional clip plane (portal plane) ax+bx+cx+d=0
-    glm::vec4 portalPlane(
-        maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getTargetDirection(),
-        -glm::dot(
-            maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getTargetDirection(),
-            maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getTargetPosition()));
-
-    geometryPortalShader.setVec4f("nearClipPortalPlane", portalPlane);
-
-    glEnable(GL_CLIP_DISTANCE0);
-    maze->getNodes().at(renderingOrder[1])->draw(geometryPortalShader);
-    glDisable(GL_CLIP_DISTANCE0);
-
-    //}
-    //}
-
-    // draw scene
-    /*geometryShader.setMat4f("VP", c->getVP());
-    glStencilFunc(GL_EQUAL, ~portalStencilMask + 0, portalStencilMask);
-    maze->getActiveNode()->draw(geometryShader);*/
-
-    // END OF SHITTY HACK
 
     // need depth buffer read only for stencil pass
     glDepthMask(GL_FALSE);
@@ -326,8 +198,7 @@ void AppDeferredRenderer::render()
     stencilPassShader.use();
 
     // camera uniforms
-    stencilPassShader.setMat4f("VP", c->getVP());
-    glStencilMask(~portalStencilMask);
+    stencilPassShader.setMat4f("VP", vp);
 
     // TODO move this to gui or so
     bool ambient = true;
@@ -352,7 +223,7 @@ void AppDeferredRenderer::render()
         // succeed always but write stencil buffer
         // one light so only one bit is significant
         glStencilMask(0x01);
-        glStencilFunc(GL_ALWAYS, 0, ~portalStencilMask);
+        glStencilFunc(GL_ALWAYS, 0, ~0xff);
         glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
         glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
         boundingSphere->draw(stencilPassShader);
@@ -360,7 +231,7 @@ void AppDeferredRenderer::render()
         // point light pass
         pointLightShader.use();
         gBuffer->bindForLightPass();
-        glStencilFunc(GL_NOTEQUAL, 0, ~portalStencilMask);
+        glStencilFunc(GL_NOTEQUAL, 0, 0xff);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendEquation(GL_FUNC_ADD);
@@ -374,8 +245,8 @@ void AppDeferredRenderer::render()
         pointLightShader.setVec2f("screenSize", width, height);
 
         // camera uniforms
-        pointLightShader.setMat4f("VP", c->getVP());
-        pointLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
+        pointLightShader.setMat4f("VP", vp);
+        pointLightShader.setVec3f("camWorldPos", camPos);
 
         // TODO fix magic numbers
         pointLightShader.setFloat("far_plane", 100.0f);
@@ -401,7 +272,7 @@ void AppDeferredRenderer::render()
         dirLightShader.use();
         gBuffer->setUniforms(dirLightShader);
         dirLightShader.setVec2f("screenSize", width, height);
-        dirLightShader.setVec3f("camWorldPos", c->getCamWorldPos());
+        dirLightShader.setVec3f("camWorldPos", camPos);
 
         gBuffer->bindForLightPass();
         glDisable(GL_DEPTH_TEST);
@@ -438,8 +309,23 @@ void AppDeferredRenderer::render()
         glEnable(GL_CULL_FACE);
     }
 
-    gBuffer->bindForFinalPass();
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    if (portal == nullptr)
+    {
+        gBuffer->bindForFinalPass();
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    }
+    else
+    {
+        // glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
+        depthStencilPassShader.use();
+        depthStencilPassShader.setMat4f("VP", maze->getCamera()->getVP());
+        depthStencilPassShader.setVec2f(
+            "portalResize",
+            portal->getSize() /
+                glm::vec2(App::getInstance()->getWidth(), App::getInstance()->getHeight()));
+        gBuffer->bindForPortalPass(depthStencilPassShader);
+        portal->draw(depthStencilPassShader);
+    }
 
     // reset
     // glBindFramebuffer(GL_FRAMEBUFFER, 0);
