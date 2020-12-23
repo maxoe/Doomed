@@ -103,15 +103,15 @@ Portal::Portal(
     const auto& size = portalObject->getWorldSize();
 
     // note that size.z is 0 because the quad is 2-dimensional
-    const auto& matrix =
+    const auto& scaleMatrix =
         glm::scale(glm::identity<glm::mat4>(), glm::vec3(width / size.x, height / size.y, 1.0f));
 
     // note that dir is inverted because given direction is the direction of travel through the
     // portal
-    portalObject->setModelMatrix(glm::translate(
-        glm::rotate(
-            matrix, glm::angle(normal, glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(0.0f, 1.0f, 0.0f)),
-        pos));
+    glm::mat4 rot = glm::lookAt(glm::vec3(0.0f), normal, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(rot * glm::vec4(pos, 1.0f)));
+
+    portalObject->setModelMatrix(scaleMatrix * rot * trans);
 }
 
 void Portal::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
@@ -129,7 +129,6 @@ glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
     auto up = glm::vec3(0.0f, 1.0f, 0.0f);
     auto worldPos = camera.getCamWorldPos();
     auto spanTwo = glm::normalize(glm::cross(normal, up));
-    auto toCamera = worldPos - centerPoint;
 
     const auto& portalToCam = camera.getCamWorldPos() - centerPoint;
     const auto& camDir = camera.getCameraWorldDir();

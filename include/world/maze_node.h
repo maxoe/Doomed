@@ -32,6 +32,11 @@ public:
         {
             delete model;
         }
+
+        for (auto* portal : portals)
+        {
+            delete portal;
+        }
     }
 
     void setLightUniforms(const AppShader& shader) const;
@@ -76,7 +81,7 @@ public:
         const glm::vec3& cameraDirectionInTarget,
         bool seemless);
 
-    [[nodiscard]] std::vector<Portal>& getPortals();
+    [[nodiscard]] std::vector<Portal*>& getPortals();
 
     MazeNode* addModel(const std::string& relModelPath);
     MazeNode* addModel(const std::string& relModelPath, const glm::mat4& modelMatrix);
@@ -114,7 +119,7 @@ private:
     calcAttachmentOffset(const Model* oldModel, const Model* newModel, AttachmentPoint ap) const;
 
     std::vector<Model*> models;
-    std::vector<Portal> portals;
+    std::vector<Portal*> portals;
     std::unordered_map<std::string, GLuint> loadedTextures;
 
     glm::vec3 ambient = glm::vec3(0.0f);

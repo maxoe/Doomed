@@ -125,11 +125,9 @@ std::vector<std::size_t> Maze::getRenderingOrder(std::size_t depth, bool allowCy
             continue;
         }
 
-        for (auto neighborIt = nodes.at(nodeId)->getPortals().begin();
-             neighborIt != nodes.at(nodeId)->getPortals().end();
-             ++neighborIt)
+        for (std::size_t i = 0; i < nodes.at(nodeId)->getPortals().size(); ++i)
         {
-            std::size_t neighborId = neighborIt->getDestinationNode();
+            std::size_t neighborId = nodes.at(nodeId)->getPortals().at(i)->getDestinationNode();
             auto& neighborAttr = attr[neighborId];
 
             if (!neighborAttr.scanned || allowCycles)

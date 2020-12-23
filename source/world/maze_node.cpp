@@ -43,9 +43,9 @@ void MazeNode::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
 
 void MazeNode::drawPortals(AppShader& shader, GLuint nextFreeTextureUnit) const
 {
-    for (const auto& portal : portals)
+    for (const auto* portal : portals)
     {
-        portal.draw(shader, nextFreeTextureUnit);
+        portal->draw(shader, nextFreeTextureUnit);
     }
 }
 
@@ -56,11 +56,11 @@ void MazeNode::update()
         l.update();
     }
 
-    for (auto& portal : portals)
+    for (auto* portal : portals)
     {
-        if (portal.collide())
+        if (portal->collide())
         {
-            portal.teleport();
+            portal->teleport();
             break;
         }
     }
@@ -68,14 +68,14 @@ void MazeNode::update()
 
 MazeNode* MazeNode::addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height)
 {
-    portals.emplace_back(
+    portals.emplace_back(new Portal(
         App::getInstance()->getMaze().getNodeIndex(this),
         App::getInstance()->getMaze().getNodeIndex(this),
         pos,
         dir,
         width,
         height,
-        false);
+        false));
 
     return this;
 }
@@ -88,7 +88,7 @@ MazeNode* MazeNode::addPortal(
     const glm::vec3& posInTarget,
     const glm::vec3& cameraDirectionInTarget)
 {
-    portals.emplace_back(
+    portals.emplace_back(new Portal(
         App::getInstance()->getMaze().getNodeIndex(this),
         App::getInstance()->getMaze().getNodeIndex(this),
         pos,
@@ -97,7 +97,7 @@ MazeNode* MazeNode::addPortal(
         height,
         posInTarget,
         cameraDirectionInTarget,
-        false);
+        false));
 
     return this;
 }
@@ -110,14 +110,14 @@ MazeNode* MazeNode::addPortal(
     float height,
     bool seemless)
 {
-    portals.emplace_back(
+    portals.emplace_back(new Portal(
         App::getInstance()->getMaze().getNodeIndex(this),
         destination,
         pos,
         dir,
         width,
         height,
-        seemless);
+        seemless));
 
     return this;
 }
@@ -132,7 +132,7 @@ MazeNode* MazeNode::addPortal(
     const glm::vec3& cameraDirectionInTarget,
     bool seemless)
 {
-    portals.emplace_back(
+    portals.emplace_back(new Portal(
         App::getInstance()->getMaze().getNodeIndex(this),
         destination,
         pos,
@@ -141,7 +141,7 @@ MazeNode* MazeNode::addPortal(
         height,
         posInTarget,
         cameraDirectionInTarget,
-        seemless);
+        seemless));
 
     return this;
 }
@@ -155,7 +155,7 @@ MazeNode* MazeNode::addPortal(
     float height,
     bool seemless)
 {
-    portals.emplace_back(
+    portals.emplace_back(new Portal(
         relModelPath,
         App::getInstance()->getMaze().getNodeIndex(this),
         destination,
@@ -163,7 +163,7 @@ MazeNode* MazeNode::addPortal(
         dir,
         width,
         height,
-        seemless);
+        seemless));
 
     return this;
 }
@@ -323,7 +323,7 @@ MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& i
     return this;
 }
 
-std::vector<Portal>& MazeNode::getPortals()
+std::vector<Portal*>& MazeNode::getPortals()
 {
     return portals;
 }

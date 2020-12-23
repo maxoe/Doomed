@@ -292,14 +292,14 @@ void AppDeferredRenderer::render()
 
     // place virtual camera
     geometryPortalShader.setMat4f(
-        "VP", maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getVirtualVPMatrix(*c));
+        "VP", maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getVirtualVPMatrix(*c));
 
     // additional clip plane (portal plane) ax+bx+cx+d=0
     glm::vec4 portalPlane(
-        maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getTargetDirection(),
+        maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getTargetDirection(),
         -glm::dot(
-            maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getTargetDirection(),
-            maze->getNodes().at(renderingOrder[0])->getPortals().at(0).getTargetPosition()));
+            maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getTargetDirection(),
+            maze->getNodes().at(renderingOrder[0])->getPortals().at(0)->getTargetPosition()));
 
     geometryPortalShader.setVec4f("nearClipPortalPlane", portalPlane);
 
