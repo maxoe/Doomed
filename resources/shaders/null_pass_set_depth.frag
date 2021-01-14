@@ -9,5 +9,5 @@ out vec4 fragColor;
 
 void main()
 {
-	fragColor = vec4(texture(portalTexture, 1 - texCoord).rgb, 1.0);
+	fragColor = vec4(texture(portalTexture, 1.0 - texCoord).xyz, 1.0);
 }

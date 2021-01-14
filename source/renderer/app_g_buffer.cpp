@@ -49,7 +49,15 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glGenTextures(1, &finalTexture);
     glBindTexture(GL_TEXTURE_2D, finalTexture);
     glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA8,
+        windowWidth,
+        windowHeight,
+        0,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        nullptr);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -115,6 +123,7 @@ void AppGBuffer::bindForPortalPass(const AppShader& shader) const
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, finalTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
     shader.setInt("portalTexture", 0);
 }
 
