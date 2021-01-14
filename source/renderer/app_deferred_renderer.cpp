@@ -183,11 +183,21 @@ void AppDeferredRenderer::render(Portal* portal)
         const auto* c = maze->getCamera();
         vp = portal->getVirtualVPMatrix(*c);
         camPos = portal->getVirtualCameraPosition(*c);
-        // glViewport(0, 0, portal->getWidth(), portal->getHeight());
+
+        // clip away stuff between portal and camera
+        glm::vec4 portalPlane(
+            portal->getTargetDirection(),
+            -glm::dot(portal->getTargetDirection(), portal->getTargetPosition()));
+
+        geometryPortalShader.setVec4f("nearClipPortalPlane", portalPlane);
+
+        glEnable(GL_CLIP_DISTANCE0);
     }
 
     geometryShader.setMat4f("VP", vp);
     maze->getNodes().at(renderingOrder[0])->draw(geometryShader);
+
+    glDisable(GL_CLIP_DISTANCE0);
 
     // need depth buffer read only for stencil pass
     glDepthMask(GL_FALSE);
