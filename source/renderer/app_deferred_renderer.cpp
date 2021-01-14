@@ -329,6 +329,8 @@ void AppDeferredRenderer::render(Portal* portal)
             "portalResize",
             portal->getSize() /
                 glm::vec2(App::getInstance()->getWidth(), App::getInstance()->getHeight()));
+        depthStencilPassShader.setVec2f("screenSize", width, height);
+
         gBuffer->bindForPortalPass(depthStencilPassShader);
         portal->draw(depthStencilPassShader);
     }
