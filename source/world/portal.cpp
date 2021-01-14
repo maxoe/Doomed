@@ -177,8 +177,9 @@ glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
                glm::radians(45.0f), width / height, 0.01f, 100.0f)*/
            * glm::lookAt(
                  getVirtualCameraPosition(camera),
-                 getVirtualCameraPosition(camera) + targetDir * dirScalarProjOnNormal +
-                     targetSpanTwo * dirScalarProjOnWidth + up * dirScalarProjOnUp,
+                 getVirtualCameraPosition(camera) + targetDir /** dirScalarProjOnNormal +
+                     targetSpanTwo * dirScalarProjOnWidth + up * dirScalarProjOnUp*/
+                 ,
                  glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
@@ -209,8 +210,9 @@ glm::vec3 Portal::getVirtualCameraPosition(const AppCamera& camera) const
     auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
     auto scalarProjOnUp = glm::dot(portalToCam, up);
 
-    return targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
-           scalarProjOnWidth * targetSpanTwo;
+    return targetPos /* + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+            scalarProjOnWidth * targetSpanTwo*/
+        ;
 }
 
 glm::vec3 Portal::getTargetPosition() const

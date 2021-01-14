@@ -312,11 +312,17 @@ void AppDeferredRenderer::render(Portal* portal)
     if (portal == nullptr)
     {
         gBuffer->bindForFinalPass();
+        glDepthMask(GL_TRUE);
+
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+        glBlitFramebuffer(
+            0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     }
     else
     {
         // glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
+        glEnable(GL_DEPTH_TEST);
         depthStencilPassShader.use();
         depthStencilPassShader.setMat4f("VP", maze->getCamera()->getVP());
         depthStencilPassShader.setVec2f(

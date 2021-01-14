@@ -34,12 +34,12 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_DEPTH32F_STENCIL8,
+        GL_DEPTH24_STENCIL8,
         windowWidth,
         windowHeight,
         0,
         GL_DEPTH_STENCIL,
-        GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+        GL_UNSIGNED_INT_24_8,
         nullptr);
 
     glFramebufferTexture2D(
