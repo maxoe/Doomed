@@ -48,7 +48,11 @@ void Maze::render()
     if (!nodes.empty())
     {
         renderer->render();
-        renderer->render(nodes.at(0)->getPortals().at(0));
+
+        if (nodes.at(0)->getPortals().size() != 0)
+        {
+            renderer->render(nodes.at(0)->getPortals().at(0));
+        }
     }
 }
 

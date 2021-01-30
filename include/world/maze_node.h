@@ -104,6 +104,16 @@ public:
         bool shadows,
         const std::vector<glm::vec4>& initKeyframes);
 
+    MazeNode* addCube(const glm::vec3& pos, float size, const glm::vec3& color);
+    MazeNode* addWall(
+        std::size_t length,
+        std::size_t width,
+        const glm::vec3& dir,
+        const glm::vec3& sndDir,
+        const glm::vec3& leftBottomCorner,
+        const glm::vec3& color,
+        const glm::vec3& sndColor = glm::vec3(1.0f));
+
     std::vector<PointLight>& getPointLights();
 
     MazeNode* setDirectionalLight(const glm::vec3& dir, const glm::vec3& intensity);

@@ -11,6 +11,8 @@ in vec3 worldPosition;            // the (interpolated) world space position cor
 in vec3 worldNormalInterpolated; // the (interpolated) world space normal
 in vec2 texCoord;
 
+uniform vec3 singleColor;
+
 
 layout (location = 0) out vec3 worldPosOut;
 layout (location = 1) out vec3 diffuseOut;
@@ -21,7 +23,14 @@ void main()
 {
 	worldPosOut = worldPosition;
 	// following works because max 1 each supported
-	diffuseOut = diffuseNr * texture(textureDiffuse0, texCoord).rgb;
+
+	if (length(singleColor) != 0)
+	{
+		diffuseOut = singleColor;
+	} else {
+		diffuseOut = diffuseNr * texture(textureDiffuse0, texCoord).rgb;
+	}
+
 	specularOut = specularNr * texture(textureSpecular0, texCoord).rgb;
 	normalOut = normalize(worldNormalInterpolated);
 }

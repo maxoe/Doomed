@@ -9,6 +9,7 @@
 #include "renderer/point_light.h"
 #include "core/app_camera.h"
 #include "core/logger.h"
+#include "world/geometry_builder.h"
 
 MazeNode::MazeNode()
 {
@@ -188,6 +189,45 @@ MazeNode* MazeNode::addModel(const std::string& relModelPath)
 {
     glm::mat4 modelMatrix = glm::identity<glm::mat4>();
     addModel(relModelPath, modelMatrix);
+
+    return this;
+}
+
+MazeNode* MazeNode::addWall(
+    std::size_t length,
+    std::size_t width,
+    const glm::vec3& dir,
+    const glm::vec3& sndDir,
+    const glm::vec3& leftBottomCorner,
+    const glm::vec3& color,
+    const glm::vec3& sndColor)
+{
+    int count = 0;
+
+    for (int j = 0; j < length; ++j)
+    {
+        for (int i = 0; i < width; ++i)
+        {
+            addCube(
+                leftBottomCorner +
+                    2.0f * (static_cast<float>(j) * dir + static_cast<float>(i) * sndDir),
+                1.0f,
+                count % 2 == 0 ? sndColor : color);
+            ++count;
+        }
+
+        ++count;
+    }
+
+    return this;
+}
+
+MazeNode* MazeNode::addCube(const glm::vec3& pos, float size, const glm::vec3& color)
+{
+    glm::mat4 modelMatrix = glm::translate(glm::identity<glm::mat4>(), pos);
+    addModel("cube.obj", modelMatrix);
+    models.back()->resize(size);
+    models.back()->setSingleColor(color);
 
     return this;
 }
