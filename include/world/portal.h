@@ -72,6 +72,7 @@ public:
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
     [[nodiscard]] glm::mat4 getVirtualVPMatrix(const AppCamera& camera) const;
     [[nodiscard]] glm::vec3 getVirtualCameraPosition(const AppCamera& camera) const;
+    [[nodiscard]] glm::vec3 getVirtualCameraDirection(const AppCamera& camera) const;
     [[nodiscard]] std::size_t getDestinationNode() const;
     [[nodiscard]] glm::vec3 getTargetPosition() const;
     [[nodiscard]] glm::vec3 getTargetDirection() const;

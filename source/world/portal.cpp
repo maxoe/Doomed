@@ -104,50 +104,35 @@ Portal::Portal(
     , seemless(seemless)
 {
     const auto& size = portalObject->getWorldSize();
-
-    // note that size.z is 0 because the quad is 2-dimensional
-    const auto& scaleMatrix =
-        glm::scale(glm::identity<glm::mat4>(), glm::vec3(width / size.x, height / size.y, 1.0f));
+    /*std::cout << "Portal with height " << height << " width " << width << " and dir " << normal.x
+              << " " << normal.y << " " << normal.z << std::endl;*/
 
     // note that dir is inverted because given direction is the direction of travel through the
     // portal
     glm::mat4 rot = glm::lookAt(glm::vec3(0.0f), normal, glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(rot * glm::vec4(pos, 1.0f)));
 
+    // note that size.z is 0 because the quad is 2-dimensional
+    const auto& scaleMatrix =
+        glm::scale(glm::vec3(glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)));
+    /*std::cout << glm::vec3(glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)).x << " "
+              << glm::vec3(glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)).y << " "
+              << glm::vec3(glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)).z << " "
+              << std::endl;
+    std::cout << glm::vec3(rot * glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)).x << " "
+              << glm::vec3(rot * glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)).y << " "
+              << glm::vec3(rot * glm::vec4(width / size.x, height / size.y, 1.0f, 0.0f)).z << " "
+              << std::endl;
+    std::cout << std::endl;*/
     portalObject->setModelMatrix(scaleMatrix * rot * trans);
 
-    //// setup texture target
-    // auto windowHeight = App::getInstance()->getHeight();
-    // auto windowWidth = App::getInstance()->getWidth();
-    //// fbo
-    // glGenFramebuffers(1, &fbo);
-    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    /*std::cout << "Portal has actual x " << portalObject->getWorldSize().x << ", y "
+              << portalObject->getWorldSize().y << " and z " << portalObject->getWorldSize().z
+              << std::endl;*/
 
-    //// texture
-    // glGenTextures(1, &texture);
-    // glBindTexture(GL_TEXTURE_2D, texture);
-
-    // glTexImage2D(
-    //    GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
-    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-    // glGenerateMipmap(GL_TEXTURE_2D);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //// glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    //// glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    // const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-    // if (status != GL_FRAMEBUFFER_COMPLETE)
-    //{
-    //    LOG_WORLD_ERROR("Error initializing framebuffer for portal: " + std::to_string(status));
-    //}
-
-    //// restore default fbo
-    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    // TODO remove width hack
+    auto spanTwo = glm::normalize(glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f)));
+    this->width = glm::abs(glm::dot(portalObject->getWorldSize(), spanTwo));
 }
 
 void Portal::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
@@ -177,8 +162,7 @@ glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
                glm::radians(45.0f), width / height, 0.01f, 100.0f)*/
            * glm::lookAt(
                  getVirtualCameraPosition(camera),
-                 getVirtualCameraPosition(camera) + targetDir * dirScalarProjOnNormal +
-                     targetSpanTwo * dirScalarProjOnWidth + up * dirScalarProjOnUp,
+                 getVirtualCameraPosition(camera) + getVirtualCameraDirection(camera),
                  glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
@@ -222,6 +206,22 @@ glm::vec3 Portal::getTargetDirection() const
 {
     return targetDir;
 }
+glm::vec3 Portal::getVirtualCameraDirection(const AppCamera& camera) const
+{
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto spanTwo = glm::normalize(glm::cross(normal, up));
+
+    const auto& camDir = camera.getCameraWorldDir();
+
+    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+
+    auto dirScalarProjOnNormal = glm::dot(camDir, normal);
+    auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
+    auto dirScalarProjOnUp = glm::dot(camDir, up);
+
+    return targetDir * dirScalarProjOnNormal + targetSpanTwo * dirScalarProjOnWidth +
+           up * dirScalarProjOnUp;
+}
 
 bool Portal::collide()
 {
@@ -230,14 +230,18 @@ bool Portal::collide()
     auto toCamera = worldPos - centerPoint;
     auto scalarProjOnNormal = glm::dot(toCamera, normal);
 
-    // bias because near plane clips away portal so stuff behind gets visible for a short time when
-    // going through the portal
-    const float bias = 0.15f;
-    // check if we are on the correct side of the portal so we could have walked into it since the
-    // last step
+    float worldHeight = portalObject->getWorldSize().y;
+    float worldWidth = portalObject->getWorldSize().z;
+
+    // bias because near plane clips away portal so stuff behind gets visible for a short time
+    // when going through the portal
+    const float bias = 0.05f;
+    // check if we are on the correct side of the portal so we could have walked into it since
+    // the last step
 
     if (scalarProjOnNormal <= 0.0f - bias)
     {
+        // std::cout << "outside normal" << std::endl;
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
@@ -245,6 +249,7 @@ bool Portal::collide()
     // check if camera is below oder beneath the portal
     if (glm::abs(toCamera.y) > height / 2.0f)
     {
+        // std::cout << "outside height" << std::endl;
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
@@ -255,13 +260,20 @@ bool Portal::collide()
 
     if (glm::abs(scalarProjOnWidth) > width / 2.0f)
     {
+        // std::cout << "outside width: " << glm::abs(scalarProjOnWidth) << " > " << width / 2.0
+        //<< std::endl;
+        // std::cout << "length of diff: " << glm::length(toCamera) << std::endl;
+
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
 
-    // we are in the bias area in front of the portal, check if we walk into the portals direction
-    // since the last step
-    if (lastScalarProjOnNormal < scalarProjOnNormal)
+    // std::cout << "can teleport" << std::endl;
+
+    // we are in the bias area in front of the portal, check if we walk into the portals
+    // direction since the last step
+    if (lastScalarProjOnNormal < scalarProjOnNormal ||
+        (lastScalarProjOnNormal < 0 && scalarProjOnNormal > 0))
     {
         lastScalarProjOnNormal = scalarProjOnNormal;
         return true;

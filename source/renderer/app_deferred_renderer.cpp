@@ -185,6 +185,10 @@ void AppDeferredRenderer::render(Portal* portal)
         camPos = portal->getVirtualCameraPosition(*c);
 
         // clip away stuff between portal and camera
+        /*glm::vec4 portalPlane(
+            portal->getVirtualCameraDirection(*c),
+            -glm::dot(portal->getVirtualCameraDirection(*c), portal->getTargetPosition()));*/
+
         glm::vec4 portalPlane(
             portal->getTargetDirection(),
             -glm::dot(portal->getTargetDirection(), portal->getTargetPosition()));
