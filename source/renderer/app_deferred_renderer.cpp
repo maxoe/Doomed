@@ -194,7 +194,7 @@ void AppDeferredRenderer::render(Portal* portal)
 
         glm::vec4 portalPlane(
             portal->getTargetDirection(),
-            -glm::dot(portal->getTargetDirection(), portal->getTargetPosition()));
+            -(glm::dot(portal->getTargetDirection(), portal->getTargetPosition())));
 
         geometryPortalShader.setVec4f("nearClipPortalPlane", portalPlane);
 

@@ -136,7 +136,7 @@ int App::mainLoop()
     // modelMatrix = glm::rotate(
     // modelMatrix, glm::radians(static_cast<float>(180)), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    const float bias = 0.55f;
+    const float bias = 0.505f;
 
     maze.addNode()
         ->addBox(
@@ -151,11 +151,11 @@ int App::mainLoop()
         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(1.0f))
         ->addPortal(
             1,
-            glm::vec3(0.0f, 0.0f, 10.0f - bias),
+            glm::vec3(0.5f, 2.5f, 10.0f - bias),
             glm::vec3(0.0f, 0.0f, 1.0f),
             2.0f,
-            4.0f,
-            glm::vec3(0.0f, 0.0f, 0.0f),
+            2.0f,
+            glm::vec3(0.5f, 2.5f, 0.0f),
             glm::vec3(1.0f, 0.0f, 0.0f),
             true);
 
@@ -167,9 +167,38 @@ int App::mainLoop()
             glm::vec3(1.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 1.0f),
             glm::vec3(-20.0f, 0.0f, -20.0f),
-            glm::vec3(0.2f, 1.0f, 0.2f))
+            glm::vec3(0.2f, 0.9f, 0.2f))
         ->addPointLight(glm::vec3(9.0f, 1.7f, 0.0f), glm::vec3(1.0f), 50, true)
-        ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(1.0f));
+        ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(1.0f))
+        ->addPortal(
+            2,
+            glm::vec3(0.5f, 2.5f, 10.0f - bias),
+            glm::vec3(0.0f, 0.0f, 1.0f),
+            2.0f,
+            2.0f,
+            glm::vec3(0.5f, 2.5f, 0.0f),
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            true);
+    maze.addNode()
+        ->addBox(
+            20,
+            20,
+            5,
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 1.0f),
+            glm::vec3(-20.0f, 0.0f, -20.0f),
+            glm::vec3(0.9f, 0.2f, 0.2f))
+        ->addPointLight(glm::vec3(9.0f, 1.7f, 0.0f), glm::vec3(1.0f), 50, true)
+        ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(1.0f))
+        ->addPortal(
+            0,
+            glm::vec3(0.5f, 2.5f, 10.0f - bias),
+            glm::vec3(0.0f, 0.0f, 1.0f),
+            2.0f,
+            2.0f,
+            glm::vec3(0.5f, 2.5f, 0.0f),
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            true);
     // maze.addNode()
     //    ->addModel("debug/sponza/sponza.obj", 30.0f)
     //    //->attachModelToLast("sci-fi/hallway.obj", AttachmentPoint::PosZ, false)

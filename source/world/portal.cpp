@@ -96,8 +96,8 @@ Portal::Portal(
     , from(fromNode)
     , target(toNode)
     , targetPos(posInTarget)
-    , targetDir(cameraDirectionInTarget)
-    , normal(glm::normalize(dir))
+    , targetDir(glm::normalize(cameraDirectionInTarget) * glm::sign(cameraDirectionInTarget))
+    , normal(glm::normalize(dir) * glm::sign(dir))
     , centerPoint(pos)
     , width(width)
     , height(height)
@@ -131,7 +131,7 @@ Portal::Portal(
               << std::endl;*/
 
     // TODO remove width hack
-    auto spanTwo = glm::normalize(glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f)));
+    auto spanTwo = glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f));
     this->width = glm::abs(glm::dot(portalObject->getWorldSize(), spanTwo));
 }
 
@@ -148,22 +148,21 @@ const glm::mat4& Portal::getModelMatrix() const
 glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
 {
     auto up = glm::vec3(0.0f, 1.0f, 0.0f);
-    auto spanTwo = glm::normalize(glm::cross(normal, up));
+    auto spanTwo = glm::cross(normal, up);
 
     const auto& camDir = camera.getCameraWorldDir();
 
-    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+    auto targetSpanTwo = glm::cross(targetDir, up);
 
     auto dirScalarProjOnNormal = glm::dot(camDir, normal);
     auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
     auto dirScalarProjOnUp = glm::dot(camDir, up);
 
-    return camera.getProjection() /*glm::perspective(
-               glm::radians(45.0f), width / height, 0.01f, 100.0f)*/
-           * glm::lookAt(
-                 getVirtualCameraPosition(camera),
-                 getVirtualCameraPosition(camera) + getVirtualCameraDirection(camera),
-                 glm::vec3(0.0f, 1.0f, 0.0f));
+    return camera.getProjection() *
+           glm::lookAt(
+               getVirtualCameraPosition(camera),
+               getVirtualCameraPosition(camera) + getVirtualCameraDirection(camera),
+               glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 float Portal::getWidth() const
@@ -184,10 +183,10 @@ glm::vec2 Portal::getSize() const
 glm::vec3 Portal::getVirtualCameraPosition(const AppCamera& camera) const
 {
     auto up = glm::vec3(0.0f, 1.0f, 0.0f);
-    auto spanTwo = glm::normalize(glm::cross(normal, up));
+    auto spanTwo = glm::cross(normal, up);
 
     const auto& portalToCam = camera.getCamWorldPos() - centerPoint;
-    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+    auto targetSpanTwo = glm::cross(targetDir, up);
 
     auto scalarProjOnNormal = glm::dot(portalToCam, normal);
     auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
@@ -209,11 +208,11 @@ glm::vec3 Portal::getTargetDirection() const
 glm::vec3 Portal::getVirtualCameraDirection(const AppCamera& camera) const
 {
     auto up = glm::vec3(0.0f, 1.0f, 0.0f);
-    auto spanTwo = glm::normalize(glm::cross(normal, up));
+    auto spanTwo = glm::cross(normal, up);
 
     const auto& camDir = camera.getCameraWorldDir();
 
-    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+    auto targetSpanTwo = glm::cross(targetDir, up);
 
     auto dirScalarProjOnNormal = glm::dot(camDir, normal);
     auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
@@ -226,7 +225,7 @@ glm::vec3 Portal::getVirtualCameraDirection(const AppCamera& camera) const
 bool Portal::collide()
 {
     auto worldPos = App::getInstance()->getMaze().getCamera()->getCamWorldPos();
-    auto spanTwo = glm::normalize(glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f)));
+    auto spanTwo = glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f));
     auto toCamera = worldPos - centerPoint;
     auto scalarProjOnNormal = glm::dot(toCamera, normal);
 
@@ -238,12 +237,12 @@ bool Portal::collide()
     const float bias = 0.15f;
     // check if we are on the correct side of the portal so we could have walked into it since
     // the last step
-    std::cout << "scalar proj on normal is " << lastScalarProjOnNormal << std::endl;
-    std::cout << "scalar proj on normal is " << scalarProjOnNormal << std::endl;
+    // std::cout << "old scalar proj on normal is " << lastScalarProjOnNormal << std::endl;
+    // std::cout << "scalar proj on normal is " << scalarProjOnNormal << std::endl;
 
     if (scalarProjOnNormal <= 0.0f - bias)
     {
-        std::cout << "outside normal" << std::endl;
+        // std::cout << "outside normal" << std::endl;
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
@@ -251,7 +250,7 @@ bool Portal::collide()
     // check if camera is below oder beneath the portal
     if (glm::abs(toCamera.y) > height / 2.0f)
     {
-        std::cout << "outside height" << std::endl;
+        // std::cout << "outside height" << std::endl;
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
@@ -262,8 +261,8 @@ bool Portal::collide()
 
     if (glm::abs(scalarProjOnWidth) > width / 2.0f)
     {
-        std::cout << "outside width: " << glm::abs(scalarProjOnWidth) << " > " << width / 2.0
-                  << std::endl;
+        // std::cout << "outside width: " << glm::abs(scalarProjOnWidth) << " > " << width / 2.0
+        //<< std::endl;
         // std::cout << "length of diff: " << glm::length(toCamera) << std::endl;
 
         lastScalarProjOnNormal = scalarProjOnNormal;
@@ -292,7 +291,7 @@ void Portal::teleport()
 
     auto up = glm::vec3(0.0f, 1.0f, 0.0f);
     auto worldPos = cam->getCamWorldPos();
-    auto spanTwo = glm::normalize(glm::cross(normal, up));
+    auto spanTwo = glm::cross(normal, up);
     auto toCamera = worldPos - centerPoint;
 
     const auto& portalToCam = cam->getCamWorldPos() - centerPoint;
@@ -302,7 +301,7 @@ void Portal::teleport()
     auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
     auto scalarProjOnUp = glm::dot(portalToCam, up);
 
-    auto targetSpanTwo = glm::normalize(glm::cross(targetDir, up));
+    auto targetSpanTwo = glm::cross(targetDir, up);
 
     auto dirScalarProjOnNormal = glm::dot(camDir, normal);
     auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
