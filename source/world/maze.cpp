@@ -49,9 +49,9 @@ void Maze::render()
     {
         renderer->render();
 
-        if (nodes.at(0)->getPortals().size() != 0)
+        for (auto* portal : getActiveNode()->getPortals())
         {
-            renderer->render(nodes.at(0)->getPortals().at(0));
+            renderer->render(portal);
         }
     }
 }

@@ -113,6 +113,24 @@ public:
         const glm::vec3& leftBottomCorner,
         const glm::vec3& color,
         const glm::vec3& sndColor = glm::vec3(1.0f));
+    MazeNode* addOpenBox(
+        std::size_t length,
+        std::size_t width,
+        std::size_t height,
+        const glm::vec3& dir,
+        const glm::vec3& sndDir,
+        const glm::vec3& leftBottomCorner,
+        const glm::vec3& color,
+        const glm::vec3& sndColor = glm::vec3(1.0f));
+    MazeNode* addBox(
+        std::size_t length,
+        std::size_t width,
+        std::size_t height,
+        const glm::vec3& dir,
+        const glm::vec3& sndDir,
+        const glm::vec3& leftBottomCorner,
+        const glm::vec3& color,
+        const glm::vec3& sndColor = glm::vec3(1.0f));
 
     std::vector<PointLight>& getPointLights();
 

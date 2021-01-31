@@ -109,7 +109,7 @@ Portal::Portal(
 
     // note that dir is inverted because given direction is the direction of travel through the
     // portal
-    glm::mat4 rot = glm::lookAt(glm::vec3(0.0f), normal, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rot = glm::lookAt(glm::vec3(0.0f), -normal, glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(rot * glm::vec4(pos, 1.0f)));
 
     // note that size.z is 0 because the quad is 2-dimensional
@@ -235,13 +235,15 @@ bool Portal::collide()
 
     // bias because near plane clips away portal so stuff behind gets visible for a short time
     // when going through the portal
-    const float bias = 0.05f;
+    const float bias = 0.15f;
     // check if we are on the correct side of the portal so we could have walked into it since
     // the last step
+    std::cout << "scalar proj on normal is " << lastScalarProjOnNormal << std::endl;
+    std::cout << "scalar proj on normal is " << scalarProjOnNormal << std::endl;
 
     if (scalarProjOnNormal <= 0.0f - bias)
     {
-        // std::cout << "outside normal" << std::endl;
+        std::cout << "outside normal" << std::endl;
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
@@ -249,7 +251,7 @@ bool Portal::collide()
     // check if camera is below oder beneath the portal
     if (glm::abs(toCamera.y) > height / 2.0f)
     {
-        // std::cout << "outside height" << std::endl;
+        std::cout << "outside height" << std::endl;
         lastScalarProjOnNormal = scalarProjOnNormal;
         return false;
     }
@@ -260,8 +262,8 @@ bool Portal::collide()
 
     if (glm::abs(scalarProjOnWidth) > width / 2.0f)
     {
-        // std::cout << "outside width: " << glm::abs(scalarProjOnWidth) << " > " << width / 2.0
-        //<< std::endl;
+        std::cout << "outside width: " << glm::abs(scalarProjOnWidth) << " > " << width / 2.0
+                  << std::endl;
         // std::cout << "length of diff: " << glm::length(toCamera) << std::endl;
 
         lastScalarProjOnNormal = scalarProjOnNormal;
@@ -272,8 +274,8 @@ bool Portal::collide()
 
     // we are in the bias area in front of the portal, check if we walk into the portals
     // direction since the last step
-    if (lastScalarProjOnNormal < scalarProjOnNormal ||
-        (lastScalarProjOnNormal < 0 && scalarProjOnNormal > 0))
+    if (/*lastScalarProjOnNormal < scalarProjOnNormal ||*/
+        (lastScalarProjOnNormal < 0 && scalarProjOnNormal > 0 - bias))
     {
         lastScalarProjOnNormal = scalarProjOnNormal;
         return true;

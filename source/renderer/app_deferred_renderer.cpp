@@ -136,7 +136,7 @@ void AppDeferredRenderer::render(Portal* portal)
 {
     createShadowMaps();
 
-    const auto& renderingOrder = maze->getRenderingOrder(4, false);
+    // const auto& renderingOrder = maze->getRenderingOrder(4, false);
 
     // for (auto& n : renderingOrder)
     //{
@@ -171,18 +171,21 @@ void AppDeferredRenderer::render(Portal* portal)
 
     glm::mat4 vp;
     glm::vec3 camPos;
+    MazeNode* nodeToDraw;
 
     if (portal == nullptr)
     {
         const auto* c = maze->getCamera();
         vp = c->getVP();
         camPos = c->getCamWorldPos();
+        nodeToDraw = maze->getActiveNode();
     }
     else
     {
         const auto* c = maze->getCamera();
         vp = portal->getVirtualVPMatrix(*c);
         camPos = portal->getVirtualCameraPosition(*c);
+        nodeToDraw = maze->getNodes().at(portal->getDestinationNode());
 
         // clip away stuff between portal and camera
         /*glm::vec4 portalPlane(
@@ -199,7 +202,7 @@ void AppDeferredRenderer::render(Portal* portal)
     }
 
     geometryShader.setMat4f("VP", vp);
-    maze->getNodes().at(renderingOrder[0])->draw(geometryShader);
+    nodeToDraw->draw(geometryShader);
 
     glDisable(GL_CLIP_DISTANCE0);
 

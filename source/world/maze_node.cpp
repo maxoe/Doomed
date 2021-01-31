@@ -193,6 +193,73 @@ MazeNode* MazeNode::addModel(const std::string& relModelPath)
     return this;
 }
 
+MazeNode* MazeNode::addOpenBox(
+    std::size_t length,
+    std::size_t width,
+    std::size_t height,
+    const glm::vec3& dir,
+    const glm::vec3& sndDir,
+    const glm::vec3& leftBottomCorner,
+    const glm::vec3& color,
+    const glm::vec3& sndColor)
+{
+    glm::vec3 thirdDir = glm::cross(sndDir, dir);
+    const float cubeSize = 2.0f;
+
+    // floor
+    addWall(length, width, dir, sndDir, leftBottomCorner, color, sndColor);
+    // headwall
+    addWall(length, height, dir, thirdDir, leftBottomCorner, color, sndColor);
+    // left
+    addWall(width, height, sndDir, thirdDir, leftBottomCorner, color, sndColor);
+
+    addWall(
+        width,
+        height,
+        sndDir,
+        thirdDir,
+        leftBottomCorner + dir * static_cast<float>(length) * cubeSize,
+        color,
+        sndColor);
+    addWall(
+        length,
+        height,
+        dir,
+        thirdDir,
+        leftBottomCorner + sndDir * static_cast<float>(width) * cubeSize,
+        color,
+        sndColor);
+
+    return this;
+}
+
+MazeNode* MazeNode::addBox(
+    std::size_t length,
+    std::size_t width,
+    std::size_t height,
+    const glm::vec3& dir,
+    const glm::vec3& sndDir,
+    const glm::vec3& leftBottomCorner,
+    const glm::vec3& color,
+    const glm::vec3& sndColor)
+{
+    glm::vec3 thirdDir = glm::cross(sndDir, dir);
+    const float cubeSize = 2.0f;
+
+    addOpenBox(length, width, height, dir, sndDir, leftBottomCorner, color, sndColor);
+
+    addWall(
+        length,
+        width,
+        dir,
+        sndDir,
+        leftBottomCorner + thirdDir * static_cast<float>(height) * cubeSize,
+        color,
+        sndColor);
+
+    return this;
+}
+
 MazeNode* MazeNode::addWall(
     std::size_t length,
     std::size_t width,
@@ -212,7 +279,7 @@ MazeNode* MazeNode::addWall(
                 leftBottomCorner +
                     2.0f * (static_cast<float>(j) * dir + static_cast<float>(i) * sndDir),
                 1.0f,
-                count % 2 == 0 ? sndColor : color);
+                (i + j) % 2 == 0 ? sndColor : color);
             ++count;
         }
 
