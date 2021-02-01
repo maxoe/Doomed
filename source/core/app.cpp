@@ -155,7 +155,7 @@ int App::mainLoop()
             glm::vec3(0.0f, 0.0f, 1.0f),
             2.0f,
             2.0f,
-            glm::vec3(0.5f, 2.0f, 0.0f),
+            glm::vec3(-(5.0f - bias), 2.0f, 0.5f),
             glm::vec3(1.0f, 0.0f, 0.0f),
             true);
 
@@ -176,7 +176,7 @@ int App::mainLoop()
             glm::vec3(0.0f, 0.0f, 1.0f),
             2.0f,
             2.0f,
-            glm::vec3(0.5f, 2.0f, 0.0f),
+            glm::vec3(-(5.0f - bias), 2.0f, 0.5f),
             glm::vec3(1.0f, 0.0f, 0.0f),
             true);
     maze.addNode()
@@ -196,7 +196,7 @@ int App::mainLoop()
             glm::vec3(0.0f, 0.0f, 1.0f),
             2.0f,
             2.0f,
-            glm::vec3(0.5f, 2.0f, 0.0f),
+            glm::vec3(-(5.0f - bias), 2.0f, 0.5f),
             glm::vec3(1.0f, 0.0f, 0.0f),
             true);
     // maze.addNode()

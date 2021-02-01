@@ -1,5 +1,6 @@
 #include "world/maze.h"
 
+#include <iostream>
 #include <queue>
 
 #include "renderer/app_deferred_renderer.h"

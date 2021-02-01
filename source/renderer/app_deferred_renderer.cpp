@@ -339,7 +339,7 @@ void AppDeferredRenderer::render(Portal* portal)
     else
     {
         // glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
-        glEnable(GL_DEPTH_TEST);
+
         depthStencilPassShader.use();
         depthStencilPassShader.setMat4f("VP", maze->getCamera()->getVP());
         depthStencilPassShader.setVec2f(
@@ -349,6 +349,8 @@ void AppDeferredRenderer::render(Portal* portal)
         depthStencilPassShader.setVec2f("screenSize", width, height);
 
         gBuffer->bindForPortalPass(depthStencilPassShader);
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
         portal->draw(depthStencilPassShader);
     }
 
