@@ -40,19 +40,28 @@ void AppDeferredRenderer::initialize(Maze* mazePtr)
     quad = ModelLoader::load("deferred_shading/quad.obj");
 
     // init shadow mapping
+    std::size_t num = 0;
+    numShadowMaps.push_back(num);
 
     if (this->shadows)
     {
-        for (auto& l : maze->getActiveNode()->getPointLights())
+        for (auto* node : maze->getNodes())
         {
-            if (l.hasShadows())
+            for (auto& l : node->getPointLights())
             {
-                shadowMaps.emplace_back(ShadowMap::createShadowMap(), &l);
+                if (l.hasShadows())
+                {
+                    shadowMaps.emplace_back(ShadowMap::createShadowMap(), &l);
+                }
+                else
+                {
+                    shadowMaps.emplace_back(ShadowMap::createDummy(), &l);
+                }
+
+                ++num;
             }
-            else
-            {
-                shadowMaps.emplace_back(ShadowMap::createDummy(), &l);
-            }
+
+            numShadowMaps.push_back(num);
         }
 
         createShadowMaps(true);
@@ -221,8 +230,11 @@ void AppDeferredRenderer::render(Portal* portal /*, const glm::vec3& toPortal*/)
     // TODO move this to gui or so
     bool ambient = true;
 
-    for (auto& lightPair : shadowMaps)
+    for (auto i = numShadowMaps[maze->getNodeIndex(nodeToDraw)];
+         i < numShadowMaps[maze->getNodeIndex(nodeToDraw) + 1];
+         ++i)
     {
+        auto& lightPair = shadowMaps[i];
         auto* l = lightPair.second;
 
         // setup bounding sphere

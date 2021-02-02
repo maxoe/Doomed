@@ -35,12 +35,19 @@ void Maze::initialize()
 
 void Maze::update()
 {
+    bool needsRendererUpdate = false;
+
     for (auto* node : nodes)
     {
         if (node->getIsVisible())
         {
-            node->update();
+            needsRendererUpdate |= node->update();
         }
+    }
+
+    if (needsRendererUpdate)
+    {
+        // renderer->afterActiveNodeChange();
     }
 }
 

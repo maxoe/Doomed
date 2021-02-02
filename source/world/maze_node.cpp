@@ -50,8 +50,10 @@ void MazeNode::drawPortals(AppShader& shader, GLuint nextFreeTextureUnit) const
     }
 }
 
-void MazeNode::update()
+bool MazeNode::update()
 {
+    bool nodeChanged = false;
+
     for (auto& l : pointLights)
     {
         l.update();
@@ -62,9 +64,12 @@ void MazeNode::update()
         if (portal->collide())
         {
             portal->teleport();
+            nodeChanged = true;
             break;
         }
     }
+
+    return nodeChanged;
 }
 
 MazeNode* MazeNode::addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height)

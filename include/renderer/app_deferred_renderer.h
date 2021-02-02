@@ -57,4 +57,5 @@ private:
     bool shadows = false;
     AppShader shadowMapShader = AppShader("shadow_map", true);
     std::vector<std::pair<ShadowMap*, PointLight*>> shadowMaps;
+    std::vector<std::size_t> numShadowMaps;
 };

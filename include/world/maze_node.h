@@ -42,7 +42,7 @@ public:
     void setLightUniforms(const AppShader& shader) const;
     void draw(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
     void drawPortals(AppShader& shader, GLuint nextFreeTextureUnit = 0) const;
-    void update();
+    bool update();
 
     MazeNode* addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height);
 
