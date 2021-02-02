@@ -4,6 +4,8 @@
 #include "renderer/app_shader.h"
 #include "renderer/shadow_map.h"
 
+#include "world/portal.h"
+
 class Maze;
 
 class AppDefaultRenderer : public AppRenderer
@@ -23,7 +25,8 @@ public:
     }
 
     void initialize(Maze* maze) override;
-    void render() override;
+    void afterActiveNodeChange() override;
+    void render(Portal* portal = nullptr) override;
 
     [[nodiscard]] std::string getTypeName() const override;
     void createShadowMaps(bool updateAll = false) override;

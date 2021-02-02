@@ -1,10 +1,10 @@
-#include "core/camera.h"
+#include "core/app_camera.h"
 
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-Camera::Camera()
+AppCamera::AppCamera()
     : camWorldPos(0.0f, 1.0f, 0.0f)
     , cameraWorldDir(glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)))
     , up(glm::vec3(0.0f, 1.0f, 0.0f))
@@ -17,67 +17,74 @@ Camera::Camera()
 {
 }
 
-glm::vec3 Camera::getCamWorldPos() const
+glm::vec3 AppCamera::getCamWorldPos() const
 {
     return camWorldPos;
 }
 
-glm::vec3 Camera::getCameraWorldDir() const
+glm::vec3 AppCamera::getCameraWorldDir() const
 {
     return cameraWorldDir;
 }
 
-glm::mat4 Camera::getView() const
+glm::mat4 AppCamera::getView() const
 {
     return glm::lookAt(camWorldPos, camWorldPos + cameraWorldDir, up);
 }
 
-glm::mat4 Camera::getProjection() const
+glm::mat4 AppCamera::getProjection() const
 {
     return glm::perspective(glm::radians(fov), aspectRatio, near, far);
 }
 
-glm::mat4 Camera::getVP() const
+glm::mat4 AppCamera::getVP() const
 {
     return getProjection() * getView();
 }
 
-float Camera::getYaw() const
+float AppCamera::getYaw() const
 {
     return yaw;
 }
 
-float Camera::getPitch() const
+float AppCamera::getPitch() const
 {
     return pitch;
 }
 
-void Camera::setCamWorldPos(const glm::vec3& pos)
+void AppCamera::setCamWorldPos(const glm::vec3& pos)
 {
     camWorldPos = pos;
 }
 
-void Camera::setCameraWorldDir(const glm::vec3& dir)
+void AppCamera::setCameraWorldDir(const glm::vec3& dir)
 {
     cameraWorldDir = glm::normalize(dir);
+    pitch = glm::asin(-cameraWorldDir.y);
+    yaw = atan2(cameraWorldDir.x, cameraWorldDir.z);
 }
 
-void Camera::move(const glm::vec2& deltaPos)
+void AppCamera::move(const glm::vec2& deltaPos)
 {
     camWorldPos += cameraWorldDir * deltaPos.x;
     camWorldPos += glm::normalize(glm::cross(cameraWorldDir, up)) * deltaPos.y;
 }
 
-void Camera::addYaw(float deltaDegrees)
+void AppCamera::setYaw(float degrees)
 {
-    yaw += deltaDegrees;
+    yaw = degrees;
     cameraWorldDir.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
     cameraWorldDir.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
 }
 
-void Camera::addPitch(float deltaDegrees)
+void AppCamera::addYaw(float deltaDegrees)
 {
-    pitch += deltaDegrees;
+    setYaw(deltaDegrees + yaw);
+}
+
+void AppCamera::setPitch(float degrees)
+{
+    pitch = degrees;
 
     pitch = pitch > 89.0f ? 89.0f : pitch;
     pitch = pitch < -89.0f ? -89.0f : pitch;
@@ -85,4 +92,9 @@ void Camera::addPitch(float deltaDegrees)
     cameraWorldDir.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
     cameraWorldDir.y = glm::sin(glm::radians(pitch));
     cameraWorldDir.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+}
+
+void AppCamera::addPitch(float deltaDegrees)
+{
+    setPitch(pitch + deltaDegrees);
 }

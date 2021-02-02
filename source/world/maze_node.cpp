@@ -1,18 +1,17 @@
 #include "world/maze_node.h"
 
 #include <iostream>
+#include <core/app.h>
 #include <glm/ext/matrix_transform.hpp>
 #include "glm/gtx/string_cast.hpp"
 
 #include "renderer/model_loader.h"
 #include "renderer/point_light.h"
-#include "core/camera.h"
+#include "core/app_camera.h"
 #include "core/logger.h"
+#include "world/geometry_builder.h"
 
 MazeNode::MazeNode()
-    : ambient(glm::vec3(0.f))
-    , directionalLightDir(0.f)
-    , directionalLightIntensity(glm::vec3(0.f))
 {
 }
 
@@ -43,12 +42,136 @@ void MazeNode::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
     }
 }
 
-void MazeNode::update()
+void MazeNode::drawPortals(AppShader& shader, GLuint nextFreeTextureUnit) const
 {
+    for (const auto* portal : portals)
+    {
+        portal->draw(shader, nextFreeTextureUnit);
+    }
+}
+
+bool MazeNode::update()
+{
+    bool nodeChanged = false;
+
     for (auto& l : pointLights)
     {
         l.update();
     }
+
+    for (auto* portal : portals)
+    {
+        if (portal->collide())
+        {
+            portal->teleport();
+            nodeChanged = true;
+            break;
+        }
+    }
+
+    return nodeChanged;
+}
+
+MazeNode* MazeNode::addPortal(const glm::vec3& pos, const glm::vec3& dir, float width, float height)
+{
+    portals.emplace_back(new Portal(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        App::getInstance()->getMaze().getNodeIndex(this),
+        pos,
+        dir,
+        width,
+        height,
+        false));
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height,
+    const glm::vec3& posInTarget,
+    const glm::vec3& cameraDirectionInTarget)
+{
+    portals.emplace_back(new Portal(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        App::getInstance()->getMaze().getNodeIndex(this),
+        pos,
+        dir,
+        width,
+        height,
+        posInTarget,
+        cameraDirectionInTarget,
+        false));
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    std::size_t destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height,
+    bool seemless)
+{
+    portals.emplace_back(new Portal(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        destination,
+        pos,
+        dir,
+        width,
+        height,
+        seemless));
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    std::size_t destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height,
+    const glm::vec3& posInTarget,
+    const glm::vec3& cameraDirectionInTarget,
+    bool seemless)
+{
+    portals.emplace_back(new Portal(
+        App::getInstance()->getMaze().getNodeIndex(this),
+        destination,
+        pos,
+        dir,
+        width,
+        height,
+        posInTarget,
+        cameraDirectionInTarget,
+        seemless));
+
+    return this;
+}
+
+MazeNode* MazeNode::addPortal(
+    const std::string& relModelPath,
+    std::size_t destination,
+    const glm::vec3& pos,
+    const glm::vec3& dir,
+    float width,
+    float height,
+    bool seemless)
+{
+    portals.emplace_back(new Portal(
+        relModelPath,
+        App::getInstance()->getMaze().getNodeIndex(this),
+        destination,
+        pos,
+        dir,
+        width,
+        height,
+        seemless));
+
+    return this;
 }
 
 MazeNode* MazeNode::addModel(const std::string& relModelPath, const glm::mat4& modelMatrix)
@@ -71,6 +194,112 @@ MazeNode* MazeNode::addModel(const std::string& relModelPath)
 {
     glm::mat4 modelMatrix = glm::identity<glm::mat4>();
     addModel(relModelPath, modelMatrix);
+
+    return this;
+}
+
+MazeNode* MazeNode::addOpenBox(
+    std::size_t length,
+    std::size_t width,
+    std::size_t height,
+    const glm::vec3& dir,
+    const glm::vec3& sndDir,
+    const glm::vec3& leftBottomCorner,
+    const glm::vec3& color,
+    const glm::vec3& sndColor)
+{
+    glm::vec3 thirdDir = glm::cross(sndDir, dir);
+    const float cubeSize = 2.0f;
+
+    // floor
+    addWall(length, width, dir, sndDir, leftBottomCorner, color, sndColor);
+    // headwall
+    addWall(length, height, dir, thirdDir, leftBottomCorner, color, sndColor);
+    // left
+    addWall(width, height, sndDir, thirdDir, leftBottomCorner, color, sndColor);
+
+    addWall(
+        width,
+        height,
+        sndDir,
+        thirdDir,
+        leftBottomCorner + dir * static_cast<float>(length) * cubeSize,
+        color,
+        sndColor);
+    addWall(
+        length,
+        height,
+        dir,
+        thirdDir,
+        leftBottomCorner + sndDir * static_cast<float>(width) * cubeSize,
+        color,
+        sndColor);
+
+    return this;
+}
+
+MazeNode* MazeNode::addBox(
+    std::size_t length,
+    std::size_t width,
+    std::size_t height,
+    const glm::vec3& dir,
+    const glm::vec3& sndDir,
+    const glm::vec3& leftBottomCorner,
+    const glm::vec3& color,
+    const glm::vec3& sndColor)
+{
+    glm::vec3 thirdDir = glm::cross(sndDir, dir);
+    const float cubeSize = 2.0f;
+
+    addOpenBox(length, width, height, dir, sndDir, leftBottomCorner, color, sndColor);
+
+    addWall(
+        length,
+        width,
+        dir,
+        sndDir,
+        leftBottomCorner + thirdDir * static_cast<float>(height) * cubeSize,
+        color,
+        sndColor);
+
+    return this;
+}
+
+MazeNode* MazeNode::addWall(
+    std::size_t length,
+    std::size_t width,
+    const glm::vec3& dir,
+    const glm::vec3& sndDir,
+    const glm::vec3& leftBottomCorner,
+    const glm::vec3& color,
+    const glm::vec3& sndColor)
+{
+    int count = 0;
+
+    for (int j = 0; j < length; ++j)
+    {
+        for (int i = 0; i < width; ++i)
+        {
+            addCube(
+                leftBottomCorner +
+                    2.0f * (static_cast<float>(j) * dir + static_cast<float>(i) * sndDir),
+                1.0f,
+                (i + j) % 2 == 0 ? sndColor : color);
+            ++count;
+        }
+
+        ++count;
+    }
+
+    return this;
+}
+
+MazeNode* MazeNode::addCube(const glm::vec3& pos, float size, const glm::vec3& color)
+{
+    glm::mat4 modelMatrix = glm::translate(glm::identity<glm::mat4>(), pos);
+    addModel("cube.obj", modelMatrix);
+    models.back()->resize(size);
+    models.back()->setSingleColor(color);
 
     return this;
 }
@@ -206,6 +435,11 @@ MazeNode* MazeNode::setDirectionalLight(const glm::vec3& dir, const glm::vec3& i
     return this;
 }
 
+std::vector<Portal*>& MazeNode::getPortals()
+{
+    return portals;
+}
+
 std::vector<PointLight>& MazeNode::getPointLights()
 {
     return pointLights;
@@ -214,4 +448,14 @@ std::vector<PointLight>& MazeNode::getPointLights()
 bool MazeNode::getHasDirectionalLight() const
 {
     return hasDirectionalLight;
+}
+
+bool MazeNode::getIsVisible() const
+{
+    return isVisible;
+}
+
+void MazeNode::setIsVisible(bool visible)
+{
+    isVisible = visible;
 }

@@ -57,10 +57,16 @@ Model::Model(
     }
 }
 
+void Model::setSingleColor(const glm::vec3& color)
+{
+    singleColor = color;
+}
+
 void Model::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
 {
     shader.setMat4f("modelMatrix", modelMatrix);
     shader.setMat3f("normalMatrix", normalMatrix);
+    shader.setVec3f("singleColor", singleColor);
 
     for (auto* mesh : meshes)
     {
@@ -87,7 +93,7 @@ void Model::addModelTransformation(const glm::mat4& matrix)
 
 void Model::resize(float maxDimensionLength)
 {
-    auto s = getObjectSize();
+    auto& s = getObjectSize();
     float maxLength = glm::max(s.x, glm::max(s.y, s.z));
 
     addModelTransformation(glm::scale(glm::vec3(maxDimensionLength / maxLength)));

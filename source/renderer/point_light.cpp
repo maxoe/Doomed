@@ -153,13 +153,13 @@ float PointLight::getQuadAttenuation() const
  */
 float PointLight::getDist() const
 {
-    float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
+    /*float maxChannel = glm::max(glm::max(intensity.x, intensity.y), intensity.z);
 
     return (-linAttenuation + sqrtf(
                                   linAttenuation * linAttenuation -
                                   4 * quadAttenuation * (quadAttenuation - 256 * maxChannel))) /
-           (2 * quadAttenuation);
-    // return dist;
+           (2 * quadAttenuation);*/
+    return dist;
 }
 
 bool PointLight::hasShadows() const
@@ -203,7 +203,7 @@ void PointLight::addKeyFrame(const glm::vec4& kf)
 
 void PointLight::addKeyFrame(const glm::vec3& keyFramePos, float timeDelta)
 {
-    addKeyFrame(keyFramePos, timeDelta);
+    addKeyFrame(glm::vec4(keyFramePos.x, keyFramePos.y, keyFramePos.z, timeDelta));
 }
 
 void PointLight::enableShadows()

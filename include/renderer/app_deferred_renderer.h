@@ -29,7 +29,8 @@ public:
     }
 
     void initialize(Maze* maze) override;
-    void render() override;
+    void afterActiveNodeChange() override;
+    void render(Portal* portal = nullptr /*, const glm::vec3& toPortal = glm::vec3(0.0f)*/);
     void createShadowMaps(bool updateAll = false) override;
 
     [[nodiscard]] std::string getTypeName() const override;
@@ -42,11 +43,13 @@ public:
 private:
     Maze* maze;
 
-    std::array<AppShader, 4> shader{
+    std::array<AppShader, 6> shader{
         "deferred_geometry",
         "deferred_point_light",
         "deferred_dir_light",
-        "null_pass"};
+        "null_pass",
+        "null_pass_set_depth",
+        "deferred_geometry_portal"};
     std::shared_ptr<AppGBuffer> gBuffer;
     Model* boundingSphere;
     Model* quad;
@@ -54,4 +57,5 @@ private:
     bool shadows = false;
     AppShader shadowMapShader = AppShader("shadow_map", true);
     std::vector<std::pair<ShadowMap*, PointLight*>> shadowMaps;
+    std::vector<std::size_t> numShadowMaps;
 };

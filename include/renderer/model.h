@@ -32,6 +32,8 @@ public:
     void resize(float maxDimensionLength);
     void addModelTransformation(const glm::mat4& matrix);
 
+    void setSingleColor(const glm::vec3& color);
+
     [[nodiscard]] const std::unordered_map<std::string, GLuint>& getTextureRegistry() const;
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
     [[nodiscard]] const glm::vec3& getObjectSize() const;
@@ -50,4 +52,6 @@ private:
     glm::vec3 maxValues;
     glm::vec3 minValues;
     glm::vec3 ownSize;
+
+    glm::vec3 singleColor = glm::vec3(0.0f);
 };

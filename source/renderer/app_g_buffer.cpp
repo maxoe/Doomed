@@ -34,12 +34,12 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_DEPTH32F_STENCIL8,
+        GL_DEPTH24_STENCIL8,
         windowWidth,
         windowHeight,
         0,
         GL_DEPTH_STENCIL,
-        GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+        GL_UNSIGNED_INT_24_8,
         nullptr);
 
     glFramebufferTexture2D(
@@ -49,7 +49,20 @@ AppGBuffer::AppGBuffer(GLuint windowWidth, GLuint windowHeight)
     glGenTextures(1, &finalTexture);
     glBindTexture(GL_TEXTURE_2D, finalTexture);
     glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA8,
+        windowWidth,
+        windowHeight,
+        0,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        nullptr);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, finalTexture, 0);
 
     const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -103,6 +116,18 @@ void AppGBuffer::bindForFinalPass() const
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glReadBuffer(GL_COLOR_ATTACHMENT4);
+}
+
+void AppGBuffer::bindForFinalPortalPass() const
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glReadBuffer(GL_COLOR_ATTACHMENT4);
+}
+
+void AppGBuffer::bindForPortalPass(const AppShader& shader) const
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    glDrawBuffer(GL_COLOR_ATTACHMENT4);
 }
 
 void AppGBuffer::setUniforms(const AppShader& shader) const

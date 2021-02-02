@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/camera.h"
+#include "core/app_camera.h"
 
 class InputDispatcher
 {
@@ -34,8 +34,8 @@ public:
 
     void onMouseOut();
     void addMovement(Movement dir);
-    void processMouseMovement(Camera* camera, double xPos, double yPos);
-    void processKeyInput(Movement dir, Camera* camera);
+    void processMouseMovement(AppCamera* camera, double xPos, double yPos);
+    void processKeyInput(Movement dir, AppCamera* camera);
 
 private:
     float lastMouseX;

@@ -8,13 +8,13 @@ uniform mat4 VP;              // the view-projection matrix
 uniform mat4 modelMatrix;     // the world transformation of the model
 uniform mat3 normalMatrix;    // the world transformation for normals
 
+uniform vec4 nearClipPortalPlane; // near clip plane, basically the portal
+
 out vec3 worldPosition;              // position of the vertex in world space
 out vec3 worldNormalInterpolated;   // normal of the vertex in world space
 out vec2 texCoord;
 
-// for portals
 out float gl_ClipDistance[1];
-uniform vec4 nearClipPortalPlane; // additional near clip plane, basically the portal
 
 void main() {
 	gl_Position = VP * modelMatrix * vec4(POSITION, 1);
