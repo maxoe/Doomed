@@ -21,6 +21,8 @@ public:
     }
 
     void initialize();
+    // void renderRecursive(const glm::vec3& toPortal, const std::vector<std::size_t>&
+    // renderingOrder);
     void render();
     void update();
 

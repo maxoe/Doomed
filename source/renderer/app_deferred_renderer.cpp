@@ -132,7 +132,7 @@ void AppDeferredRenderer::createShadowMaps(bool updateAll)
     glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
 }
 
-void AppDeferredRenderer::render(Portal* portal)
+void AppDeferredRenderer::render(Portal* portal /*, const glm::vec3& toPortal*/)
 {
     createShadowMaps();
 
@@ -183,8 +183,9 @@ void AppDeferredRenderer::render(Portal* portal)
     else
     {
         const auto* c = maze->getCamera();
-        vp = portal->getVirtualVPMatrix(*c);
-        camPos = portal->getVirtualCameraPosition(*c);
+        vp = portal->getVirtualVPMatrix(*c /*, toPortal*/);
+        camPos = portal->getVirtualCameraPosition(*c /*, toPortal*/);
+
         nodeToDraw = maze->getNodes().at(portal->getDestinationNode());
 
         // clip away stuff between portal and camera
@@ -248,6 +249,7 @@ void AppDeferredRenderer::render(Portal* portal)
         // point light pass
         pointLightShader.use();
         gBuffer->bindForLightPass();
+        // glClear(GL_COLOR_BUFFER_BIT);
         glStencilFunc(GL_NOTEQUAL, 0, 0xff);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -283,8 +285,8 @@ void AppDeferredRenderer::render(Portal* portal)
     glDisable(GL_STENCIL_TEST);
 
     // directional light pass
-    const auto* n = maze->getActiveNode();
-    if (n->getHasDirectionalLight() || ambient)
+    // const auto* n = maze->getActiveNode();
+    if (nodeToDraw->getHasDirectionalLight() || ambient)
     {
         dirLightShader.use();
         gBuffer->setUniforms(dirLightShader);
@@ -309,10 +311,11 @@ void AppDeferredRenderer::render(Portal* portal)
             dirLightShader.setVec3f("ambient", glm::vec3(0.00f));
         }
 
-        if (n->getHasDirectionalLight())
+        if (nodeToDraw->getHasDirectionalLight())
         {
             dirLightShader.setDirectionalLight(
-                n->getDirectionalLightDirection(), n->getDirectionalLightIntensity());
+                nodeToDraw->getDirectionalLightDirection(),
+                nodeToDraw->getDirectionalLightIntensity());
         }
         else
         {
@@ -324,6 +327,24 @@ void AppDeferredRenderer::render(Portal* portal)
 
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
+    }
+
+    // draw portals
+    for (auto* p : nodeToDraw->getPortals())
+    {
+        depthStencilPassShader.use();
+        depthStencilPassShader.setMat4f("VP", vp);
+        depthStencilPassShader.setVec2f(
+            "portalResize",
+            p->getSize() /
+                glm::vec2(App::getInstance()->getWidth(), App::getInstance()->getHeight()));
+        depthStencilPassShader.setVec2f("screenSize", width, height);
+
+        gBuffer->bindForPortalPass(depthStencilPassShader);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        p->draw(depthStencilPassShader);
     }
 
     if (portal == nullptr)
@@ -340,18 +361,11 @@ void AppDeferredRenderer::render(Portal* portal)
     {
         // glViewport(0, 0, App::getInstance()->getWidth(), App::getInstance()->getHeight());
 
-        depthStencilPassShader.use();
-        depthStencilPassShader.setMat4f("VP", maze->getCamera()->getVP());
-        depthStencilPassShader.setVec2f(
-            "portalResize",
-            portal->getSize() /
-                glm::vec2(App::getInstance()->getWidth(), App::getInstance()->getHeight()));
-        depthStencilPassShader.setVec2f("screenSize", width, height);
+        gBuffer->bindForFinalPortalPass();
+        portal->bindForFinalPass();
+        // glDepthMask(GL_TRUE);
 
-        gBuffer->bindForPortalPass(depthStencilPassShader);
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(GL_TRUE);
-        portal->draw(depthStencilPassShader);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
     }
 
     // reset

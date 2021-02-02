@@ -118,13 +118,16 @@ void AppGBuffer::bindForFinalPass() const
     glReadBuffer(GL_COLOR_ATTACHMENT4);
 }
 
+void AppGBuffer::bindForFinalPortalPass() const
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glReadBuffer(GL_COLOR_ATTACHMENT4);
+}
+
 void AppGBuffer::bindForPortalPass(const AppShader& shader) const
 {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, finalTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    shader.setInt("portalTexture", 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    glDrawBuffer(GL_COLOR_ATTACHMENT4);
 }
 
 void AppGBuffer::setUniforms(const AppShader& shader) const

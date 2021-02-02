@@ -44,17 +44,63 @@ void Maze::update()
     }
 }
 
+// void Maze::renderRecursive(
+//    const glm::vec3& toPortal,
+//    const std::vector<std::size_t>& renderingOrder)
+//{
+//    if (renderingOrder.empty())
+//    {
+//        return;
+//    }
+//
+//    renderer->render(getNodes().at(renderingOrder.at(0))->getPortals().at(0), toPortal);
+//
+//    if (renderingOrder.size() == 1)
+//    {
+//        return;
+//    }
+//
+//    glm::vec3 newToPortal =
+//        toPortal + (getNodes().at(renderingOrder.at(1))->getPortals().at(0)->getCenterPoint() -
+//                    getNodes().at(renderingOrder.at(0))->getPortals().at(0)->getTargetPosition());
+//
+//    renderRecursive(
+//        newToPortal, std::vector<std::size_t>(renderingOrder.begin() + 1, renderingOrder.end()));
+//}
+
 void Maze::render()
 {
     if (!nodes.empty())
     {
-        renderer->render();
+        const auto& order = getRenderingOrder(1);
 
-        for (auto* portal : getActiveNode()->getPortals())
+        for (auto it = order.rbegin(); it != order.rend(); ++it)
         {
-            renderer->render(portal);
+            for (auto* portal : getNodes().at(*it)->getPortals())
+            {
+                renderer->render(portal);
+            }
+        }
+
+        /*const auto& renderingOrder = getRenderingOrder();
+
+        renderRecursive(
+            getNodes().at(renderingOrder.front())->getPortals().at(0)->getCenterPoint(),
+            renderingOrder);*/
+
+        renderer->render();
+    }
+
+    for (auto* node : getNodes())
+    {
+        for (auto* portal : node->getPortals())
+        {
+            // clears texture
+            portal->bindForFinalPass();
         }
     }
+
+    // renderer->render(getNodes().at(1)->getPortals().at(0));
 }
 
 MazeNode* Maze::addNode()

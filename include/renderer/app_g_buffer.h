@@ -46,6 +46,7 @@ public:
     void bindForLightPass() const;
     void bindForPortalPass(const AppShader& shader) const;
     void bindForFinalPass() const;
+    void bindForFinalPortalPass() const;
 
     void setUniforms(const AppShader& shader) const;
 

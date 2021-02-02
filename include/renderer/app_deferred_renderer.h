@@ -30,7 +30,7 @@ public:
 
     void initialize(Maze* maze) override;
     void afterActiveNodeChange() override;
-    void render(Portal* portal = nullptr) override;
+    void render(Portal* portal = nullptr /*, const glm::vec3& toPortal = glm::vec3(0.0f)*/);
     void createShadowMaps(bool updateAll = false) override;
 
     [[nodiscard]] std::string getTypeName() const override;

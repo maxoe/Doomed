@@ -133,16 +133,65 @@ Portal::Portal(
     // TODO remove width hack
     auto spanTwo = glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f));
     this->width = glm::abs(glm::dot(portalObject->getWorldSize(), spanTwo));
+
+    auto windowWidth = App::getInstance()->getWidth();
+    auto windowHeight = App::getInstance()->getHeight();
+
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA8,
+        windowWidth,
+        windowHeight,
+        0,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        nullptr);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOG_WORLD_ERROR("Error initializing framebuffer for g-buffer: " + std::to_string(status));
+    }
+
+    // restore default fbo
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 void Portal::draw(AppShader& shader, GLuint nextFreeTextureUnit) const
 {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    shader.setInt("portalTexture", 0);
     portalObject->draw(shader, nextFreeTextureUnit);
 }
 
 const glm::mat4& Portal::getModelMatrix() const
 {
     return portalObject->getModelMatrix();
+}
+
+void Portal::bindForFinalPass() const
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
@@ -163,6 +212,26 @@ glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera) const
                getVirtualCameraPosition(camera),
                getVirtualCameraPosition(camera) + getVirtualCameraDirection(camera),
                glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+glm::mat4 Portal::getVirtualVPMatrix(const AppCamera& camera, const glm::vec3& toPortal) const
+{
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto spanTwo = glm::cross(normal, up);
+
+    const auto& camDir = camera.getCameraWorldDir();
+
+    auto targetSpanTwo = glm::cross(targetDir, up);
+
+    auto dirScalarProjOnNormal = glm::dot(camDir, normal);
+    auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
+    auto dirScalarProjOnUp = glm::dot(camDir, up);
+
+    return camera.getProjection() * glm::lookAt(
+                                        getVirtualCameraPosition(camera, toPortal),
+                                        getVirtualCameraPosition(camera, toPortal) +
+                                            getVirtualCameraDirection(camera, toPortal),
+                                        glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 float Portal::getWidth() const
@@ -196,6 +265,22 @@ glm::vec3 Portal::getVirtualCameraPosition(const AppCamera& camera) const
            scalarProjOnWidth * targetSpanTwo;
 }
 
+glm::vec3 Portal::getVirtualCameraPosition(const AppCamera& camera, const glm::vec3& toPortal) const
+{
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto spanTwo = glm::cross(normal, up);
+
+    const auto& portalToCam = camera.getCamWorldPos() - toPortal;
+    auto targetSpanTwo = glm::cross(targetDir, up);
+
+    auto scalarProjOnNormal = glm::dot(portalToCam, normal);
+    auto scalarProjOnWidth = glm::dot(portalToCam, spanTwo);
+    auto scalarProjOnUp = glm::dot(portalToCam, up);
+
+    return targetPos + scalarProjOnNormal * targetDir + scalarProjOnUp * up +
+           scalarProjOnWidth * targetSpanTwo;
+}
+
 glm::vec3 Portal::getTargetPosition() const
 {
     return targetPos;
@@ -211,6 +296,24 @@ glm::vec3 Portal::getVirtualCameraDirection(const AppCamera& camera) const
     auto spanTwo = glm::cross(normal, up);
 
     const auto& camDir = camera.getCameraWorldDir();
+
+    auto targetSpanTwo = glm::cross(targetDir, up);
+
+    auto dirScalarProjOnNormal = glm::dot(camDir, normal);
+    auto dirScalarProjOnWidth = glm::dot(camDir, spanTwo);
+    auto dirScalarProjOnUp = glm::dot(camDir, up);
+
+    return targetDir * dirScalarProjOnNormal + targetSpanTwo * dirScalarProjOnWidth +
+           up * dirScalarProjOnUp;
+}
+
+glm::vec3
+Portal::getVirtualCameraDirection(const AppCamera& camera, const glm::vec3& toPortal) const
+{
+    auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto spanTwo = glm::cross(normal, up);
+
+    const auto& camDir = glm::normalize(toPortal - camera.getCamWorldPos());
 
     auto targetSpanTwo = glm::cross(targetDir, up);
 
@@ -335,4 +438,9 @@ void Portal::teleport()
 std::size_t Portal::getDestinationNode() const
 {
     return target;
+}
+
+glm::vec3 Portal::getCenterPoint() const
+{
+    return centerPoint;
 }

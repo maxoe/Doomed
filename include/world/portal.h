@@ -71,14 +71,23 @@ public:
 
     [[nodiscard]] const glm::mat4& getModelMatrix() const;
     [[nodiscard]] glm::mat4 getVirtualVPMatrix(const AppCamera& camera) const;
+    [[nodiscard]] glm::mat4
+    getVirtualVPMatrix(const AppCamera& camera, const glm::vec3& toPortal) const;
     [[nodiscard]] glm::vec3 getVirtualCameraPosition(const AppCamera& camera) const;
+    [[nodiscard]] glm::vec3
+    getVirtualCameraPosition(const AppCamera& camera, const glm::vec3& toPortal) const;
     [[nodiscard]] glm::vec3 getVirtualCameraDirection(const AppCamera& camera) const;
+    [[nodiscard]] glm::vec3
+    getVirtualCameraDirection(const AppCamera& camera, const glm::vec3& toPortal) const;
     [[nodiscard]] std::size_t getDestinationNode() const;
     [[nodiscard]] glm::vec3 getTargetPosition() const;
+    [[nodiscard]] glm::vec3 getCenterPoint() const;
     [[nodiscard]] glm::vec3 getTargetDirection() const;
     [[nodiscard]] float getWidth() const;
     [[nodiscard]] float getHeight() const;
     [[nodiscard]] glm::vec2 getSize() const;
+
+    void bindForFinalPass() const;
 
 private:
     Model* portalObject;
@@ -97,4 +106,7 @@ private:
     float width;
     float height;
     float lastScalarProjOnNormal = 0.0f;
+
+    GLuint texture;
+    GLuint fbo;
 };
