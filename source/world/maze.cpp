@@ -47,7 +47,7 @@ void Maze::update()
 
     if (needsRendererUpdate)
     {
-        // renderer->afterActiveNodeChange();
+         renderer->afterActiveNodeChange();
     }
 }
 

@@ -210,7 +210,7 @@ int App::mainLoop()
             glm::vec3(1.0f, 0.0f, 0.0f),
             true);
 
-    /* maze.addNode()
+   /* maze.addNode()
          ->addBox(
              10,
              10,
@@ -219,8 +219,8 @@ int App::mainLoop()
              glm::vec3(0.0f, 0.0f, 1.0f),
              glm::vec3(-10.0f, 0.0f, -10.0f),
              glm::vec3(0.2f, 0.2f, 1.0f))
-         ->addPointLight(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(1.0f), 50, true)
-         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.2f))
+         ->addPointLight(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(1.0f), 20, false)
+         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.1f))
          ->addPortal(
              1,
              glm::vec3(0.5f, 2.0f, 5.0f - bias),
@@ -240,8 +240,8 @@ int App::mainLoop()
              glm::vec3(0.0f, 0.0f, 1.0f),
              glm::vec3(-10.0f, 0.0f, -10.0f),
              glm::vec3(0.2f, 0.9f, 0.2f))
-         ->addPointLight(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(1.0f), 50, true)
-         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.2f))
+         ->addPointLight(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(1.0f), 20, false)
+         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.1f))
          ->addPortal(
              2,
              glm::vec3(0.5f, 2.0f, 5.0f - bias),
@@ -260,8 +260,8 @@ int App::mainLoop()
              glm::vec3(0.0f, 0.0f, 1.0f),
              glm::vec3(-10.0f, 0.0f, -10.0f),
              glm::vec3(0.9f, 0.2f, 0.2f))
-         ->addPointLight(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(1.0f), 50, true)
-         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.2f))
+         ->addPointLight(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(1.0f), 20, false)
+         ->setDirectionalLight(glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.1f))
          ->addPortal(
              0,
              glm::vec3(0.5f, 2.0f, 5.0f - bias),
