@@ -307,6 +307,11 @@ glm::vec3 Portal::getVirtualCameraDirection(const AppCamera& camera) const
            up * dirScalarProjOnUp;
 }
 
+void Portal::changeDestination(std::size_t dest)
+{
+    target = dest;
+}
+
 glm::vec3
 Portal::getVirtualCameraDirection(const AppCamera& camera, const glm::vec3& toPortal) const
 {

@@ -87,6 +87,8 @@ public:
     [[nodiscard]] float getHeight() const;
     [[nodiscard]] glm::vec2 getSize() const;
 
+    void changeDestination(std::size_t dest);
+
     void bindForFinalPass() const;
 
 private:
