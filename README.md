@@ -1,5 +1,5 @@
 # Doomed
-A game about a maze that does not follow the rules of your mind.
+A buggy game about a maze that does not follow the rules Euclidean space.
 
 # How to Build
 
