@@ -1,5 +1,5 @@
 # Doomed
-A buggy game about a maze that does not follow the rules Euclidean space.
+A little buggy engine supporting deferred shading and portals.
 
 # How to Build
 
